@@ -371,6 +371,6 @@ Apache-2.0，商用友好，含明确专利授权。
 
 <div align="center">
 
-<sub>Built with 🐼 by <a href="https://github.com/GeniusDapeng">GeniusDapeng</a> · The first skill engine that speaks <b>AI-to-AI</b> in filmmaking.</sub>
+<sub>Built with 🐼 by <a href="https://github.com/GeniusDapeng">GeniusDapeng</a> · The first skill engine that speaks <b>AI-to-AI</b> in filmmaking. · <a href="./AUTHORS.md">About the Author</a></sub>
 
 </div>
