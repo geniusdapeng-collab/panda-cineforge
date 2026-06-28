@@ -1,0 +1,14 @@
+# Optional dependencies — PandaCineForge degrades gracefully if any are missing
+# Install all for full functionality:
+#   pip install -r requirements.txt
+
+# External knowledge fetching (web crawling + search)
+scrapling[all]>=0.1.0
+
+# LLM + embeddings
+openai>=1.0.0
+
+# Structured processing
+pyyaml>=6.0
+jsonschema>=4.0.0
+jinja2>=3.0.0
