@@ -1,0 +1,19 @@
+{
+  "name": "panda-cineforge",
+  "version": "1.0.0",
+  "description": "AI Agent-native skill generation engine for cinematic storytelling",
+  "type": "skill",
+  "author": "GeniusDapeng",
+  "license": "MIT",
+  "homepage": "https://github.com/geniusdapeng-collab/panda-cineforge",
+  "repository": "https://github.com/geniusdapeng-collab/panda-cineforge.git",
+  "keywords": ["ai-agent", "skill-engine", "ai-cinema", "film-production", "cinematic"],
+  "entryPoints": {
+    "skill": "./panda_cineforge.skill.md",
+    "mcp": "./mcp-server/index.py"
+  },
+  "compatibility": {
+    "openclaw": ">=1.0.0",
+    "claudeCode": ">=0.1.0"
+  }
+}

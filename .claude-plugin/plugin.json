@@ -1,0 +1,42 @@
+{
+  "name": "panda-cineforge",
+  "version": "1.0.0",
+  "description": "AI Agent-native skill generation engine for cinematic storytelling — turn AI agents into world-class film producers, for free",
+  "type": "skill",
+  "command": "panda-cineforge",
+  "keywords": [
+    "ai-agent", "ai-agents", "skill-engine", "skill-generation",
+    "ai-cinema", "ai-filmmaking", "ai-video", "film-production",
+    "cinematic", "agent-framework", "llm", "rag",
+    "prompt-engineering", "openclaw", "video-production",
+    "ai-manga-drama", "content-creation"
+  ],
+  "author": {
+    "name": "GeniusDapeng",
+    "url": "https://github.com/geniusdapeng-collab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/geniusdapeng-collab/panda-cineforge",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geniusdapeng-collab/panda-cineforge.git"
+  },
+  "claudeCode": {
+    "type": "skill",
+    "command": "panda-cineforge",
+    "workloadProfiles": ["creative", "production", "research"]
+  },
+  "mcp": {
+    "server": "./mcp-server/index.py"
+  },
+  "skills": [
+    {
+      "name": "skill-generation",
+      "description": "Generate structured AI agent skills for cinematic video production"
+    },
+    {
+      "name": "cinematic-storytelling",
+      "description": "End-to-end film production skill design from concept to render"
+    }
+  ]
+}
