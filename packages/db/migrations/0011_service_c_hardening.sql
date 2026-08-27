@@ -3,7 +3,7 @@
 --    口径与 0010 同：workspace_id + RLS（app.workspace_id 连接级隔离）+ 双角色授权；
 -- ② H8 版本链幂等：kb_documents 加 UNIQUE(workspace_id, hash)（同内容指纹不重复建版，NULL 不冲突）。
 
--- ---------- 酒店演示会员（biz-hotel 适配器数据源；演示数据，真实部署换挂业务库） ----------
+-- ---------- 电商演示会员（biz-hotel 适配器数据源；演示数据，真实部署换挂业务库） ----------
 CREATE TABLE IF NOT EXISTS demo_members (
   member_id     TEXT PRIMARY KEY,
   workspace_id  TEXT NOT NULL REFERENCES workspaces(id),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS demo_members (
 );
 CREATE INDEX IF NOT EXISTS idx_demo_members_ws ON demo_members (workspace_id, member_id);
 
--- ---------- 酒店演示订单 ----------
+-- ---------- 电商演示订单 ----------
 CREATE TABLE IF NOT EXISTS demo_orders (
   order_id      TEXT PRIMARY KEY,
   workspace_id  TEXT NOT NULL REFERENCES workspaces(id),

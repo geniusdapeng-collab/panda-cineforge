@@ -41,7 +41,7 @@ d("PG 集成记忆（种子库）", async () => {
   const { upsertMemory, searchMemories, recordMemoryUsage, getMemorySources, transitionMemory } =
     await import("./memory.js");
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   const embedder = new MockEmbedder();
 
   const RUN = Date.now().toString(36); // 唯一后缀：同一数据库可重跑（集成测试不留跨轮污染）

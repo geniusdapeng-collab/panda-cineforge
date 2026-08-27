@@ -56,7 +56,7 @@ function wireDialogDb(db: FakeDb): FakeDb {
 
 function hit(content: string, score: number, over: Partial<KbSearchHit> = {}): KbSearchHit {
   return {
-    content, heading: "住客须知 / 退房时间", documentTitle: "熊猫优选集团住客服务须知",
+    content, heading: "买家须知 / 退货时间", documentTitle: "熊猫优选集团买家服务须知",
     documentId: "kbd-1", score, ...over,
   };
 }
@@ -76,7 +76,7 @@ function base(cUserId = "cu-1") {
 
 describe("B1 意图路由 · 规则表优先级", () => {
   it("complaint：投诉关键词直判", () => {
-    expect(ruleBasedIntent("我要投诉，房间卫生差")).toBe("complaint");
+    expect(ruleBasedIntent("我要投诉，商品质量差")).toBe("complaint");
   });
 
   it("complaint 优先于 biz_query（同句含订单词）", () => {
@@ -91,44 +91,44 @@ describe("B1 意图路由 · 规则表优先级", () => {
     expect(ruleBasedIntent("我的会员积分还有多少余额")).toBe("biz_query");
   });
 
-  it("biz_query：房价查询（房型词+多少钱）", () => {
-    expect(ruleBasedIntent("豪华大床房多少钱一晚")).toBe("biz_query"); // 含房型词「大床房」→ 业务查询
-    expect(ruleBasedIntent("房价多少")).toBe("biz_query");
+  it("biz_query：售价查询（业务词+多少钱）", () => {
+    expect(ruleBasedIntent("这件商品售价多少钱")).toBe("biz_query"); // 含业务词「售价」→ 业务查询
+    expect(ruleBasedIntent("售价多少")).toBe("biz_query");
   });
 
-  it("kb_qa：非房语境的价格疑问走知识库（面膜多少钱/加床多少钱）", () => {
+  it("kb_qa：非订单语境的价格疑问走知识库（面膜多少钱/加购多少钱）", () => {
     expect(ruleBasedIntent("面膜多少钱")).toBe("kb_qa");
-    expect(ruleBasedIntent("加床一张多少钱")).toBe("kb_qa"); // 评测校准：无房语境不触发房价查询
+    expect(ruleBasedIntent("加购一份多少钱")).toBe("kb_qa"); // 评测校准：无订单语境不触发售价查询
   });
 
   it("疑问句优先 kb_qa 不建单（含服务词「送」）", () => {
-    expect(ruleBasedIntent("送站巴士几点发车")).toBe("kb_qa");
+    expect(ruleBasedIntent("配送车辆几点发车")).toBe("kb_qa");
   });
 
   it("疑问句标记：吗/呢/怎么/如何/时间/什么时候", () => {
     expect(ruleBasedIntent("可以带宠物吗")).toBe("kb_qa");
-    expect(ruleBasedIntent("停车场怎么收费呢")).toBe("kb_qa");
-    expect(ruleBasedIntent("如何办理入住")).toBe("kb_qa");
-    expect(ruleBasedIntent("健身房开放时间")).toBe("kb_qa");
+    expect(ruleBasedIntent("自提柜怎么收费呢")).toBe("kb_qa");
+    expect(ruleBasedIntent("如何办理退货")).toBe("kb_qa");
+    expect(ruleBasedIntent("自提点开放时间")).toBe("kb_qa");
   });
 
   it("修坏了直连 service_request（疑问句也不拦）", () => {
-    expect(ruleBasedIntent("空调坏了帮我修一下")).toBe("service_request");
-    expect(ruleBasedIntent("马桶漏水了")).toBe("service_request");
-    expect(ruleBasedIntent("热水器不制热怎么回事")).toBe("kb_qa"); // 「怎么回事」是诊断疑问 → kb_qa（未覆盖则拒答+工单草稿，评测校准口径）
+    expect(ruleBasedIntent("冰柜坏了帮我修一下")).toBe("service_request");
+    expect(ruleBasedIntent("水管漏水了")).toBe("service_request");
+    expect(ruleBasedIntent("冰柜不制冷怎么回事")).toBe("kb_qa"); // 「怎么回事」是诊断疑问 → kb_qa（未覆盖则拒答+工单草稿，评测校准口径）
   });
 
-  it("指令型服务词 → service_request（送/拿/打扫/换床单/开发票/续住）", () => {
+  it("指令型服务词 → service_request（送/拿/补货/换货/开发票/续费）", () => {
     expect(ruleBasedIntent("帮我送两瓶矿泉水")).toBe("service_request");
-    expect(ruleBasedIntent("房间需要打扫")).toBe("service_request");
+    expect(ruleBasedIntent("库房需要补货")).toBe("service_request");
     expect(ruleBasedIntent("帮我开发票")).toBe("service_request");
-    expect(ruleBasedIntent("我要续住一晚")).toBe("service_request");
+    expect(ruleBasedIntent("我要续费一年")).toBe("service_request");
   });
 
-  it("kb_qa：政策/早餐/wifi/停车/退房/入住类问句", () => {
-    expect(ruleBasedIntent("早餐几点开始")).toBe("kb_qa");
-    expect(ruleBasedIntent("wifi 密码是什么")).toBe("kb_qa");
-    expect(ruleBasedIntent("退房时间政策")).toBe("kb_qa");
+  it("kb_qa：政策/发货/运费/退货类问句", () => {
+    expect(ruleBasedIntent("发货几点开始")).toBe("kb_qa");
+    expect(ruleBasedIntent("物流时效怎么计算")).toBe("kb_qa");
+    expect(ruleBasedIntent("退货时间政策")).toBe("kb_qa");
   });
 
   it("规则未命中 → null（闲聊交 LLM/兜底）", () => {
@@ -196,21 +196,21 @@ describe("B2 置信度三档 · 0.72 / 0.5 临界值", () => {
 /* ================= B3. 工具/类型映射纯函数 ================= */
 
 describe("B3 映射 · 工单类型与业务工具", () => {
-  it("ticketKindForServiceRequest：修/坏/漏水/空调 → repair", () => {
-    expect(ticketKindForServiceRequest("马桶漏水了")).toBe("repair");
-    expect(ticketKindForServiceRequest("电视坏了")).toBe("repair");
+  it("ticketKindForServiceRequest：修/坏/漏水/冰柜 → repair", () => {
+    expect(ticketKindForServiceRequest("水管漏水了")).toBe("repair");
+    expect(ticketKindForServiceRequest("冰柜坏了")).toBe("repair");
   });
 
-  it("ticketKindForServiceRequest：送/拿/打扫/多要 → delivery", () => {
-    expect(ticketKindForServiceRequest("送两条毛巾")).toBe("delivery");
-    expect(ticketKindForServiceRequest("多要一床被子")).toBe("delivery");
+  it("ticketKindForServiceRequest：送/拿/补货/多要 → delivery", () => {
+    expect(ticketKindForServiceRequest("送两箱样品")).toBe("delivery");
+    expect(ticketKindForServiceRequest("多要一箱赠品")).toBe("delivery");
   });
 
   it("ticketKindForServiceRequest：其余 → other", () => {
-    expect(ticketKindForServiceRequest("帮我安排安静房间")).toBe("other");
+    expect(ticketKindForServiceRequest("帮我安排加急发货")).toBe("other");
   });
 
-  it("bizToolFor：账单/房费/押金/发票 → query_bill", () => {
+  it("bizToolFor：账单/运费/发票 → query_bill", () => {
     expect(bizToolFor("我的账单呢", "u1")).toEqual({ tool: "biz.query_bill", params: { cUserId: "u1" } });
   });
 
@@ -229,13 +229,13 @@ describe("B4 handleMessage · kb_qa 三档分流", () => {
   it("高置信（0.9）直答：答案含内容与来源，citations 非空，tier=high", async () => {
     const db = wireDialogDb(new FakeDb());
     const r = await handleMessage(
-      { db, search: async () => [hit("退房时间为中午十二点前", 0.9)] },
-      { ...base(), text: "退房时间是几点" },
+      { db, search: async () => [hit("退货时限为签收后七天", 0.9)] },
+      { ...base(), text: "退货时限是多久" },
     );
     expect(r.intent).toBe("kb_qa");
     expect(r.tier).toBe("high");
-    expect(r.answer).toContain("退房时间为中午十二点前");
-    expect(r.answer).toContain("来源：熊猫优选集团住客服务须知");
+    expect(r.answer).toContain("退货时限为签收后七天");
+    expect(r.answer).toContain("来源：熊猫优选集团买家服务须知");
     expect(r.citations.length).toBeGreaterThan(0);
     expect(r.confidence).toBe(0.9);
     expect(r.ticketDraft).toBeUndefined();
@@ -244,8 +244,8 @@ describe("B4 handleMessage · kb_qa 三档分流", () => {
   it("中置信（0.6）附「可能不完全准确」提示", async () => {
     const db = wireDialogDb(new FakeDb());
     const r = await handleMessage(
-      { db, search: async () => [hit("早餐七点到十点", 0.6)] },
-      { ...base(), text: "早餐几点" },
+      { db, search: async () => [hit("发货每日十七点截止", 0.6)] },
+      { ...base(), text: "发货几点" },
     );
     expect(r.tier).toBe("medium");
     expect(r.answer).toContain("可能不完全准确");
@@ -270,7 +270,7 @@ describe("B4 handleMessage · kb_qa 三档分流", () => {
     const db = wireDialogDb(new FakeDb());
     const r = await handleMessage(
       { db, search: async () => [] },
-      { ...base(), text: "早餐几点开始" },
+      { ...base(), text: "发货几点开始" },
     );
     expect(r.tier).toBe("low");
     expect(r.confidence).toBeNull();
@@ -281,10 +281,10 @@ describe("B4 handleMessage · kb_qa 三档分流", () => {
     const db = wireDialogDb(new FakeDb());
     const r = await handleMessage(
       { db, search: async () => [hit("内容".repeat(100), 0.85)] },
-      { ...base(), text: "退房时间" },
+      { ...base(), text: "退货时间" },
     );
     const c = r.citations[0]!;
-    expect(c).toMatchObject({ documentId: "kbd-1", documentTitle: "熊猫优选集团住客服务须知", heading: "住客须知 / 退房时间" });
+    expect(c).toMatchObject({ documentId: "kbd-1", documentTitle: "熊猫优选集团买家服务须知", heading: "买家须知 / 退货时间" });
     expect(typeof c.score).toBe("number");
     expect(c.snippet.length).toBeLessThanOrEqual(120);
   });
@@ -293,21 +293,21 @@ describe("B4 handleMessage · kb_qa 三档分流", () => {
 describe("B4 handleMessage · complaint / service_request / biz_query / chat", () => {
   it("complaint：高优先级工单草稿 + 致歉文案（confidence=1 规则源）", async () => {
     const db = wireDialogDb(new FakeDb());
-    const r = await handleMessage({ db }, { ...base(), text: "我要投诉，房间太吵了" });
+    const r = await handleMessage({ db }, { ...base(), text: "我要投诉，包装有破损" });
     expect(r.intent).toBe("complaint");
     expect(r.confidence).toBe(1);
     expect(r.ticketDraft).toMatchObject({ kind: "complaint", priority: "high" });
-    expect(r.answer).toContain("值班经理");
+    expect(r.answer).toContain("客服主管");
   });
 
   it("service_request 报修 → repair 草稿", async () => {
     const db = wireDialogDb(new FakeDb());
-    const r = await handleMessage({ db }, { ...base(), text: "空调坏了帮我修一下" });
+    const r = await handleMessage({ db }, { ...base(), text: "冰柜坏了帮我修一下" });
     expect(r.intent).toBe("service_request");
     expect(r.ticketDraft).toMatchObject({ kind: "repair", priority: "normal" });
   });
 
-  it("service_request 送物 → delivery 草稿", async () => {
+  it("service_request 配送 → delivery 草稿", async () => {
     const db = wireDialogDb(new FakeDb());
     const r = await handleMessage({ db }, { ...base(), text: "帮我送两瓶矿泉水" });
     expect(r.ticketDraft).toMatchObject({ kind: "delivery" });
@@ -318,7 +318,7 @@ describe("B4 handleMessage · complaint / service_request / biz_query / chat", (
     const r = await handleMessage({ db }, { ...base(), text: "我的订单查一下" });
     expect(r.intent).toBe("biz_query");
     expect(r.bizTool).toEqual({ tool: "biz.query_orders", params: { cUserId: "cu-1" } });
-    expect(r.answer).not.toContain("豪华大床房"); // 不碰业务数据
+    expect(r.answer).not.toContain("豪华礼盒装"); // 不碰业务数据
   });
 
   it("chat 无 LLM：确定性 mock 应答（mock:true + degraded + confidence 0.3）", async () => {
@@ -346,15 +346,15 @@ describe("B4 handleMessage · complaint / service_request / biz_query / chat", (
 describe("B4 handleMessage · 会话与留痕", () => {
   it("无 conversationId → 新建会话（CCV 前缀）", async () => {
     const db = wireDialogDb(new FakeDb());
-    const r = await handleMessage({ db }, { ...base(), text: "我要投诉噪音" });
+    const r = await handleMessage({ db }, { ...base(), text: "我要投诉破损" });
     expect(r.conversationId).toMatch(/^CCV/);
     expect(db.table("c_conversations")).toHaveLength(1);
   });
 
   it("conversationId 续聊 → 复用同一会话", async () => {
     const db = wireDialogDb(new FakeDb());
-    const r1 = await handleMessage({ db }, { ...base(), text: "我要投诉噪音" });
-    const r2 = await handleMessage({ db }, { ...base(), text: "而且卫生也差", conversationId: r1.conversationId });
+    const r1 = await handleMessage({ db }, { ...base(), text: "我要投诉破损" });
+    const r2 = await handleMessage({ db }, { ...base(), text: "而且服务也差", conversationId: r1.conversationId });
     expect(r2.conversationId).toBe(r1.conversationId);
     expect(db.table("c_conversations")).toHaveLength(1);
   });
@@ -367,8 +367,8 @@ describe("B4 handleMessage · 会话与留痕", () => {
 
   it("多轮消息落库：两轮后 2 条 user + 2 条 assistant", async () => {
     const db = wireDialogDb(new FakeDb());
-    const r1 = await handleMessage({ db }, { ...base(), text: "我要投诉噪音" });
-    await handleMessage({ db }, { ...base(), text: "卫生也差", conversationId: r1.conversationId });
+    const r1 = await handleMessage({ db }, { ...base(), text: "我要投诉破损" });
+    await handleMessage({ db }, { ...base(), text: "服务也差", conversationId: r1.conversationId });
     const msgs = db.table("c_messages");
     expect(msgs.filter((m) => m["role"] === "user")).toHaveLength(2);
     expect(msgs.filter((m) => m["role"] === "assistant")).toHaveLength(2);
@@ -378,7 +378,7 @@ describe("B4 handleMessage · 会话与留痕", () => {
     const db = wireDialogDb(new FakeDb());
     await handleMessage(
       { db, search: async () => [hit("内容", 0.9)] },
-      { ...base(), text: "退房时间" },
+      { ...base(), text: "退货时间" },
     );
     const assistant = db.table("c_messages").find((m) => m["role"] === "assistant")!;
     expect(assistant["intent"]).toBe("kb_qa");
@@ -399,7 +399,7 @@ describe("B4 handleMessage · 会话与留痕", () => {
     const sink: Array<{ action: string; draft: ServiceEventDraft }> = [];
     const r: HandleMessageResult = await handleMessage(
       { db, emit: memoryEmit(sink), search: async () => [hit("内容", 0.9)] },
-      { ...base(), text: "退房时间" },
+      { ...base(), text: "退货时间" },
     );
     expect(sink).toHaveLength(1);
     expect(sink[0]!.action).toBe("service.message.handle");

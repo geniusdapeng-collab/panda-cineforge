@@ -103,9 +103,9 @@ describe("契约 · member / orders / notifications（H6）", () => {
 describe("契约 · 工单（H1/H2/H6/L9/M9）", () => {
   it("建单 → {ticket:{id,kind,title,status,statusText}}；同键重放 idempotentReplay 且同 id", async () => {
     const { token } = await makeSession(`${RUN}-t`);
-    const body = JSON.stringify({ kind: "repair", title: "契约测试-水龙头漏水", payload: { room: "9999" }, idempotencyKey: `${RUN}-t1` });
+    const body = JSON.stringify({ kind: "repair", title: "契约测试-耳机无法开机", payload: { orderId: "OD-DEMO-1" }, idempotencyKey: `${RUN}-t1` });
     const r1 = (await (await req("/tickets", { method: "POST", body }, token)).json()) as { ticket: Record<string, unknown> };
-    expect(r1.ticket).toMatchObject({ kind: "repair", title: "契约测试-水龙头漏水", status: "assigned", statusText: "已受理" });
+    expect(r1.ticket).toMatchObject({ kind: "repair", title: "契约测试-耳机无法开机", status: "assigned", statusText: "已受理" });
     expect(typeof r1.ticket.id).toBe("string");
 
     const r2 = (await (await req("/tickets", { method: "POST", body }, token)).json()) as { ticket: { id: string }; idempotentReplay?: boolean };
@@ -122,7 +122,7 @@ describe("契约 · 工单（H1/H2/H6/L9/M9）", () => {
     const { token } = await makeSession(`${RUN}-r`);
     const created = (await (await req("/tickets", {
       method: "POST",
-      body: JSON.stringify({ kind: "delivery", title: "契约测试-送水", payload: {}, idempotencyKey: `${RUN}-r1` }),
+      body: JSON.stringify({ kind: "delivery", title: "契约测试-催发货", payload: {}, idempotencyKey: `${RUN}-r1` }),
     }, token)).json()) as { ticket: { id: string } };
     const rate = await req(`/tickets/${created.ticket.id}/rate`, { method: "POST", body: JSON.stringify({ score: 5 }) }, token);
     expect(rate.status).toBe(409);
@@ -147,7 +147,7 @@ describe("契约 · chat（H5/H6/M9）", () => {
     const { token } = await makeSession(`${RUN}-c`);
     const r = (await (await req("/chat", {
       method: "POST",
-      body: JSON.stringify({ text: "退房时间是几点？" }),
+      body: JSON.stringify({ text: "退货期限是多久？" }),
     }, token)).json()) as Record<string, unknown>;
     expect(r).toMatchObject({ intent: "kb_qa" });
     expect(typeof r.answer).toBe("string");
@@ -156,7 +156,7 @@ describe("契约 · chat（H5/H6/M9）", () => {
     expect(conf).toBeLessThanOrEqual(1);
     expect((r.citations as unknown[]).length).toBeGreaterThan(0);
     for (const card of (r.cards ?? []) as Array<{ kind: string; data: unknown }>) {
-      expect(["order", "member", "catalog"]).toContain(card.kind);
+      expect(["order", "member", "catalog", "product", "guide"]).toContain(card.kind);
       expect(typeof card.data).toBe("object");
     }
   });

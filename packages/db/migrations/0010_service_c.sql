@@ -105,7 +105,7 @@ CREATE TABLE c_tickets (                                          -- 工单（�
   workspace_id     TEXT NOT NULL REFERENCES workspaces(id),
   c_user_id        TEXT REFERENCES c_users(id),
   conversation_id  TEXT,
-  kind             TEXT NOT NULL,                                 -- delivery/repair/complaint/other（酒店预置）
+  kind             TEXT NOT NULL,                                 -- delivery/repair/complaint/other（电商预置）
   title            TEXT NOT NULL,
   payload          JSONB NOT NULL DEFAULT '{}',
   status           TEXT NOT NULL DEFAULT 'created'

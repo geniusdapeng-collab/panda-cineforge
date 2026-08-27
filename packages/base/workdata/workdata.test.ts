@@ -18,7 +18,7 @@ import { canonicalJson, eventHash, GENESIS_HASH, isReplayEventId } from "./event
 
 const draft = (action: string, whoId = "pricing-agent") => ({
   who: { type: "agent" as const, id: whoId, version: "v2.3" },
-  context: { tenant_id: "tenant-demo", workspace_id: "ws-yunqi", time: "2026-08-16T22:10:00+08:00" },
+  context: { tenant_id: "tenant-demo", workspace_id: "ws-demo", time: "2026-08-16T22:10:00+08:00" },
   object: { type: "room_price", id: "RT-DLX-KING" },
   decision: { action },
   rule_impact: [],
@@ -106,7 +106,7 @@ describe("权限段①（F2.10/L9.1 复查位）", () => {
 
 describe("高风险授权段③（L3.5 + P1-8 验真）", () => {
   const desktop = { id: "desktop-agent", type: "agent" as const, highRisk: true, fenceBindings: ["R2"] };
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   /** 审批表桩：模拟 approvals 查询结果（P1-8 段③已改为查表验真） */
   const stubDb = (rows: Array<{ status: string; snapshot: unknown }>) =>
     ({ query: async () => ({ rows }) }) as unknown as GatewayQueryable;
@@ -187,7 +187,7 @@ d("PG 集成（H-2/L1.4：幂等丢弃、哈希链序）", async () => {
   const pg = (await import("pg")).default;
   const { gatewayAppend, gatewayAppendIdempotent } = await import("./gateway.js");
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   const ctx = { ...scope, actor: { id: "pricing-agent", type: "agent" as const, fenceBindings: ["R1", "R2"] } };
 
   /** 读侧辅助：RLS 要求会话级 workspace 上下文（L7.1），否则返回空 */

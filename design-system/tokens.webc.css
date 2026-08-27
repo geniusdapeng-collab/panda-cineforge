@@ -1,6 +1,6 @@
 /**
  * C 端「AI 服务前台」设计令牌（默认主题：深空底 #0a1230 + 暗金 #e9b558，可在 service-front.config.json 换色）
- * 与 B 端舰桥同族视觉：深空底 #0a1230 + 酒店金 #e9b558
+ * 与 B 端舰桥同族视觉：深空底 #0a1230 + 品牌金 #e9b558
  * Tailwind v4 令牌制：只写 @theme，无 tailwind.config.js
  */
 @import "tailwindcss";

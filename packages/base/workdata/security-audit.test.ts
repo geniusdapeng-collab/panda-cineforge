@@ -12,7 +12,7 @@ describe.runIf(RUN_DB)("安全审计 PG 集成（附录 H）", async () => {
   const { gatewayAppend } = await import("./gateway.js");
   const app = new pg.default.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.default.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
 
   /** 断言查询辅助：事务内设 RLS 上下文（与生产口径一致；池直查在 RLS 下恒 0 行，断言会假绿/假红） */
   const qApp = async <T extends Record<string, any> = Record<string, any>>(sql: string, params: unknown[] = []) => {

@@ -10,7 +10,7 @@ description: 天猫旗舰店店长。对店铺 GMV 与毛利负责，统管活�
 readonly: false
 night_shift: true           # 夜班窗口内自动上线（R16 白名单自治）
 high_risk: false
-fence_bindings: [R8, R16, R17, R29]   # 新店首发必审 / 夜班白名单 / 夜班调价≤3% / 账号绩效越限整改
+fence_bindings: [R1, R2, R8, R16, R17, R29]   # 降价自动上限 / 毛利红线熔断 / 新店首发必审 / 夜班白名单 / 夜班调价≤3% / 账号绩效越限整改
 skills: [shop-health-check, activity-enroll, platform-rule-track]
 tools:
   - { name: tmall.order.read, access: read,  desc: 读取天猫订单与成交明细 }

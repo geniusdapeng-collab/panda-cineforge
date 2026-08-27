@@ -2,7 +2,7 @@
  * A5 · 演示种子数据（PRD V2.5 P 章示例场景：熊猫优选集团）
  * 用法：pnpm db:seed（读取 .env；幂等，可重复执行）
  *
- * 内容：demo 租户 / 熊猫优选集团工作区 / 3 人类成员（创始人·董事长/运营总监/财务总监）/ 81 Agent preset 实例 /
+ * 内容：demo 租户 / 熊猫优选集团工作区 / 3 人类成员（创始人·董事长/运营总监/财务总监）/ Agent preset 实例 /
  *      集团一档 + 14 店铺档案（含 forbidden 硬约束 + 价格带/毛利红线/广告红线/客服SLA 字段组）/
  *      基线围栏 R1–R30（ecom-baseline/v1）装载 / 160 官方技能 /
  *      10 触发器 / 昨夜夜班班次 / 100 条五元事件（哈希链，含 5 条经营剧情链 + 勾稽约束）/ 审批样例 / 组织记忆
@@ -39,7 +39,7 @@ const GATEWAY_URL =
 
 const TENANT_ID = "tenant-demo";
 const TENANT_NAME = "演示租户（Demo）";
-const WS_ID = "ws-yunqi";
+const WS_ID = "ws-panda";
 const WS_NAME = "熊猫优选集团";
 const WS_SLUG = "panda-group";
 const FENCE_VERSION = "ecom-baseline/v1"; // 与 bundles/ecommerce/fences/ecom-baseline.yml 的 version 一致
@@ -154,32 +154,9 @@ function loadSkills(): SkillDoc[] {
       const raw = readFileSync(join(dir, d, "SKILL.md"), "utf-8");
       const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
       const fm = YAML.parse(m?.[1] ?? "{}");
+      // 技能→围栏绑定映射（与 SKILL.md「边界与围栏」节声明同源；未列出的技能绑定为空）
       const bindMap: Record<string, string[]> = {
-        "revenue-manager": ["R1", "R2", "R7", "R8"],
-        "review-crisis": ["R6"],
-        "channel-reconciler": ["R4", "R5"],
-        "inspection-suite": [],
-        "night-audit-suite": ["R5"],
-        "checkin-checkout": ["R4", "R14"],
-        "customer-service": ["R13"],
-        "content-marketing": ["R3", "R15"],
-        "retention-manager": ["R9"],
-        "inventory-procurement": ["R11"],
-        "staff-scheduler": ["R12"],
-        "safety-compliance": ["R10"],
-        "finance-reporting": [],
-        "morning-briefing": [],
-        "handover-manager": [],
-        "pricing-matrix": ["R1", "R2"],
-        "review-asset-mining": [],
-        "room-service-dispatch": ["R14"],
-        "maintenance-dispatch": [],
-        "ai-live-assistant": ["R15", "R2"],
-        "ota-operations": [],
-        "guest-profile-crm": [],
-        "phone-concierge": ["R9", "R13"],
-        "overbooking-parity-guard": ["R17", "R18", "R2"],
-        "incident-postmortem": ["R10"],
+        "margin-guard": ["R1", "R2", "R30"], // 毛利红线守护：降价闸门/毛利红线/高危审批超时升级
       };
       return {
         name: String(fm.name ?? d),
@@ -312,7 +289,7 @@ function pandaArchive(): Record<string, unknown> {
       procurement_l4_line_usd: 100_000, // R20 ≥$10 万升 L4 同源
     },
     group_org: {
-      digital_army_size: 81, structure: "1+2+N：指挥层 4 / 共享中台 27 / 国内军 26 / 跨境军 24",
+      digital_army_size: 82, structure: "1+2+N：指挥层 4 / 共享中台 28（含巡检哨兵）/ 国内军 26 / 跨境军 24",
       human_members: ["MEM-001 董事长", "MEM-002 运营总监", "MEM-003 财务总监"],
       night_shift: "夜班班组主攻跨时区（美东/欧洲白天 = 北京 22:00-08:30）",
     },
@@ -1092,7 +1069,8 @@ async function main(): Promise<void> {
     await q(
       `INSERT INTO agents (id, workspace_id, preset_key, name, version, kind, readonly, fence_bindings, skills, status, meta)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'ready',$10)
-       ON CONFLICT (id) DO NOTHING`,
+       ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, version = EXCLUDED.version, kind = EXCLUDED.kind,
+         readonly = EXCLUDED.readonly, fence_bindings = EXCLUDED.fence_bindings, skills = EXCLUDED.skills, meta = EXCLUDED.meta`,
       [
         `agt-${p.preset_key}`,
         WS_ID,
@@ -1114,7 +1092,7 @@ async function main(): Promise<void> {
       ],
     );
   }
-  console.log(`✓ Agent 实例 ×${presets.length}（81 人数字军团 preset 全量实例化，L9.1）`);
+  console.log(`✓ Agent 实例 ×${presets.length}（数字军团 preset 全量实例化，L9.1）`);
 
   // 集团一档 + 14 店铺档案（槽①；forbidden 双写：archive 内 + 独立列，L1.6）
   // dataMode=simulated：落地向导（D24）横幅事实源——种子库即「全模拟运行态」，向导启用真实模式后翻转
@@ -1155,19 +1133,19 @@ async function main(): Promise<void> {
   }
   console.log(`✓ 基线围栏装载 ×${fences.length}（${FENCE_VERSION}，active）`);
 
-  // 官方技能 + 安装绑定（F8.1/F8.2）
+  // 官方技能 + 安装绑定（F8.1/F8.2；幂等且可纠偏：重跑同步最新 fence_bindings 与安装快照）
   for (const s of skillsDocs) {
     const skillId = `skill-${s.name}`;
     await q(
       `INSERT INTO skills (id, level, bundle, name, version, description, fence_bindings, body, desensitized)
        VALUES ($1,'official','ecommerce',$2,'1.0.0',$3,$4,$5,false)
-       ON CONFLICT (id) DO NOTHING`,
+       ON CONFLICT (id) DO UPDATE SET description = EXCLUDED.description, fence_bindings = EXCLUDED.fence_bindings, body = EXCLUDED.body`,
       [skillId, s.name, s.description, JSON.stringify(s.fenceBindings), s.body],
     );
     await q(
       `INSERT INTO skill_installs (skill_id, workspace_id, installed_by, installed_version, fence_bindings_snapshot)
        SELECT $1,$2,'MEM-001', s.version, s.fence_bindings FROM skills s WHERE s.id=$1
-       ON CONFLICT (skill_id, workspace_id) DO NOTHING`,
+       ON CONFLICT (skill_id, workspace_id) DO UPDATE SET installed_version = EXCLUDED.installed_version, fence_bindings_snapshot = EXCLUDED.fence_bindings_snapshot`,
       [skillId, WS_ID],
     );
   }
@@ -1176,7 +1154,7 @@ async function main(): Promise<void> {
   // 团队技能 + 行业共享技能（P6 装备库三区演示数据；F8.1 三级体系；幂等 ON CONFLICT）
   await q(
     `INSERT INTO skills (id, level, bundle, name, version, description, fence_bindings, body, desensitized)
-     VALUES ('skill-t-ws-yunqi-weekly-ops-review','team','ecommerce','周一经营复盘','1.2.0',
+     VALUES ('skill-t-ws-panda-weekly-ops-review','team','ecommerce','周一经营复盘','1.2.0',
              '每周一 08:00 自动汇总上周经营：GMV/毛利/ACoS/差评闭环/调价采纳率，产出复盘报告草稿（本工作区自建，F8.3 三要素零代码锻造）。',
              '[]',
              '# 周一经营复盘\n\n## 触发（何时用）\n每周一 08:00 定时触发。\n\n## 步骤（怎么做）\n1. 汇总上周 14 店 GMV 与毛利曲线（只读）。\n2. 汇总 ACoS、差评闭环与调价采纳率。\n3. 产出复盘报告草稿进 P4 待审。\n\n## 边界（什么不做）\n不直接改价、不直接回评价。',
@@ -1186,7 +1164,7 @@ async function main(): Promise<void> {
   );
   await q(
     `INSERT INTO skill_installs (skill_id, workspace_id, installed_by)
-     VALUES ('skill-t-ws-yunqi-weekly-ops-review',$1,'MEM-002') ON CONFLICT (skill_id, workspace_id) DO NOTHING`,
+     VALUES ('skill-t-ws-panda-weekly-ops-review',$1,'MEM-002') ON CONFLICT (skill_id, workspace_id) DO NOTHING`,
     [WS_ID],
   );
   await q(
@@ -1578,7 +1556,7 @@ async function main(): Promise<void> {
   console.log("✓ 买家服务前台运行态：买家×2 / 知识库集合×2+官网源 / 会话×2（含多模态截图）/ 工单×3（全状态+时间线）/ 通知×3");
 
   // ============ AI 服务前台 · 知识库全量预置（电商买家 FAQ · seed 内联数据） ============
-  // 说明：bundles/ecommerce/service-front 目录由他人负责改造，seed 不依赖其酒店 JSON，
+  // 说明：bundles/ecommerce/service-front 目录由他人负责改造，seed 不依赖其旧版 JSON，
   //      买家 FAQ/售后政策/物流说明在此内联（8 大类 48 问 + 政策详解 + 物流说明）。
   interface FaqCategory { key: string; docTitle: string; items: Array<{ q: string; a: string }> }
   const BUYER_FAQ: FaqCategory[] = [

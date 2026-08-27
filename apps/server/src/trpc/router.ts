@@ -2447,7 +2447,7 @@ const twinRouter = router({
       return queryEventsByActions(scopeOf(ctx.identity), input.actions, input.limit);
     }),
 
-  /** 单对象全链穿透（P13 订单/房间时间线：按 object.id 正序回放） */
+  /** 单对象全链穿透（P13 订单/商品时间线：按 object.id 正序回放） */
   objectTrail: protectedProcedure
     .input(z.object({ objectId: z.string().min(1).max(64), limit: z.number().int().min(1).max(100).default(50) }))
     .query(async ({ ctx, input }) => {

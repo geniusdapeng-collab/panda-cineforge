@@ -6,7 +6,7 @@
 import { describe, expect, it } from "vitest";
 import {
   aggregateBySource,
-  HOTEL_CHECKS,
+  DEFAULT_CHECKS,
   runChecks,
   type Finding,
   type InspectionSnapshot,
@@ -20,40 +20,40 @@ const RUN = Date.now().toString(36);
 
 const snapshot: InspectionSnapshot = {
   channels: [
-    { channel: `携程-${RUN}`, price: 480, parity: true, status: "online" },
-    { channel: `美团-${RUN}`, price: 480, parity: false, status: "online" },
-    { channel: `飞猪-${RUN}`, status: "offline" },
+    { channel: `天猫-${RUN}`, price: 480, parity: true, status: "online" },
+    { channel: `京东-${RUN}`, price: 480, parity: false, status: "online" },
+    { channel: `拼多多-${RUN}`, status: "offline" },
   ],
   roomStates: [
-    { roomType: `大床房-${RUN}`, synced: true },
-    { roomType: `双床房-${RUN}`, synced: false },
+    { roomType: `SKU-3C-${RUN}`, synced: true },
+    { roomType: `SKU-HM-${RUN}`, synced: false },
   ],
-  reviews: [{ id: `rv-${RUN}`, channel: "携程", score: 2 }],
+  reviews: [{ id: `rv-${RUN}`, channel: "天猫", score: 2 }],
   violations: [],
 };
 
-describe("巡检探针（F9.1 酒店四检，确定性）", () => {
+describe("巡检探针（F9.1 内置四检，确定性）", () => {
   it("渠道价格：offline 高优 / parity=false 中优 / 正常项", () => {
-    const findings = runChecks(HOTEL_CHECKS, snapshot);
+    const findings = runChecks(DEFAULT_CHECKS, snapshot);
     const price = findings.filter((f) => f.checkId === "chk-channel-price");
     expect(price).toHaveLength(3);
-    expect(price.find((f) => f.objectId === `飞猪-${RUN}`)).toMatchObject({ status: "anomaly", severity: "high" });
-    expect(price.find((f) => f.objectId === `美团-${RUN}`)).toMatchObject({ status: "anomaly", severity: "medium" });
-    expect(price.find((f) => f.objectId === `携程-${RUN}`)).toMatchObject({ status: "ok" });
+    expect(price.find((f) => f.objectId === `拼多多-${RUN}`)).toMatchObject({ status: "anomaly", severity: "high" });
+    expect(price.find((f) => f.objectId === `京东-${RUN}`)).toMatchObject({ status: "anomaly", severity: "medium" });
+    expect(price.find((f) => f.objectId === `天猫-${RUN}`)).toMatchObject({ status: "ok" });
   });
 
   it("差评 ≤3 分高优；违规列表空=正常；快照缺项=nodata 不计正常", () => {
-    const findings = runChecks(HOTEL_CHECKS, snapshot);
+    const findings = runChecks(DEFAULT_CHECKS, snapshot);
     expect(findings.find((f) => f.objectId === `rv-${RUN}`)).toMatchObject({ status: "anomaly", severity: "high" });
     expect(findings.find((f) => f.checkId === "chk-violation")).toMatchObject({ status: "ok" });
-    const nodata = runChecks(HOTEL_CHECKS, {});
+    const nodata = runChecks(DEFAULT_CHECKS, {});
     expect(nodata.every((f) => f.status === "nodata")).toBe(true);
   });
 });
 
 describe("同源聚合（E9.2）与去重键（L9.3）", () => {
   it("同 source 异常合并为一条摘要，严重度取最高", () => {
-    const groups = aggregateBySource(runChecks(HOTEL_CHECKS, snapshot));
+    const groups = aggregateBySource(runChecks(DEFAULT_CHECKS, snapshot));
     const priceGroup = groups.find((g) => g.source === "channel_price");
     expect(priceGroup).toMatchObject({ count: 2, severity: "high" });
     expect(groups.find((g) => g.source === "review")).toMatchObject({ count: 1, severity: "high" });
@@ -86,7 +86,7 @@ describe.runIf(RUN_DB)("巡检 PG 集成（M9 铁律）", async () => {
   const { runInspectionScan, inspectionStatusBar, dispatchFromAnomaly, resolveAnomaly } = await import("./index.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   /** app 池断言查询辅助：事务内设 RLS 上下文（与生产口径一致；池直查在 RLS 下恒 0 行） */
   const qApp = async <T extends Record<string, any> = Record<string, any>>(sql: string, params: unknown[] = []) => {
     const c = await app.connect();
@@ -109,9 +109,9 @@ describe.runIf(RUN_DB)("巡检 PG 集成（M9 铁律）", async () => {
   it("L9.1 只读前置通过 + F9.2 异常分级事件 + G3 高优推送 + F9.4 状态条", async () => {
     const report = await runInspectionScan(app, gw, scope, { snapshot });
     expect(report.ok).toBe(true);
-    expect(report.anomalies.filter((a) => !a.deduped)).toHaveLength(4); // 飞猪/美团/双床房/差评
+    expect(report.anomalies.filter((a) => !a.deduped)).toHaveLength(4); // 拼多多/京东/SKU-HM/差评
     expect(report.notifyEventIds.length).toBeGreaterThanOrEqual(2); // channel_price 源 + review 源各一条摘要
-    expect(report.okCount).toBe(3); // 携程/大床房/违规
+    expect(report.okCount).toBe(3); // 天猫/SKU-3C/违规
 
     const bar = await inspectionStatusBar(app, scope);
     expect(bar.lastRunAt).not.toBeNull();

@@ -5,11 +5,13 @@
  *    IP+channel 限流 60 次/分（限流 Map 5 分钟 TTL 清扫）
  *  - 鉴权：Bearer c-token（verifyCToken）；内存限流 60 次/分钟/用户
  *  - POST /c/chat：service-dialog 流水线；toolCall → biz-ecom 适配器执行并渲染契约卡片；
+ *    多模态消息（image/screenshot/video，演示级不接真实视觉模型）：
+ *    截图识别→订单关联（order 卡）/ 图片找货→商品卡片（product 卡）/ 视频诊断→安装步骤（guide 卡）；
  *    ticketDraft + confirmTicket:true → 服务端幂等键 + createTicket/assignTicket/五元事件同一 serviceTx（H2）；
  *    pushMessage 失败 catch 落库 status='failed' 不阻断响应
- *  - 契约（H6，以 webc types.ts 为准）：cards={kind:'order'|'member'|'catalog',data}；
- *    工单附 statusText 中文枚举（保留英文 status）；/member={level,points,benefits[],demo?}；
- *    /orders=[{id,title,status,checkIn?,roomType?,amount?}]；/notifications 每项含 read:false
+ *  - 契约（H6，以 webc types.ts 为准）：cards={kind:'order'|'member'|'catalog'|'product'|'guide',data}；
+ *    工单附 statusText 中文枚举（保留英文 status）；/member={level,points,benefits[],coupons?,demo?}；
+ *    /orders=[{id,title,status,sku,quantity,logistics,amount,aftersale}]；/notifications 每项含 read:false
  *  - 输入约束（M9）：/chat text≤2000；/tickets kind 白名单 + title≤120 + payload JSON≤10KB
  * 工作区解析：C 端无工作区入参，取 env SERVICE_C_WORKSPACE_ID，缺省第一个工作区（演示口径）。
  */
@@ -21,8 +23,8 @@ import {
   CHANNELS, cSecret, exchangeCodeForOpenid, getCUser, issueCToken, listNotifications, pushMessage,
   resolveCUser, verifyCToken, type Channel, type CTokenPayload,
 } from "./channels.js";
-import { handleMessage } from "./dialog.js";
-import { runBizTool, ecomBizAdapter, type BizTool, type DemoOrder } from "./adapters/biz-ecom.js";
+import { handleMessage, mediaKindOfText, type MediaKind } from "./dialog.js";
+import { runBizTool, ecomBizAdapter, type BizTool, type CatalogItem, type DemoOrder } from "./adapters/biz-ecom.js";
 import {
   ServiceHttpError, assignTicketOn, createTicketOn, getTicket, listTickets, rateTicket, ticketTimeline,
   type Ticket,
@@ -113,6 +115,11 @@ function sha256(text: string): string {
   return createHash("sha256").update(text).digest("hex");
 }
 
+/** body.media.type → MediaKind（非法值视为无附件，回落文本标记识别） */
+function parseMediaKind(v: unknown): MediaKind | null {
+  return v === "screenshot" || v === "image" || v === "video" ? v : null;
+}
+
 /* ---------------- H6 契约序列化 ---------------- */
 
 /** 工单状态 → webc 中文枚举（保留英文 status，提供 statusText） */
@@ -128,21 +135,26 @@ export function serializeTicket(t: Ticket): Ticket & { statusText: string } {
   return { ...t, statusText: TICKET_STATUS_TEXT[t.status] ?? t.status };
 }
 
-/** 会员等级 → 权益清单（演示口径） */
+/** 会员等级 → 权益清单（电商演示口径） */
 function benefitsOf(tier: string): string[] {
-  if (tier.includes("金")) return ["免费双人早餐", "延迟退房至 14:00", "积分 1.5 倍累积"];
-  if (tier.includes("银")) return ["免费早餐", "积分 1.2 倍累积"];
-  return ["积分累积"];
+  if (tier.includes("黑卡")) return ["专享 95 折", "顺丰包邮", "优先拣货", "专属客服"];
+  if (tier.includes("金")) return ["会员 97 折", "积分 1.5 倍累积", "生日礼券"];
+  if (tier.includes("银")) return ["积分 1.2 倍累积", "每月优惠券"];
+  return ["积分累积", "积分每 100 抵 1 元"];
 }
 
+/** 电商订单 → H6 契约卡（商品名/SKU/数量/金额/物流状态/售后入口） */
 function orderToContract(o: DemoOrder): Record<string, unknown> {
   return {
     id: o.orderId,
-    title: `${o.roomType} · 入住 ${o.checkIn}`,
+    title: o.productName,
     status: o.status,
-    checkIn: o.checkIn,
-    roomType: o.roomType,
+    sku: o.sku,
+    quantity: o.quantity,
+    logistics: o.logistics,
     amount: o.amountYuan,
+    orderedAt: o.orderedAt,
+    aftersale: "支持 7 天无理由退换 · 订单详情页可申请售后",
   };
 }
 
@@ -152,7 +164,7 @@ async function pushAcceptedSafely(input: {
 }): Promise<void> {
   const payload = {
     ticketId: input.ticketId, title: input.title,
-    text: `您的工单「${input.title}」已受理，${input.dept ?? "客服部"}将尽快跟进。`,
+    text: `您的工单「${input.title}」已受理，${input.dept ?? "客服组"}将尽快跟进。`,
   };
   try {
     await pushMessage({ workspaceId: input.workspaceId, cUserId: input.cUserId, kind: "ticket.accepted", payload });
@@ -238,6 +250,7 @@ serviceGateway.post("/chat", cAuth, async (c) => {
     const body = await bodyOf<{
       conversationId: string; text: string; confirmTicket: boolean; idempotencyKey: string;
       ticketDraft: { kind: string; title: string; payload: Record<string, unknown> };
+      media: { type: string; label: string; meta: string };
     }>(c);
     if (!body.text?.trim()) return c.json({ error: "缺少 text" }, 400);
     if (body.text.length > 2000) return c.json({ error: "text 超长（≤2000 字符）" }, 400);
@@ -247,8 +260,8 @@ serviceGateway.post("/chat", cAuth, async (c) => {
       text: body.text.trim(), conversationId: body.conversationId,
     });
 
-    // 业务查询工具：执行适配器并渲染契约卡片（H6：{kind:'order'|'member'|'catalog', data}）
-    const cards: Array<{ kind: "order" | "member" | "catalog"; data: Record<string, unknown> }> = [];
+    // 业务查询工具：执行适配器并渲染契约卡片（H6：{kind:'order'|'member'|'catalog'|'product'|'guide', data}）
+    const cards: Array<{ kind: "order" | "member" | "catalog" | "product" | "guide"; data: Record<string, unknown> }> = [];
     let answer = r.answer;
     if (r.toolCall) {
       const user = await getCUser(a.workspaceId, a.cUserId);
@@ -257,8 +270,8 @@ serviceGateway.post("/chat", cAuth, async (c) => {
       }, r.toolCall.params);
       const d = data as {
         demo?: boolean; bindRequired?: boolean; hint?: string;
-        orders?: DemoOrder[]; items?: Array<{ sku: string; name: string; priceYuan: number }>;
-        member?: { memberId: string; name: string; tier: string; points: number } | null;
+        orders?: DemoOrder[]; items?: CatalogItem[];
+        member?: { memberId: string; name: string; tier: string; points: number; coupons: number } | null;
         ticket?: Record<string, unknown> | null;
       };
       if (d.bindRequired) {
@@ -270,15 +283,65 @@ serviceGateway.post("/chat", cAuth, async (c) => {
         if (d.member) {
           cards.push({
             kind: "member",
-            data: { level: d.member.tier, points: d.member.points, benefits: benefitsOf(d.member.tier), demo: d.demo ?? true },
+            data: { level: d.member.tier, points: d.member.points, coupons: d.member.coupons, benefits: benefitsOf(d.member.tier), demo: d.demo ?? true },
           });
         }
       } else if (r.toolCall.tool === "query_catalog") {
         cards.push({ kind: "catalog", data: { items: d.items ?? [], demo: d.demo ?? true } });
       } else if (r.toolCall.tool === "query_ticket") {
         const t = d.ticket;
-        if (t) answer = `您的工单「${String(t.title)}」当前状态：${TICKET_STATUS_TEXT[String(t.status)] ?? String(t.status)}，${String(t.dept ?? "客服部")}跟进中。`;
+        if (t) answer = `您的工单「${String(t.title)}」当前状态：${TICKET_STATUS_TEXT[String(t.status)] ?? String(t.status)}，${String(t.dept ?? "客服组")}跟进中。`;
       }
+    }
+
+    // 多模态消息（演示级，不接真实视觉模型）：body.media 或文本内 [截图]/[图片]/[视频] 标记
+    const mediaKind = parseMediaKind(body.media?.type) ?? mediaKindOfText(body.text.trim());
+    if (mediaKind === "screenshot") {
+      // 截图识别 → 订单关联：已绑定出订单卡，未绑定给绑定引导
+      const user = await getCUser(a.workspaceId, a.cUserId);
+      if (user?.memberId) {
+        const data = await ecomBizAdapter.queryOrder({ workspaceId: a.workspaceId, cUserId: a.cUserId, memberId: user.memberId });
+        const top = data.orders[0];
+        if (top) {
+          cards.length = 0;
+          cards.push({ kind: "order", data: orderToContract(top) });
+          answer = `截图已识别：已为您关联到订单「${top.productName}」（${top.orderId}，${top.logistics}）。如需退款/退货/换货可直接告诉我。`;
+        } else {
+          answer = "截图已识别，但未查询到您的近期订单。已为您准备工单草稿，确认后转人工核查。";
+        }
+      } else {
+        cards.length = 0;
+        answer = "截图已识别。为您关联订单前需要先绑定会员身份，完成手机号验证后即可继续。";
+      }
+    } else if (mediaKind === "image") {
+      // 图片找货 → 商品卡片（演示识别结果）
+      cards.length = 0;
+      cards.push({
+        kind: "product",
+        data: {
+          name: "原木置物架 三层", spec: "原木色 / 60×30×90cm", priceYuan: 199,
+          tag: "图片找货 · 相似度 92%", thumb: "架",
+          note: "视觉匹配商品库 TOP1（演示识别，未接真实视觉模型），今日下单送免打孔配件包。",
+        },
+      });
+      answer = "已为您完成图片找货：店内「原木置物架 三层」与您发的图片相似度最高，商品卡片见下方，需要可直接下单。";
+    } else if (mediaKind === "video") {
+      // 视频诊断 → 安装步骤（演示识别结果）
+      cards.length = 0;
+      cards.push({
+        kind: "guide",
+        data: {
+          title: "视频诊断 · 安装步骤（演示识别）",
+          steps: [
+            "第 1 步：核对板材编号与五金包清单",
+            "第 2 步：先装两侧立板与层板，螺丝预留半扣",
+            "第 3 步：整体调平后拧紧全部连接件",
+            "第 4 步：双人扶正做晃动检查，确认无松动",
+          ],
+          note: "关键帧比对标准安装流程生成（演示级，未接真实视觉模型）；仍装不好可转人工视频客服。",
+        },
+      });
+      answer = "视频已收到：关键帧分析完成，初步诊断为安装步骤卡点，分步指导见下方卡片；如需人工协助可一键建单。";
     }
 
     // 工单草稿确认：confirmTicket:true → 服务端幂等键 + 同事务建单/派单/五元事件（H2）
@@ -319,7 +382,7 @@ serviceGateway.post("/chat", cAuth, async (c) => {
   }
 });
 
-/* ---------------- 业务查询（酒店示例适配器；H6 契约形状） ---------------- */
+/* ---------------- 业务查询（电商买家示例适配器；H6 契约形状） ---------------- */
 serviceGateway.get("/orders", cAuth, async (c) => {
   const requestId = randomUUID();
   try {
@@ -344,13 +407,14 @@ serviceGateway.get("/member", cAuth, async (c) => {
     const data = await ecomBizAdapter.queryMember({ workspaceId: a.workspaceId, cUserId: a.cUserId, memberId: user?.memberId ?? null });
     if (data.bindRequired || !data.member) {
       return c.json({
-        level: "游客", points: 0, benefits: [], demo: data.demo,
+        level: "游客", points: 0, benefits: [], coupons: 0, demo: data.demo,
         bindRequired: true, hint: data.hint,
       });
     }
     return c.json({
       level: data.member.tier,
       points: data.member.points,
+      coupons: data.member.coupons,
       benefits: benefitsOf(data.member.tier),
       demo: data.demo,
     });
@@ -360,7 +424,11 @@ serviceGateway.get("/member", cAuth, async (c) => {
 });
 
 /* ---------------- 工单 ---------------- */
-const TICKET_KINDS = ["delivery", "repair", "complaint", "other", "service_request", "consult"] as const;
+/** kind 白名单：电商售后类（退款/退货/换货/纠纷/价保）+ 兼容存量类（repair/delivery/complaint 等） */
+const TICKET_KINDS = [
+  "refund", "return", "exchange", "dispute", "price_protect",
+  "repair", "delivery", "complaint", "other", "service_request", "consult",
+] as const;
 
 serviceGateway.post("/tickets", cAuth, async (c) => {
   const requestId = randomUUID();

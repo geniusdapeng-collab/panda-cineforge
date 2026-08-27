@@ -110,7 +110,7 @@ d("PG 集成 Quest 循环（种子库）", async () => {
   const { assemblePreset, AssemblyReject } = await import("./assembly.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
 
   const newThread = async (title: string) => {
     const id = `T-${Date.now().toString(36)}-${Math.floor(Math.random() * 999)}`;

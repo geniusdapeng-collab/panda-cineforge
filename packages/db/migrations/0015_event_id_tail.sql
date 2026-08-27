@@ -1,7 +1,7 @@
 -- 0015_event_id_tail.sql · 事件号源尾部函数（D28 号源纪律落地）
 -- 背景：appendEventInTx 的号源查询在 RLS 上下文内执行，只能看到当前工作区的事件，
 --       导致各工作区"各自为政"分配 event_id，跨工作区撞号后被 ON CONFLICT 幂等静默吞掉
---       （ws-yunqi 计数器冲进 ws-geo 种子号段 9901-9960 时 60 条事件被吞，套件 R 域连环失败）。
+--       （ws-panda 计数器冲进 ws-geo 种子号段 9901-9960 时 60 条事件被吞，套件 R 域连环失败）。
 -- 方案：SECURITY DEFINER 函数以属主身份读取全租户事件号最大值（绕过 RLS，只读、只暴露一个数字）。
 CREATE OR REPLACE FUNCTION public.biz_events_max_event_no(p_tenant_id text)
 RETURNS bigint

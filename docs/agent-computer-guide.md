@@ -47,7 +47,7 @@ pnpm computer:preflight     # 即 packages/base/computer-use/toolkit/preflight_c
 ```bash
 docker start workloom-im-pg                       # PG17+pgvector
 cd <仓库根> && pnpm dev                      # server :8787 + web :5173（后台运行）
-# 可选：灌入酒店获客演示数据
+# 可选：灌入电商经营演示数据
 pnpm exec tsx --env-file=.env scripts/seed.ts
 ```
 

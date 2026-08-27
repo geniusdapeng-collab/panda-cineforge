@@ -5,13 +5,13 @@
 import { describe, expect, it } from "vitest";
 import { BusinessEventSchema, safeParseBusinessEvent } from "./event-schema.js";
 
-/** 合法事件：字段对齐 PRD V2.5 附录 E（酒店版调价场景，P3/P4 同款） */
+/** 合法事件：字段对齐 PRD V2.5 附录 E（电商版调价场景，P3/P4 同款） */
 const VALID_EVENT = {
   event_id: "E-8806",
   who: { type: "agent", id: "pricing-agent", version: "v2.3" },
   context: {
     tenant_id: "tenant-demo",
-    workspace_id: "ws-yunqi",
+    workspace_id: "ws-panda",
     time: "2026-08-16T04:10:00+08:00",
     channel: "meituan",
     stage: "stable",

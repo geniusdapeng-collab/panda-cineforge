@@ -13,7 +13,7 @@ const d = RUN_DB ? describe : describe.skip;
 
 d("D16 业务+事件原子性（app 池单事务）", () => {
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   const boss = { id: "MEM-001", type: "human" as const };
 
   const draft = (action: string, objId: string) => ({
@@ -123,7 +123,7 @@ d("D16 业务+事件原子性（app 池单事务）", () => {
     try {
       await c.query("BEGIN");
       await c.query("SELECT set_config('app.tenant_id', $1, true)", [scope.tenantId]);
-      await c.query("SELECT set_config('app.workspace_id', $1, true)", ["ws-evil"]); // 上下文=ws-evil，事件写 ws-yunqi
+      await c.query("SELECT set_config('app.workspace_id', $1, true)", ["ws-evil"]); // 上下文=ws-evil，事件写 ws-demo
       await expect(
         c.query(`SELECT * FROM append_event_insert($1,$2,$3,$4,$5,$6,$7,$8)`, [
           "E-d16-spoof", scope.tenantId, scope.workspaceId, null,

@@ -42,7 +42,7 @@
 | 停止 | `bash scripts/stop.sh` | 端口释放 |
 | 数据重置（回干净演示集） | `bash scripts/reset.sh` | 演示数据集复位 |
 | 无 docker 环境重建 | `bash scripts/devbox.sh`（用户态，无需 root/docker） | 环境可用 |
-| 酒店获客演示种子 | `pnpm db:seed` | 种子回报事件/员工/对象/知识库 385 问计数 |
+| 电商经营演示种子 | `pnpm db:seed` | 种子回报事件/员工/对象/知识库计数 |
 | 全链路演示脚本 | `pnpm demo` | 输出各链路演示结果 |
 | 数字孪生模拟 | `pnpm demo:twin`（simulate-twin.ts） | 见 docs/DEMO-TWIN.md |
 | 孪生快照 / 恢复 | `pnpm demo:twin:snapshot`（snapshot-twin.sh）/ `pnpm demo:twin:restore`（restore-twin.sh） | 快照生成/回滚 |
@@ -98,7 +98,7 @@
 
 | Bundle | 内容 | 入口 |
 |---|---|---|
-| `hotel/` | 酒店垂直包：围栏、技能、员工、对象、管线 |
+| `ecommerce/` | 电商垂直包：81 presets / 160 技能 / 围栏 R1–R30 / 28 对象 / 8 阶段 / 三客群装配 |
 
 ## L5 技能资产层 · skills/official/
 

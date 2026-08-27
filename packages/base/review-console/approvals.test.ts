@@ -56,7 +56,7 @@ d("PG 集成审批流（种子队列）", async () => {
   const { listQueue, decide, batchApprove, expireSweep } = await import("./approvals.js");
   const appPool = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gwPool = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   /** app 池断言查询辅助：事务内设 RLS 上下文（与生产口径一致；池直查在 RLS 下恒 0 行） */
   const qApp = async <T extends Record<string, any> = Record<string, any>>(sql: string, params: unknown[] = []) => {
     const c = await appPool.connect();

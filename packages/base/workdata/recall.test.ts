@@ -12,14 +12,14 @@ import {
   type NlTranslator,
 } from "./recall.js";
 
-const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
 
 describe("buildWhere（结构化过滤）", () => {
   it("强制租户+工作区范围（越权返回空的第一道）", () => {
     const { sql, params } = buildWhere({}, scope);
     expect(sql).toContain("tenant_id = $1");
     expect(sql).toContain("workspace_id = $2");
-    expect(params).toEqual(["tenant-demo", "ws-yunqi"]);
+    expect(params).toEqual(["tenant-demo", "ws-demo"]);
   });
 
   it("对象/动作/规则结果组合过滤，全参数化", () => {
@@ -29,7 +29,7 @@ describe("buildWhere（结构化过滤）", () => {
     );
     expect(sql).toContain("payload->'object'->>'type' = $3");
     expect(sql).toContain("@>");
-    expect(params).toEqual(["tenant-demo", "ws-yunqi", "review", "review.reply", "review"]);
+    expect(params).toEqual(["tenant-demo", "ws-demo", "review", "review.reply", "review"]);
   });
 
   it("非法字符直接拒绝（防注入底线）", () => {

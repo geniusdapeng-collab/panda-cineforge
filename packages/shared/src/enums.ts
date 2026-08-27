@@ -83,7 +83,7 @@ export type MemoryKind = (typeof MEMORY_KINDS)[number];
 export const TRIGGER_KINDS = ["cron", "event"] as const;
 export type TriggerKind = (typeof TRIGGER_KINDS)[number];
 
-/** 酒店版 7 个 Agent 职业（游戏规则手册 §3.2） */
+/** 电商版 7 个 Agent 职业（游戏规则手册 §3.2） */
 export const HOTEL_AGENT_KINDS = [
   "pricing",
   "review",

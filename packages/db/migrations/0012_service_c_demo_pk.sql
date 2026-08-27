@@ -1,6 +1,6 @@
 -- 0012_service_c_demo_pk.sql · AI 服务前台演示表主键修正
 -- 问题：demo_members/demo_orders 以 member_id/order_id 单列为主键，
---       多工作区仓库（如视频版 ws-video + ws-yunqi 并存）下第二工作区引导种子
+--       多工作区仓库（如视频版 ws-video + ws-panda 并存）下第二工作区引导种子
 --       因 ON CONFLICT DO NOTHING 被整体跳过。
 -- 修法：先摘 demo_orders→demo_members 外键，主键改为 (workspace_id, *) 复合主键，
 --       再按复合键重建外键（全程幂等守卫，兼容各库历史漂移）。

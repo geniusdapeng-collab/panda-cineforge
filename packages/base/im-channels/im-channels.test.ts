@@ -97,7 +97,7 @@ d("PG 集成（G8/L1.4/L5.3/E5.2/L5.1）", async () => {
   const { ingestInbound, handleGestureCallback, sendApprovalCard, resolveMemberByOpenid } = await import("./index.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gateway = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   // 自备数据唯一后缀（可重跑纪律）
   const sfx = `im${Date.now().toString(36)}`;
   const openId = `ou_${sfx}`;

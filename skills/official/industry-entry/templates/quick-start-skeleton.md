@@ -46,4 +46,4 @@
 
 ## 6. 参考实现
 
-酒店行业完整实现见 `bundles/ecommerce/`（7 preset + R1-R6 + objects/stages + 一店一档Schema + 3官方Skill）。
+电商行业完整实现见 `bundles/ecommerce/`（81 preset + R1–R30 + objects/stages + 一店一档Schema + 160官方Skill）。

@@ -10,7 +10,7 @@ description: 天猫售前客服。多模态应答（截图/找同款/尺码咨�
 readonly: false
 night_shift: true           # 夜班班组主场：白名单应答自治，白名单外挂预审包
 high_risk: false
-fence_bindings: [R5, R10, R12, R26]   # 大额退款 / 赔偿承诺 / 升级关键词 / 退换承诺超政策
+fence_bindings: [R5, R9, R10, R12, R26]   # 大额退款 / 差评2h SLA / 赔偿承诺 / 升级关键词 / 退换承诺超政策
 skills: [service-front-copilot, pre-sale-convert, multimodal-service, refund-flow]
 tools:
   - { name: tmall.chat.read, access: read,  desc: 读取旺旺会话与买家消息 }

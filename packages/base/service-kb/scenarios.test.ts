@@ -136,7 +136,7 @@ function wireKbDb(db: FakeDb): FakeDb {
   return db;
 }
 
-async function seedCollection(db: FakeDb, name = "前台知识库"): Promise<string> {
+async function seedCollection(db: FakeDb, name = "客服知识库"): Promise<string> {
   const col = await createCollection(db, { workspaceId: WS, name });
   return col.id;
 }
@@ -145,11 +145,11 @@ async function seedCollection(db: FakeDb, name = "前台知识库"): Promise<str
 
 describe("A1 切块 · 标题层级与段落语义", () => {
   it("多级标题生成「 / 」连接的标题路径", () => {
-    const md = `# 前台政策\n\n总述内容一段，长度需要超过六十个字符才能独立成块不被合并，继续补充一些文字。\n\n## 退房时间\n\n退房为中午十二点前。\n`;
+    const md = `# 售后政策\n\n总述内容一段，长度需要超过六十个字符才能独立成块不被合并，继续补充一些文字。\n\n## 退货时间\n\n退货为签收后七天内。\n`;
     const chunks = chunkMarkdown(md);
-    const checkout = chunks.find((c) => c.heading === "前台政策 / 退房时间");
+    const checkout = chunks.find((c) => c.heading === "售后政策 / 退货时间");
     expect(checkout).toBeDefined();
-    expect(checkout!.content).toContain("退房为中午十二点前");
+    expect(checkout!.content).toContain("退货为签收后七天内");
   });
 
   it("同级标题重置路径（不串层级）", () => {
@@ -167,9 +167,9 @@ describe("A1 切块 · 标题层级与段落语义", () => {
   });
 
   it("表格行作为段落内容原样保留", () => {
-    const md = `## 价目表\n\n| 房型 | 价格 |\n| --- | --- |\n| 大床房 | 588 |\n| 双床房 | 688 |\n`;
+    const md = `## 价目表\n\n| 规格 | 价格 |\n| --- | --- |\n| 标准装 | 588 |\n| 礼盒装 | 688 |\n`;
     const chunks = chunkMarkdown(md);
-    expect(chunks[0]!.content).toContain("| 大床房 | 588 |");
+    expect(chunks[0]!.content).toContain("| 标准装 | 588 |");
     expect(chunks[0]!.heading).toBe("价目表");
   });
 
@@ -207,8 +207,8 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
     const r = await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "住客须知", sourceKind: "upload",
-      contentMd: `## 退房\n\n退房时间为中午十二点前，超过时间需要加收半天房费，请知悉并提前安排行程。\n`,
+      workspaceId: WS, collectionId: colId, title: "买家须知", sourceKind: "upload",
+      contentMd: `## 退货\n\n退货时限为签收后七天内，超过时限需要加收手续费，请知悉并提前安排处理。\n`,
     });
     expect(r.document.version).toBe(1);
     expect(r.firstVersion).toBe(true);
@@ -220,7 +220,7 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
   it("同 hash 重复上传 → 幂等返回（deduped，不建版不重切）", async () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
-    const md = `## WiFi\n\n无线网络名 Yunqi-Hotel，密码为房间号后四位，覆盖客房与公共区域，免费使用。\n`;
+    const md = `## WiFi\n\n无线网络名 Panda-Shop，密码为会员号后四位，覆盖办公区与公共区域，免费使用。\n`;
     const a = await upsertDocument(db, { workspaceId: WS, collectionId: colId, title: "网络说明", sourceKind: "upload", contentMd: md });
     const b = await upsertDocument(db, { workspaceId: WS, collectionId: colId, title: "网络说明", sourceKind: "upload", contentMd: md });
     expect(b.deduped).toBe(true);
@@ -233,12 +233,12 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
     const v1 = await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "早餐政策", sourceKind: "upload",
-      contentMd: `## 早餐\n\n早餐供应时间为七点到十点，一楼全日制餐厅凭房卡用餐，内容需要足够长一点。\n`,
+      workspaceId: WS, collectionId: colId, title: "发货政策", sourceKind: "upload",
+      contentMd: `## 发货\n\n发货揽收时间为七点到十点，华东一仓当日截单前下单当日发，内容需要足够长一点。\n`,
     });
     const v2 = await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "早餐政策", sourceKind: "upload",
-      contentMd: `## 早餐\n\n早餐供应时间调整为六点半到十点半，一楼全日制餐厅凭房卡用餐，内容足够长一点。\n`,
+      workspaceId: WS, collectionId: colId, title: "发货政策", sourceKind: "upload",
+      contentMd: `## 发货\n\n发货揽收时间调整为六点半到十点半，华东一仓当日截单前下单当日发，内容足够长一点。\n`,
     });
     expect(v2.document.version).toBe(2);
     expect(v2.firstVersion).toBe(false);
@@ -252,7 +252,7 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
     const colId = await seedCollection(db);
     const doc = await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "官网政策", sourceKind: "official_site",
-      contentMd: `## 停车\n\n住客免费停车，出场前请至前台扫码登记车牌号，具体内容需要足够长一些。\n`,
+      contentMd: `## 运费\n\n会员订单满九十九元免运费，偏远地区另行计费，具体内容需要足够长一些。\n`,
       status: "pending_review",
     });
     const pending = await listDocuments(db, { workspaceId: WS, status: "pending_review" });
@@ -297,7 +297,7 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
     const src = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/faq" });
-    const html = `<html><body><p>退房时间为中午十二点前。延迟退房视房态安排。</p><p>早餐七点到十点供应。</p></body></html>`;
+    const html = `<html><body><p>退货时限为签收后七天内。加急退货视库存安排。</p><p>发货每日十七点前截止。</p></body></html>`;
     const r = await crawlAndStructure(db, { workspaceId: WS, sourceId: src.id, collectionId: colId }, undefined, async () => html);
     expect(r.degraded).toBe(true);
     expect(r.document.status).toBe("pending_review");
@@ -314,8 +314,8 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
     const llm: StructuringLlm = {
       async extractKnowledge() {
         return [
-          { title: "退房时间", content: "中午十二点前退房。" },
-          { title: "早餐时间", content: "每日七点到十点。" },
+          { title: "退货时限", content: "签收后七天内可退。" },
+          { title: "发货时间", content: "每日十七点前截单。" },
         ];
       },
     };
@@ -323,7 +323,7 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
     expect(r.degraded).toBe(false);
     expect(r.items).toBe(2);
     const docRow = db.table("kb_documents").find((x) => x["id"] === r.document.id)!;
-    expect(String(docRow["content_md"])).toContain("## 退房时间");
+    expect(String(docRow["content_md"])).toContain("## 退货时限");
   });
 
   it("diffScan 指纹未变 → changed:false 仅回写 last_crawled_at", async () => {
@@ -364,10 +364,10 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
   });
 
   it("htmlToText 去 script/style/标签并解码实体", () => {
-    const text = htmlToText(`<html><head><style>body{color:red}</style><script>alert(1)</script></head><body><p>Wi-Fi &amp; 停车</p><br><p>第二条</p></body></html>`);
+    const text = htmlToText(`<html><head><style>body{color:red}</style><script>alert(1)</script></head><body><p>Wi-Fi &amp; 售后</p><br><p>第二条</p></body></html>`);
     expect(text).not.toContain("alert");
     expect(text).not.toContain("color");
-    expect(text).toContain("Wi-Fi & 停车");
+    expect(text).toContain("Wi-Fi & 售后");
     expect(text).toContain("第二条");
   });
 });
@@ -430,7 +430,7 @@ describe("A4 SSRF 守卫 · assertPublicHttpUrl / isPrivateAddress / 读取上�
 
 describe("A5 检索 · 2-gram 切词与确定性打分（纯函数）", () => {
   it("中文按 2-gram 切分（防单字噪声）", () => {
-    expect(tokenizeQuery("退房时间")).toEqual(["退房", "房时", "时间"]);
+    expect(tokenizeQuery("退货时间")).toEqual(["退货", "货时", "时间"]);
   });
 
   it("单字中文保留单字", () => {
@@ -450,30 +450,30 @@ describe("A5 检索 · 2-gram 切词与确定性打分（纯函数）", () => {
   });
 
   it("标点与空白剔除", () => {
-    expect(tokenizeQuery("退房，时间？！")).toEqual(["退房", "房时", "时间"]);
+    expect(tokenizeQuery("退货，时间？！")).toEqual(["退货", "货时", "时间"]);
     expect(tokenizeQuery("！！！")).toEqual([]);
   });
 
   it("scoreChunkFallback：无命中 0 分", () => {
-    expect(scoreChunkFallback("健身房", { heading: "早餐", content: "供应时间七点到十点" })).toBe(0);
+    expect(scoreChunkFallback("说明书", { heading: "发货", content: "每日十七点前下单当日发" })).toBe(0);
   });
 
   it("scoreChunkFallback：命中越多分越高", () => {
-    const chunk = { heading: "退房政策", content: "退房时间为中午十二点前，延迟退房视房态安排" };
-    const full = scoreChunkFallback("退房时间", chunk);
-    const half = scoreChunkFallback("退房泳池", chunk);
+    const chunk = { heading: "退货政策", content: "退货时间为签收后七天内，加急退货视库存安排" };
+    const full = scoreChunkFallback("退货时间", chunk);
+    const half = scoreChunkFallback("退货加购", chunk);
     expect(full).toBeGreaterThan(half);
     expect(half).toBeGreaterThan(0);
   });
 
   it("scoreChunkFallback：标题命中加权", () => {
-    const inHead = scoreChunkFallback("退房", { heading: "退房政策", content: "内容无关词" });
-    const inBody = scoreChunkFallback("退房", { heading: "其他", content: "退房相关说明" });
+    const inHead = scoreChunkFallback("退货", { heading: "退货政策", content: "内容无关词" });
+    const inBody = scoreChunkFallback("退货", { heading: "其他", content: "退货相关说明" });
     expect(inHead).toBeGreaterThan(inBody);
   });
 
   it("scoreChunkFallback：封顶 0.98 且空查询 0 分", () => {
-    const s = scoreChunkFallback("退房", { heading: "退房", content: "退房 退房 退房" });
+    const s = scoreChunkFallback("退货", { heading: "退货", content: "退货 退货 退货" });
     expect(s).toBeLessThanOrEqual(0.98);
     expect(scoreChunkFallback("", { heading: "x", content: "y" })).toBe(0);
   });
@@ -490,10 +490,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
   async function seedSearchable(db: FakeDb) {
     const colId = await seedCollection(db);
     await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "住客须知", sourceKind: "manual",
+      workspaceId: WS, collectionId: colId, title: "买家须知", sourceKind: "manual",
       contentMd: [
-        `## 退房时间\n\n本店标准退房时间为每日中午 12:00 前，延迟退房最晚至 14:00，视房态免费安排，超过按半天房费计。\n`,
-        `## 早餐时间\n\n自助早餐供应时间为每日 7:00 至 10:00，地点在一楼全日制餐厅，住客凭房卡用餐。\n`,
+        `## 退货时间\n\n本店标准退货时间为签收后 7 天内，加急退货最晚次日 12:00 前处理，视库存免费安排，超过按手续费计。\n`,
+        `## 发货时间\n\n订单发货时间为每日 7:00 至 17:00，当天十六点前下单当天发出，买家凭单号查询物流。\n`,
       ].join("\n"),
     });
     return colId;
@@ -502,11 +502,11 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
   it("无 embedder → 关键词兜底命中且 degraded:true", async () => {
     const db = wireKbDb(new FakeDb());
     await seedSearchable(db);
-    const r = await searchKB(db, "退房时间是几点", { workspaceId: WS });
+    const r = await searchKB(db, "退货时间是几点", { workspaceId: WS });
     expect(r.degraded).toBe(true);
     expect(r.hits.length).toBeGreaterThan(0);
     expect(r.hits[0]!.content).toContain("12:00");
-    expect(r.hits[0]!.documentTitle).toBe("住客须知");
+    expect(r.hits[0]!.documentTitle).toBe("买家须知");
   });
 
   it("无命中 → hits 为空", async () => {
@@ -527,8 +527,8 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
   it("特殊字符注入（引号/分号/百分号/注释符）不报错且不影响语义", async () => {
     const db = wireKbDb(new FakeDb());
     await seedSearchable(db);
-    const r = await searchKB(db, `退房'; DROP TABLE kb_chunks; -- %`, { workspaceId: WS });
-    expect(r.hits.length).toBeGreaterThan(0); // 2-gram「退房」仍命中，注入片段被切词剔除
+    const r = await searchKB(db, `退货'; DROP TABLE kb_chunks; -- %`, { workspaceId: WS });
+    expect(r.hits.length).toBeGreaterThan(0); // 2-gram「退货」仍命中，注入片段被切词剔除
     expect(db.table("kb_chunks").length).toBeGreaterThan(0);
   });
 
@@ -536,10 +536,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedSearchable(db);
     const doc = (await listDocuments(db, { workspaceId: WS, collectionId: colId }))[0]!;
-    const hitBefore = await searchKB(db, "退房时间", { workspaceId: WS });
+    const hitBefore = await searchKB(db, "退货时间", { workspaceId: WS });
     expect(hitBefore.hits.length).toBeGreaterThan(0);
     await setDocumentStatus(db, { workspaceId: WS, documentId: doc.id, status: "disabled" });
-    const hitAfter = await searchKB(db, "退房时间", { workspaceId: WS });
+    const hitAfter = await searchKB(db, "退货时间", { workspaceId: WS });
     expect(hitAfter.hits).toHaveLength(0);
   });
 
@@ -548,10 +548,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const colId = await seedCollection(db);
     await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "待审政策", sourceKind: "official_site",
-      contentMd: `## 泳池\n\n泳池开放时间为每日十点到二十一点，住客免费使用，需要足够的正文长度。\n`,
+      contentMd: `## 样品\n\n样品申领时间为每日十点到二十一点，买家免费申领，需要足够的正文长度。\n`,
       status: "pending_review",
     });
-    const r = await searchKB(db, "泳池开放时间", { workspaceId: WS });
+    const r = await searchKB(db, "样品申领时间", { workspaceId: WS });
     expect(r.hits).toHaveLength(0);
   });
 
@@ -561,7 +561,7 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const embedder = { async embed() { return [0.1, 0.2, 0.3]; } };
     await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "向量文档", sourceKind: "manual",
-      contentMd: `## 健身房\n\n健身房二十四小时开放，位于酒店三楼，刷房卡进入，正文需要足够长度。\n`,
+      contentMd: `## 健身房\n\n健身房二十四小时开放，位于园区三楼，刷工卡进入，正文需要足够长度。\n`,
     }, embedder);
     const r = await searchKB(db, "健身房开放吗", { workspaceId: WS }, { embedder });
     expect(r.degraded).toBe(false);
@@ -573,7 +573,7 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const db = wireKbDb(new FakeDb());
     await seedSearchable(db); // 无 embedder 切块 → embedding 为 NULL
     const embedder = { async embed() { return [0.1, 0.2]; } };
-    const r = await searchKB(db, "早餐几点", { workspaceId: WS }, { embedder });
+    const r = await searchKB(db, "发货几点", { workspaceId: WS }, { embedder });
     expect(r.degraded).toBe(false); // embedder 在场，走兜底但不算 degraded
     expect(r.hits.length).toBeGreaterThan(0);
     expect(r.hits[0]!.content).toContain("7:00");

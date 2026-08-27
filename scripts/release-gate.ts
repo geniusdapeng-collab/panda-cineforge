@@ -83,7 +83,7 @@ const tokens: Record<string, string> = {};
 const WS_CANDIDATES = [
   { key: "video", slug: "video-studio", member: "MEM-V01", name: "AI 视频经营（ws-video）", wsId: "ws-video", preset: "director" },
   { key: "geo", slug: "geo-growth", member: "MEM-G01", name: "社媒×GEO 双域（ws-geo）", wsId: "ws-geo", preset: "director" },
-  { key: "ecommerce", slug: "panda-group", member: "MEM-001", name: "熊猫优选集团（ws-yunqi）", wsId: "ws-yunqi", preset: "pricing-agent" },
+  { key: "ecommerce", slug: "panda-group", member: "MEM-001", name: "熊猫优选集团（ws-panda）", wsId: "ws-panda", preset: "pricing-agent" },
 ];
 const WS_LIST: typeof WS_CANDIDATES = [];
 {
@@ -119,7 +119,7 @@ const ASK_ALL: Array<{ ws: string; q: string }> = [
   { ws: "video", q: "最近哪类选题完播率最高？" },
   { ws: "geo", q: "我们本周在 AI 搜索里的能见度如何？" },
   { ws: "geo", q: "竞品在品类词上的表现比我们好吗？" },
-  { ws: "ecommerce", q: "这周入住率怎么样？" },
+  { ws: "ecommerce", q: "这周转化率怎么样？" },
   { ws: "ecommerce", q: "现在差评主要集中在哪些方面？" },
 ];
 const ASK_SCENARIOS = ASK_ALL.filter((sc) => WS_LIST.some((w) => w.key === sc.ws));

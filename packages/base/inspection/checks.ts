@@ -1,6 +1,6 @@
 /**
  * inspection · 巡检项定义与确定性探针（F9.1）
- *  - 巡检项由行业包定义：酒店=5–8 渠道价格 / 房态 / 评价 / 违规（PRD M9.2 原文口径）
+ *  - 巡检项由行业包定义：默认=多渠道价格 / 库存同步 / 评价 / 违规（PRD M9.2 原文口径）
  *  - 探针为纯函数：输入只读快照（loadSnapshot 取自 profiles.archive / 事件流），输出 Finding 列表
  *  - 探针可注入（演示/测试用）；默认探针不编造数据——快照缺项时该检项记「无数据」而非假异常
  */
@@ -16,10 +16,10 @@ export interface CheckDef {
   name: string;
 }
 
-/** 酒店巡检项清单（F9.1；US9.5：新行业只配置检项清单即获得完整巡检能力） */
-export const HOTEL_CHECKS: CheckDef[] = [
-  { id: "chk-channel-price", kind: "channel_price", name: "5–8 渠道价格一致性" },
-  { id: "chk-room-state", kind: "room_state", name: "房态同步" },
+/** 默认巡检项清单（F9.1；US9.5：新行业只配置检项清单即获得完整巡检能力） */
+export const DEFAULT_CHECKS: CheckDef[] = [
+  { id: "chk-channel-price", kind: "channel_price", name: "多渠道价格一致性" },
+  { id: "chk-room-state", kind: "room_state", name: "库存同步" },
   { id: "chk-review", kind: "review", name: "新评价扫描" },
   { id: "chk-violation", kind: "violation", name: "违规巡检" },
 ];
@@ -41,7 +41,7 @@ export interface Finding {
 export interface InspectionSnapshot {
   /** 渠道价格采样：archive.inspection.channels = [{ channel, price, parity }] */
   channels?: Array<{ channel: string; price?: number; parity?: boolean; status?: string }>;
-  /** 房态采样：archive.inspection.roomStates = [{ roomType, synced }] */
+  /** 库存采样：archive.inspection.roomStates = [{ roomType, synced }]（字段名为兼容保留，语义=库存单元） */
   roomStates?: Array<{ roomType: string; synced: boolean }>;
   /** 新评价采样：archive.inspection.reviews = [{ id, channel, score }]（≤3 分为差评） */
   reviews?: Array<{ id: string; channel: string; score: number }>;
@@ -51,40 +51,40 @@ export interface InspectionSnapshot {
 
 export type Probe = (check: CheckDef, snapshot: InspectionSnapshot) => Finding[];
 
-/* ---------- 默认酒店探针（确定性；阈值与 seed/围栏同源，不新增数值） ---------- */
+/* ---------- 默认探针（确定性；阈值与 seed/围栏同源，不新增数值） ---------- */
 
 const channelPriceProbe: Probe = (check, s) => {
   if (!s.channels || s.channels.length === 0) {
-    return [{ checkId: check.id, status: "nodata", summary: "无渠道价格快照", objectType: "channel", source: "channel_price" }];
+    return [{ checkId: check.id, status: "nodata", summary: "无平台价格快照", objectType: "platform", source: "channel_price" }];
   }
   return s.channels.map((c): Finding => {
     if (c.status && c.status !== "online") {
       return {
         checkId: check.id, status: "anomaly", severity: "high",
-        summary: `渠道「${c.channel}」状态 ${c.status}（非 online）`, objectType: "channel", objectId: c.channel, source: "channel_price",
+        summary: `平台「${c.channel}」状态 ${c.status}（非 online）`, objectType: "platform", objectId: c.channel, source: "channel_price",
       };
     }
     if (c.parity === false) {
       return {
         checkId: check.id, status: "anomaly", severity: "medium",
-        summary: `渠道「${c.channel}」价格不一致（parity=false）`, objectType: "channel", objectId: c.channel, source: "channel_price",
+        summary: `平台「${c.channel}」价格不一致（parity=false）`, objectType: "platform", objectId: c.channel, source: "channel_price",
       };
     }
     return {
       checkId: check.id, status: "ok",
-      summary: `渠道「${c.channel}」价格正常`, objectType: "channel", objectId: c.channel, source: "channel_price",
+      summary: `平台「${c.channel}」价格正常`, objectType: "platform", objectId: c.channel, source: "channel_price",
     };
   });
 };
 
 const roomStateProbe: Probe = (check, s) => {
   if (!s.roomStates || s.roomStates.length === 0) {
-    return [{ checkId: check.id, status: "nodata", summary: "无房态快照", objectType: "room_type", source: "room_state" }];
+    return [{ checkId: check.id, status: "nodata", summary: "无库存快照", objectType: "stock", source: "room_state" }];
   }
   return s.roomStates.map((r): Finding =>
     r.synced
-      ? { checkId: check.id, status: "ok", summary: `房型「${r.roomType}」房态已同步`, objectType: "room_type", objectId: r.roomType, source: "room_state" }
-      : { checkId: check.id, status: "anomaly", severity: "medium", summary: `房型「${r.roomType}」房态未同步`, objectType: "room_type", objectId: r.roomType, source: "room_state" },
+      ? { checkId: check.id, status: "ok", summary: `库存单元「${r.roomType}」库存已同步`, objectType: "stock", objectId: r.roomType, source: "room_state" }
+      : { checkId: check.id, status: "anomaly", severity: "medium", summary: `库存单元「${r.roomType}」库存未同步`, objectType: "stock", objectId: r.roomType, source: "room_state" },
   );
 };
 
@@ -104,14 +104,14 @@ const reviewProbe: Probe = (check, s) => {
 
 const violationProbe: Probe = (check, s) => {
   if (!s.violations) {
-    return [{ checkId: check.id, status: "nodata", summary: "无违规快照", objectType: "violation", source: "violation" }];
+    return [{ checkId: check.id, status: "nodata", summary: "无违规快照", objectType: "alert", source: "violation" }];
   }
   if (s.violations.length === 0) {
-    return [{ checkId: check.id, status: "ok", summary: "无违规", objectType: "violation", source: "violation" }];
+    return [{ checkId: check.id, status: "ok", summary: "无违规", objectType: "alert", source: "violation" }];
   }
   return s.violations.map((v): Finding => ({
     checkId: check.id, status: "anomaly", severity: "high",
-    summary: `违规（${v.kind}）：${v.detail}`, objectType: "violation", objectId: v.id, source: "violation",
+    summary: `违规（${v.kind}）：${v.detail}`, objectType: "alert", objectId: v.id, source: "violation",
   }));
 };
 

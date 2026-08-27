@@ -46,8 +46,8 @@ describe("SKILL.md 渲染与 ID（F8.3/F8.1）", () => {
     expect(md).toContain("## 边界（什么不做）\n不破保底价");
   });
   it("team 技能 ID 落 skill-t- 命名空间（白名单标识）", () => {
-    expect(teamSkillId("差评跟进 SOP", "ws-yunqi")).toBe("skill-t-ws-yunqi-差评跟进-sop");
-    expect(teamSkillId("  ", "ws-yunqi")).toBe("skill-t-ws-yunqi-unnamed");
+    expect(teamSkillId("差评跟进 SOP", "ws-demo")).toBe("skill-t-ws-demo-差评跟进-sop");
+    expect(teamSkillId("  ", "ws-demo")).toBe("skill-t-ws-demo-unnamed");
   });
 });
 
@@ -100,7 +100,7 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
   const { gatewayAppend } = await import("../workdata/gateway.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
   /** app 池断言查询辅助：事务内设 RLS 上下文（与生产口径一致；池直查在 RLS 下恒 0 行） */
   const qApp = async <T extends Record<string, any> = Record<string, any>>(sql: string, params: unknown[] = []) => {
     const c = await app.connect();
@@ -223,7 +223,7 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
       triplet: { trigger: "出现 ≤3 分差评", steps: ["归因", "起草回复", "挂审批"], boundary: "不承诺档案外补偿" },
       fenceBindings: ["R6"], by: "MEM-002",
     });
-    expect(draft.skillId).toBe(`skill-t-ws-yunqi-差评跟进打法-${RUN}`.toLowerCase());
+    expect(draft.skillId).toBe(`skill-t-ws-demo-差评跟进打法-${RUN}`.toLowerCase());
     expect(draft.version).toMatch(/^\d+\.\d+\.0$/); // 同名再生成版本递增（重跑安全）
 
     await expect(installSkill(app, gw, scope, { skillId: draft.skillId, by: "MEM-002" }))

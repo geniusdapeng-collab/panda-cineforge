@@ -1,6 +1,6 @@
 ---
 name: workloom-release-gate
-description: WorkLoom 发布上线前三链路校验门禁（强制红线，自动调用）。凡是使用 WorkLoom 底座的产品（WorkLoom GEO / HyperReality / 酒店等）交付或更新版本前，必须执行三条主链路全量回归：ASK 问答模式、QUEST 任务模式、自动化任务编排。任一未过 = 禁止发布。触发场景：发布、上线、交付版本、push 前检查、release、发版。
+description: WorkLoom 发布上线前三链路校验门禁（强制红线，自动调用）。凡是使用 WorkLoom 底座的产品（WorkLoom GEO / HyperReality / 电商等）交付或更新版本前，必须执行三条主链路全量回归：ASK 问答模式、QUEST 任务模式、自动化任务编排。任一未过 = 禁止发布。触发场景：发布、上线、交付版本、push 前检查、release、发版。
 ---
 
 # WorkLoom 发布上线前三链路校验（强制红线）
@@ -53,7 +53,7 @@ pnpm release:gate   # 12 项校验（工作区自适应）；任一失败 exit 1
 | 事件「写入成功」却查不到 | 号源查询在 RLS 上下文内只见本区，撞他域号段被幂等静默吞掉 | 迁移 0015 `biz_events_max_event_no` 绕 RLS 全租户口径 |
 | 线程号指数爆炸（T-133111…，20 位溢出） | pg 驱动 bigint 返回 string，`+1` 变字符串拼接 | 调用点 `Number()` 转换 |
 | 围栏该 review 却全 block | DSL 不支持 `in`/`contains_any` + 缺失路径即抛错 | expr.ts DSL 扩展 + 缺失路径比较语境宽容 |
-| QUEST 内容域目标只拆 1 步 | planQuest 模板仅酒店域 | loop.ts 内容生产链五步模板 + dispatch 注入 llmCall |
+| QUEST 内容域目标只拆 1 步 | planQuest 模板仅电商域 | loop.ts 内容生产链五步模板 + dispatch 注入 llmCall |
 | 装配校验他域 Bundle 恒红 | 探针被 RLS 锁在当前工作区 | assembly.ts 切 Bundle 属地查验 |
 | mock 测试报「mock 未覆盖 SQL」 | 号源函数 SQL 未注册进测试 mock | 测试文件补 `biz_events_max_event_no` 匹配 |
 
@@ -64,6 +64,6 @@ pnpm release:gate   # 12 项校验（工作区自适应）；任一失败 exit 1
 
 ## 记忆锚点
 
-- 组织记忆：`org_memory.mem-release-gate-*`（ws-yunqi / ws-video / ws-geo，SOP，confidence 0.95）
+- 组织记忆：`org_memory.mem-release-gate-*`（ws-panda / ws-video / ws-geo，SOP，confidence 0.95）
 - 政策文档：`docs/release-checklist.md`
 - 可执行门禁：`scripts/release-gate.ts`（`pnpm release:gate`）

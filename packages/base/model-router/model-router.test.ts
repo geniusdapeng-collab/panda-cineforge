@@ -143,7 +143,7 @@ d("PG 集成（GatewayEventSink 计量落库）", async () => {
   const { searchEvents } = await import("../workdata/recall.js");
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
 
   it("model.call 事件带 model_trace 落库；账单=事件投影（L6.3）", async () => {
     const sink = new GatewayEventSink(gw, scope);

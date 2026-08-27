@@ -33,7 +33,7 @@ const GATEWAY_URL =
   "postgres://workloom_gateway:workloom_dev_gateway@localhost:5432/workloom";
 
 const TENANT_ID = "tenant-demo";
-const WS_ID = "ws-yunqi";
+const WS_ID = "ws-panda";
 const WS_NAME = "熊猫优选集团";
 const FENCE_VERSION = "ecom-baseline/v1"; // 与 seed 装载的基线围栏版本一致
 const GENESIS_HASH = "GENESIS";
@@ -1011,7 +1011,7 @@ async function main(): Promise<void> {
     );
     memInserted += res.rowCount ?? 0;
     for (const evId of m.src.slice(0, 2)) {
-      await owner.query(`INSERT INTO memory_usage (memory_id, event_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`, [m.id, evId]);
+      await owner.query(`INSERT INTO memory_usage (memory_id, event_id, workspace_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING`, [m.id, evId, WS_ID]);
     }
   }
   console.log(`✓ 组织记忆 ×${memInserted}（pattern/sop/preference，来源事件可归因）`);
@@ -1126,6 +1126,15 @@ async function main(): Promise<void> {
   const rate = check.rowCount ? valid / check.rowCount : 0;
   console.log(`✓ 验收：回读 ${check.rowCount} 条，五元完整 ${valid} 条，完整率 ${(rate * 100).toFixed(1)}%`);
   if (rate !== 1) throw new Error("验收失败：五元完整率未达 100%");
+
+  // —— P0-3 收尾：全局事件号序列推进到本批最大编号之后（只前进不后退，与 0013 迁移同口径） ——
+  // 本脚本事件走 E-20001+ 区段直插（演示批量生成），不入网关分配通道；
+  // 不推进序列的话 verify-chain 会把 E-<n> 判为「绕过序列分配」。
+  await owner.query(
+    `SELECT setval('biz_events_eid_seq',
+       GREATEST((SELECT COALESCE(MAX(substring(event_id from '^E-(\\d+)$')::bigint), 0) + 1 FROM biz_events), 9101), false)`,
+  );
+  console.log("✓ 全局事件号序列已推进（P0-3 分配区间覆盖演示事件段）");
 
   await gw.end();
   await owner.end();

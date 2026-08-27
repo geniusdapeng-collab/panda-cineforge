@@ -1,10 +1,10 @@
 /**
- * service · 存储引导（AI 服务前台）
+ * service · 存储引导（AI 买家服务前台）
  * 表结构由 packages/db 迁移（并行底座代理）落地：c_users/c_conversations/c_messages/
  * c_notifications/c_tickets/c_ticket_events/kb_collections/kb_documents/kb_chunks/
  * kb_sources/demo_orders/demo_members，全部带 RLS（app.workspace_id GUC）。
  * 本模块职责：
- *  - 种子演示数据（幂等：目标表为空才注入；KB 住客须知缺切块则补建）
+ *  - 种子演示数据（幂等：目标表为空才注入；KB 买家须知缺切块则补建）
  *  - Markdown 切块 + 检索索引重建（kb_chunks）
  * 纪律：种子走 owner 池；业务读写一律经 events.ts 的 serviceTx/svcQuery（RLS 事务上下文）。
  */
@@ -41,7 +41,7 @@ async function seedDemo(client: SqlClient): Promise<void> {
   const ws = await client.query(`SELECT id FROM workspaces ORDER BY created_at`);
   for (const row of ws.rows) {
     const wsId = String(row.id);
-    // KB 住客须知（文档缺失则建；切块缺失则补）
+    // KB 买家须知（文档缺失则建；切块缺失则补）
     let doc = (await client.query(
       `SELECT id, version, content_md FROM kb_documents WHERE workspace_id=$1 AND id=$2 LIMIT 1`,
       [wsId, `kbd-${wsId}-notice`],
@@ -49,27 +49,30 @@ async function seedDemo(client: SqlClient): Promise<void> {
     if (!doc) {
       const colId = `kbc-${wsId}-welcome`;
       await client.query(
-        `INSERT INTO kb_collections (id, workspace_id, name, description) VALUES ($1,$2,'住客服务知识库','酒店前台常见问题与服务说明（演示种子）') ON CONFLICT (id) DO NOTHING`,
+        `INSERT INTO kb_collections (id, workspace_id, name, description) VALUES ($1,$2,'买家服务知识库','电商买家常见问题与服务说明（演示种子）') ON CONFLICT (id) DO NOTHING`,
         [colId, wsId],
       );
       const md = [
-        `# 熊猫优选集团住客服务须知`,
+        `# 熊猫优选集团买家服务须知`,
         ``,
-        `## 退房时间`,
-        `本店标准退房时间为每日中午 12:00 前。如需延迟退房，最晚可延至 14:00，视当日房态免费安排；超过 14:00 按半天房费计。`,
+        `## 退货政策`,
+        `签收次日起 7 天内支持无理由退货（跨境店 30 天），商品完好不影响二次销售即可退，运费险赔付首重。`,
         ``,
-        `## 早餐时间`,
-        `自助早餐供应时间为每日 7:00 至 10:00，地点在一楼全日制餐厅，住客凭房卡用餐。`,
+        `## 退款时效`,
+        `退货验收通过后 24 小时内打款，原路退回，1-3 个工作日到账。`,
         ``,
-        `## Wi-Fi`,
-        `客房与公共区域均覆盖免费 Wi-Fi，网络名 Yunqi-Hotel，密码为房间号后四位。`,
+        `## 物流时效`,
+        `国内订单 16:00 前付款当日发货，顺丰/中通 48-72 小时送达；跨境订单 7-15 天送达。`,
         ``,
-        `## 报修与服务`,
-        `客房设施故障或服务需求，请直接在本小程序留言，客服将在 15 分钟内响应并生成工单跟进。`,
+        `## 智能设备配网`,
+        `智能设备仅支持 2.4GHz Wi-Fi 网络，配网密码避免特殊字符；多次失败可发报错截图给客服识别错误码。`,
+        ``,
+        `## 售后服务`,
+        `商品故障、退换货或安装问题，请直接在本小程序留言，客服将在 15 分钟内响应并生成工单跟进。`,
       ].join("\n");
       await client.query(
         `INSERT INTO kb_documents (id, workspace_id, collection_id, title, source_kind, content_md, status)
-         VALUES ($1,$2,$3,'熊猫优选集团住客服务须知','manual',$4,'active') ON CONFLICT (id) DO NOTHING`,
+         VALUES ($1,$2,$3,'熊猫优选集团买家服务须知','manual',$4,'active') ON CONFLICT (id) DO NOTHING`,
         [`kbd-${wsId}-notice`, wsId, colId, md],
       );
       doc = (await client.query(
@@ -86,22 +89,23 @@ async function seedDemo(client: SqlClient): Promise<void> {
         await indexChunks(client, wsId, String(doc.id), String(doc.content_md));
       }
     }
-    // 酒店演示会员/订单（e2e 契约 fixture M-1001/M-1002：不按空表门控——
+    // 电商演示会员/订单（e2e 契约 fixture M-1001/M-1002：不按空表门控——
     // seed.ts 的扩充运行态会先占表导致本 fixture 被跳过（D36 新装环境 e2e 七连挂根因）；
-    // INSERT 均 ON CONFLICT DO NOTHING 幂等，无条件执行）
+    // INSERT 均 ON CONFLICT DO NOTHING 幂等，无条件执行；
+    // 列语义与 scripts/seed.ts 对齐：room_type 承载商品口径「商品名 ×数量」，check_in/check_out 承载下单/签收日期）
     {
       await client.query(
         `INSERT INTO demo_members (member_id, workspace_id, name, phone, tier, points) VALUES
-           ('M-1001',$1,'张伟','13800000001','金卡',2680),
-           ('M-1002',$1,'刘芳','13800000002','银卡',860)
+           ('M-1001',$1,'张伟','13800000001','熊猫金卡',2680),
+           ('M-1002',$1,'刘芳','13800000002','熊猫银卡',860)
          ON CONFLICT (workspace_id, member_id) DO NOTHING`,
         [wsId],
       );
       await client.query(
         `INSERT INTO demo_orders (order_id, workspace_id, member_id, room_type, check_in, check_out, amount_fen, status) VALUES
-           ('O-20260820-001',$1,'M-1001','豪华大床房','2026-08-21','2026-08-23',117600,'已确认'),
-           ('O-20260818-002',$1,'M-1001','行政双床房','2026-08-18','2026-08-19',68800,'已完成'),
-           ('O-20260822-003',$1,'M-1002','山景大床房','2026-08-25','2026-08-26',52800,'已确认')
+           ('OD-20260820-001',$1,'M-1001','磁吸充电宝 10000mAh ×2','2026-08-20','2026-08-22',17800,'已签收'),
+           ('OD-20260818-002',$1,'M-1001','折叠收纳箱 55L ×4','2026-08-18','2026-08-19',19600,'已签收'),
+           ('OD-20260822-003',$1,'M-1002','氮化镓快充头 65W ×1','2026-08-22','2026-08-25',7900,'配送中')
          ON CONFLICT (workspace_id, order_id) DO NOTHING`,
         [wsId],
       );

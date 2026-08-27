@@ -128,7 +128,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--line)}
     <span class="mode" id="modeTag">产业带货架电商模式</span>
     <div class="store">门店：
       <select id="storeSel" onchange="onStore(this.value)">
-        <option value="yunqi">熊猫优选·天猫旗舰店（3,214 SKU）</option>
+        <option value="panda">熊猫优选·天猫旗舰店（3,214 SKU）</option>
         <option value="xixi">熊猫优选·京东店（1,866 SKU）</option>
         <option value="manlong">熊猫优选·亚马逊店（412 SKU · 跨境）</option>
         <option value="all">🌐 全店视图（3 店）</option>
@@ -146,7 +146,7 @@ td{padding:9px 10px;border-bottom:1px solid var(--line)}
 /* ================= 模拟数据（实际可替换） ================= */
 const D = {
   kpi: {
-    yunqi: {occ:"3.8%",adr:"¥101",rev:"¥4.1万",rev30:"¥108.4万",dOcc:"+0.3pt",dAdr:"+2.2%",dRev:"+5.8%",dRev30:"达成 78%"},
+    panda: {occ:"3.8%",adr:"¥101",rev:"¥4.1万",rev30:"¥108.4万",dOcc:"+0.3pt",dAdr:"+2.2%",dRev:"+5.8%",dRev30:"达成 78%"},
     xixi: {occ:"3.2%",adr:"¥99",rev:"¥3.6万",rev30:"¥88.9万",dOcc:"+0.2pt",dAdr:"+1.1%",dRev:"+2.4%",dRev30:"达成 71%"},
     manlong: {occ:"4.1%",adr:"$14.2",rev:"$0.6万",rev30:"¥42.8万",dOcc:"+0.4pt",dAdr:"-0.8%",dRev:"+6.1%",dRev30:"达成 84%"},
   },
@@ -210,9 +210,9 @@ const D = {
   faq:[["海外仓时效多久","周问 5 次","待确认"],["支持越南语客服吗","周问 4 次","待确认"],["几天无理由退货","已入库 · 首响 2.8s","已确认"],["买贵了能补差吗","已入库 · 首响 2.5s","已确认"]],
 };
 const TITLES={today:"今日驾驶舱",goals:"经营目标",stores:"多店管理",report:"经营分析",orders:"订单全流程穿透",channels:"平台运营",price:"定价与毛利矩阵",parity:"价格健康（倒挂/超卖）",reviews:"口碑与差评",phone:"AI 多语种客服",crm:"会员与复购",front:"出库与智能波次",house:"库存与质检",night:"夜班驾驶舱",handover:"交接班",approvals:"审批队列",fence:"围栏引擎 R1–R20",skills:"技能市场",memory:"组织记忆",incident:"断点看板",staff:"排班与安全",archive:"一店一档"};
-const storeName={yunqi:"熊猫优选·天猫旗舰店",xixi:"熊猫优选·京东店",manlong:"熊猫优选·亚马逊店",all:"全店视图"};
-const storeMode={yunqi:"产业带货架电商模式",xixi:"平台自营模式",manlong:"跨境 DDP 模式",all:"店主驾驶舱 · 多模式混合"};
-let curStore="yunqi";
+const storeName={panda:"熊猫优选·天猫旗舰店",xixi:"熊猫优选·京东店",manlong:"熊猫优选·亚马逊店",all:"全店视图"};
+const storeMode={panda:"产业带货架电商模式",xixi:"平台自营模式",manlong:"跨境 DDP 模式",all:"店主驾驶舱 · 多模式混合"};
+let curStore="panda";
 
 /* ================= 工具 ================= */
 const el=h=>h;
@@ -225,7 +225,7 @@ function ring(label,pct,color){return `<div class="ring" style="background:conic
 
 /* ================= 页面渲染 ================= */
 const P={};
-P.today=()=>{const k=D.kpi[curStore]||D.kpi.yunqi;return `
+P.today=()=>{const k=D.kpi[curStore]||D.kpi.panda;return `
 <div class="grid g4">
  <div class="card"><h3>今日转化率</h3><div class="kpi">${k.occ}</div><div class="delta up">▲ ${k.dOcc} vs 上周同日</div></div>
  <div class="card"><h3>客单价</h3><div class="kpi">${k.adr}</div><div class="delta up">▲ ${k.dAdr}（夜班微调 ×2）</div></div>
@@ -259,7 +259,7 @@ ${D.goals.map(g=>`<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${bar(
 P.stores=()=>`
 <div class="card"><h3>🌐 店主驾驶舱 · 三店同屏（管理半径 3 → 5–8 个店铺）</h3>
 <table><tr><th>店铺</th><th>模式</th><th>转化率</th><th>客单价</th><th>日 GMV</th><th>月目标达成</th><th>昨夜决策包</th><th>断点率(周)</th><th>操作</th></tr>
-<tr><td><b>熊猫优选·天猫旗舰店</b><br><span style="color:var(--sub);font-size:12px">3,214 SKU</span></td><td><span class="tag t-blue">货架</span></td><td>3.8%</td><td>¥101</td><td>¥4.1万</td><td>${bar(78)}</td><td><span class="tag t-green">✓9</span><span class="tag t-amber">◆1</span><span class="tag t-gray">▲0</span></td><td>0.8 ↓</td><td><button class="btn sm" onclick="onStore('yunqi');go('today')">进入</button></td></tr>
+<tr><td><b>熊猫优选·天猫旗舰店</b><br><span style="color:var(--sub);font-size:12px">3,214 SKU</span></td><td><span class="tag t-blue">货架</span></td><td>3.8%</td><td>¥101</td><td>¥4.1万</td><td>${bar(78)}</td><td><span class="tag t-green">✓9</span><span class="tag t-amber">◆1</span><span class="tag t-gray">▲0</span></td><td>0.8 ↓</td><td><button class="btn sm" onclick="onStore('panda');go('today')">进入</button></td></tr>
 <tr><td><b>熊猫优选·京东店</b><br><span style="color:var(--sub);font-size:12px">1,866 SKU</span></td><td><span class="tag t-gold">自营</span></td><td>3.2%</td><td>¥99</td><td>¥3.6万</td><td>${bar(71)}</td><td><span class="tag t-green">✓6</span><span class="tag t-amber">◆2</span><span class="tag t-gray">▲0</span></td><td>1.2 ↓</td><td><button class="btn sm" onclick="onStore('xixi');go('today')">进入</button></td></tr>
 <tr><td><b>熊猫优选·亚马逊店</b><br><span style="color:var(--sub);font-size:12px">412 SKU</span></td><td><span class="tag t-red">跨境</span></td><td>4.1%</td><td>$14.2</td><td>$0.6万</td><td>${bar(84,'var(--green)')}</td><td><span class="tag t-green">✓8</span><span class="tag t-gray">◆0</span><span class="tag t-red">▲1</span></td><td>0.5 ↓</td><td><button class="btn sm" onclick="onStore('manlong');go('today')">进入</button></td></tr></table></div>
 <div class="grid g2" style="margin-top:14px">

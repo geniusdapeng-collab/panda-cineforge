@@ -19,7 +19,7 @@ export const WhoSchema = z.looseObject({
 });
 export type Who = z.infer<typeof WhoSchema>;
 
-/** Context：租户/工作区/时间为必填；行业字段集（酒店：store/channel/stage）由 bundle 扩展 */
+/** Context：租户/工作区/时间为必填；行业字段集（电商：store/channel/stage）由 bundle 扩展 */
 export const ContextSchema = z.looseObject({
   tenant_id: z.string().min(1),
   workspace_id: z.string().min(1),
@@ -30,7 +30,7 @@ export const ContextSchema = z.looseObject({
 });
 export type EventContext = z.infer<typeof ContextSchema>;
 
-/** Object：对象枚举行业化（酒店=房型/房价/渠道/订单/客人/评价/门店/员工） */
+/** Object：对象枚举行业化（电商=商品/价格/平台/订单/买家/评价/店铺/员工） */
 export const ObjectSchema = z.looseObject({
   type: z.string().min(1),
   id: z.string().optional(),

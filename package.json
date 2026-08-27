@@ -62,5 +62,5 @@
     "vitest": "^4.1.11",
     "yaml": "2.9.0"
   },
-  "description": "WorkLoom 熊猫电商运营系统 · AI 前厅/客房/收益一体化（酒店垂直版）"
+  "description": "WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）"
 }

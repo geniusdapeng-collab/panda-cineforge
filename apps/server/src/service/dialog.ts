@@ -1,9 +1,12 @@
 /**
  * service · 对话（接口对齐 packages/base/service-dialog 签名；表结构为底座迁移版）
  * 意图流水线（M8：与 packages/base/service-dialog/intents.ts 同一张规则表 ruleBasedIntent）：
- *   complaint（投诉）> biz_query（订单/会员/房价/工单进度）> service_request（报修服务类，产 ticketDraft）
+ *   complaint（投诉）> biz_query（订单/会员/服务目录/工单进度）> service_request（售后服务类，产 ticketDraft）
  *   > kb_qa（KB 检索三档分流）> chat（规则未命中兜底）
- *   疑问句（几点/时间/吗/呢/怎么/如何）优先 kb_qa 不建单；「修/修一下/坏了」直连 service_request。
+ *   疑问句（几点/时间/吗/呢/怎么/如何）优先 kb_qa 不建单；「修/修一下/坏了」直连 service_request；
+ *   电商售后动作（退款/退货/换货/价保/纠纷，规则表未命中时）兜底补判为 service_request。
+ * 多模态（演示级，不接真实视觉模型）：mediaKindOfText 识别 [截图]/[图片]/[视频] 标记，
+ *   网关联动「截图→订单关联 / 图片→商品卡片 / 视频→安装步骤」回复结构。
  * 置信度三档（H5：检索 score 归一化 0..1，复用 base scoreChunkFallback）：
  *   ≥0.72 直接作答（带引用）；0.45–0.72 作答但附「可能不完全准确」提示；<0.45 诚实拒答 + ticketDraft。
  * 命中 KB 必带 citations，无据不答（诚实拒答）。
@@ -39,31 +42,54 @@ function newId(prefix: string): string {
 
 /* ================= 意图（M8：复用 base 同一张规则表） ================= */
 
-/** 工单进度查询（server 侧特有 biz_query 子类，先于规则表判定） */
-const RE_TICKET_STATUS = /工单.*(进度|状态|怎么样)|进度.*工单/;
-const RE_ORDER = /订单|预订|订房|入住记录|房费|账单/;
-const RE_MEMBER = /会员|积分|等级|权益|余额/;
-const RE_CATALOG = /房价|房型|多少钱|价格/;
+/** 工单/售后进度查询（server 侧特有 biz_query 子类，先于规则表判定） */
+const RE_TICKET_STATUS = /工单.*(进度|状态|怎么样)|进度.*工单|售后.*进度/;
+const RE_ORDER = /订单|物流|快递|发货|签收|账单|发票记录/;
+const RE_MEMBER = /会员|积分|等级|权益|余额|优惠券/;
+/** 服务目录查询（退换/保修/安装等政策目录，直连 query_catalog 而非 KB 检索） */
+const RE_CATALOG = /服务目录|售后政策|退换货政策|退货政策|保修政策|安装指导|维修政策/;
+/** 售后动作指令（规则表未命中时兜底建单；疑问句已在规则表分流 kb_qa，不会走到这里） */
+const RE_AFTERSALE_ACTION = /退款|退货|换货|换新|价保|补差|纠纷/;
 
 export function classify(text: string): { intent: Intent; tool?: BizToolName } {
   if (RE_TICKET_STATUS.test(text)) return { intent: "biz_query", tool: "query_ticket" };
+  if (RE_CATALOG.test(text)) return { intent: "biz_query", tool: "query_catalog" };
   const ruled = ruleBasedIntent(text);
   if (ruled === "complaint") return { intent: "complaint" };
   if (ruled === "service_request") return { intent: "service_request" };
   if (ruled === "biz_query") {
     if (RE_MEMBER.test(text)) return { intent: "biz_query", tool: "query_member" };
-    if (RE_CATALOG.test(text)) return { intent: "biz_query", tool: "query_catalog" };
     return { intent: "biz_query", tool: "query_order" };
   }
-  if (ruled === "kb_qa") return { intent: "kb_qa" };
+  // 电商售后动作兜底：规则表（base 通用词表）未命中的退款/退货/换货/价保/纠纷指令 → 建单
+  if (!ruled && RE_AFTERSALE_ACTION.test(text)) return { intent: "service_request" };
   return { intent: "kb_qa" }; // 规则未命中：默认先查知识库（低置信走诚实拒答三档）
 }
 
-/** service_request 文本 → 工单类型（修/坏类 → repair；送/拿/打扫类 → delivery；其余 other） */
-export function ticketKindOf(text: string): "repair" | "delivery" | "other" {
-  if (/维修|修|坏|故障|漏水|不制冷|不制热|空调|热水|马桶/.test(text)) return "repair";
-  if (/送|拿|打扫|换床单|加一|多要|再来/.test(text)) return "delivery";
+/** service_request 文本 → 工单类型（电商售后口径：退款/退货/换货/纠纷/价保 + 兼容 repair/delivery） */
+export function ticketKindOf(
+  text: string,
+): "refund" | "return" | "exchange" | "dispute" | "price_protect" | "repair" | "delivery" | "other" {
+  if (/价保|补差|降价/.test(text)) return "price_protect";
+  if (/换货|换新|换尺码|换颜色|换一/.test(text)) return "exchange";
+  if (/纠纷|争议|维权|鉴定/.test(text)) return "dispute";
+  if (/退款|退钱|仅退款/.test(text)) return "refund";
+  if (/退货|退掉|退回|无理由退/.test(text)) return "return";
+  if (/维修|修|坏|故障|充不进|无法开机|不制冷|不制热|异响|漏水/.test(text)) return "repair";
+  if (/催.*发货|催单|改地址|开发票|补发/.test(text)) return "delivery";
   return "other";
+}
+
+/* ================= 多模态消息（演示级，不接真实视觉模型） ================= */
+
+export type MediaKind = "screenshot" | "image" | "video";
+
+/** 文本内多模态标记识别：[截图]/[图片]/[视频] 前缀或显式关键词（与 seed 多模态会话口径一致） */
+export function mediaKindOfText(text: string): MediaKind | null {
+  if (/\[(截图|screenshot)\]|截图/i.test(text)) return "screenshot";
+  if (/\[(视频|video)\]|视频/i.test(text)) return "video";
+  if (/\[(图片|image)\]|找同款|找类似|有没有类似/i.test(text)) return "image";
+  return null;
 }
 
 /* ================= 置信度三档（H5） ================= */
@@ -81,8 +107,8 @@ export function tierOfScore(score: number | undefined): ConfidenceTier {
   return "low";
 }
 
-export const MEDIUM_HINT = "以上回答可能不完全准确，仅供参考；如需确认可联系前台。";
-export const LOW_REFUSAL = "抱歉，这个问题我暂时无法准确回答，不敢随意编造。已为您准备好工单草稿，确认后转人工跟进；您也可以换个说法再问我。";
+export const MEDIUM_HINT = "以上回答可能不完全准确，仅供参考；如需确认可联系在线客服。";
+export const LOW_REFUSAL = "抱歉，这个问题我暂时无法准确回答，不敢随意编造。已为您准备好工单草稿，确认后转人工客服跟进；您也可以换个说法再问我。";
 
 async function ensureConversation(input: {
   workspaceId: string; cUserId: string; channel: Channel; conversationId?: string;
@@ -144,14 +170,14 @@ export async function handleMessage(input: {
     const answers: Record<BizToolName, string> = {
       query_order: "为您查询到以下订单：",
       query_member: "为您查询到会员信息：",
-      query_catalog: "为您查询到房型价格：",
+      query_catalog: "为您查询到服务目录（退换/保修/安装）：",
       query_ticket: "为您查询到工单进度：",
     };
     result = { intent: "biz_query", answer: answers[tool], confidence: 0.95, citations: [], toolCall: { tool, params: {} } };
   } else if (cls.intent === "complaint") {
     result = {
       intent: "complaint",
-      answer: "非常抱歉给您带来不便。我可以立即为您生成投诉工单，客服部将优先跟进。请确认是否提交？",
+      answer: "非常抱歉给您带来不愉快的购物体验。我可以立即为您生成投诉工单，客服团队将优先跟进。请确认是否提交？",
       confidence: 0.9,
       citations: [],
       ticketDraft: { kind: "complaint", title: input.text.slice(0, 40), payload: { text: input.text } },
@@ -160,7 +186,7 @@ export async function handleMessage(input: {
     const kind = ticketKindOf(input.text);
     result = {
       intent: "service_request",
-      answer: "好的，我可以为您生成服务工单，相关部门会尽快处理。请确认是否提交？",
+      answer: "好的，我可以为您生成售后工单，相关团队会尽快处理。请确认是否提交？",
       confidence: 0.85,
       citations: [],
       ticketDraft: { kind, title: input.text.slice(0, 40), payload: { text: input.text } },
@@ -184,8 +210,8 @@ export async function handleMessage(input: {
         },
       };
     } else if (top) {
-      // top-2 合并：次命中与首命中共享非弱词 token 且自身 ≥0.45 时并入（跨块事实，如「早餐多少钱」）
-      const WEAK = new Set(["时间", "免费", "收费", "可以", "服务", "房间", "酒店", "半天", "一份", "一瓶", "东西", "地方", "怎么", "如何", "一下", "价格", "多少钱", "客房", "住客", "客人", "前台", "工作", "两张", "一张", "几位", "一些"]);
+      // top-2 合并：次命中与首命中共享非弱词 token 且自身 ≥0.45 时并入（跨块事实，如「退货运费谁承担」）
+      const WEAK = new Set(["时间", "免费", "收费", "可以", "服务", "商品", "订单", "店铺", "买家", "客服", "售后", "东西", "地方", "怎么", "如何", "一下", "价格", "多少钱", "包邮", "工作", "一个", "一件", "一些"]);
       const norm = (t: string) => t.toLowerCase().replace(/(?<=[a-z0-9])-(?=[a-z0-9])/g, "");
       const topHay = norm(`${top.heading}\n${top.content}`);
       const topTokens = new Set(topHay.match(/[a-z0-9]+|[\u4e00-\u9fff]{2}/g) ?? []);
@@ -203,7 +229,7 @@ export async function handleMessage(input: {
       if (llm) {
         try {
           answer = await llm(
-            `你是酒店前台客服。仅依据以下资料回答客人问题，不要编造资料之外的信息，回答控制在 80 字内。\n客人：${input.text}\n资料：${blocks.map((h) => h.content.slice(0, 400)).join("\n---\n")}`,
+            `你是电商买家客服。仅依据以下资料回答买家问题，不要编造资料之外的信息，回答控制在 80 字内。\n买家：${input.text}\n资料：${blocks.map((h) => h.content.slice(0, 400)).join("\n---\n")}`,
           );
         } catch (err) {
           console.warn("[service-c] kb_qa 组答 LLM 失败，使用确定性拼装答案：", err instanceof Error ? err.message : err);

@@ -77,7 +77,7 @@ try {
   const q3 = await c("/chat", { method: "POST", body: { text: "帮我送两瓶矿泉水" }, token });
   check("送物产 delivery 草稿", q3.json.ticketDraft?.kind === "delivery" && q3.json.ticket === null);
   const q4 = await c("/chat", { method: "POST", body: { text: "帮我送两瓶矿泉水", confirmTicket: true, idempotencyKey: `${RUN}-t` }, token });
-  check("确认建单 assigned/客房部", q4.json.ticket?.status === "assigned" && q4.json.ticket?.dept === "客房部");
+  check("确认建单 assigned/配送组", q4.json.ticket?.status === "assigned" && q4.json.ticket?.dept === "配送组");
   const ticketId = q4.json.ticket.id;
   const q5 = await c("/chat", { method: "POST", body: { text: "帮我送两瓶矿泉水", confirmTicket: true, idempotencyKey: `${RUN}-t` }, token });
   check("幂等重放同单", q5.json.deduped === true && q5.json.ticket.id === ticketId);

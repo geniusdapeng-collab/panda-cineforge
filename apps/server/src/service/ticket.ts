@@ -39,22 +39,32 @@ export interface TicketEvent {
   detail: Record<string, unknown>; createdAt: string;
 }
 
-/** 部门路由表（kind → 受理部门；可按工作区配置化扩展） */
+/** 部门路由表（kind → 受理团队；电商售后口径，与 scripts/seed.ts 种子一致；可按工作区配置化扩展） */
 export const DEPT_ROUTE: Record<string, string> = {
-  complaint: "客服部",
-  repair: "工程部",
-  delivery: "客房部",
-  service_request: "客房部",
-  consult: "前厅部",
-  other: "前厅部",
+  refund: "售后组",
+  return: "售后组",
+  exchange: "售后组",
+  dispute: "值班主管",
+  price_protect: "客服专家组",
+  complaint: "客服组",
+  repair: "售后组",
+  delivery: "物流组",
+  service_request: "客服组",
+  consult: "客服组",
+  other: "客服组",
 };
 
-/** SLA 时限（小时，按 kind；演示口径） */
+/** SLA 时限（小时，按 kind；电商售后演示口径） */
 const SLA_HOURS: Record<string, number> = {
+  refund: 4,
+  return: 24,
+  exchange: 24,
+  dispute: 2,
+  price_protect: 8,
   complaint: 4,
-  repair: 2,
-  delivery: 1,
-  service_request: 2,
+  repair: 24,
+  delivery: 4,
+  service_request: 4,
   consult: 8,
   other: 24,
 };

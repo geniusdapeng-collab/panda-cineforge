@@ -85,7 +85,7 @@ body{background:#dfe4ee;display:flex;justify-content:center;min-height:100vh}
     <div class="row1">
       <div class="store" id="storeName">熊猫优选集团</div>
       <select id="storeSel" onchange="onStore(this.value)">
-        <option value="yunqi">熊猫优选（天猫旗舰）</option>
+        <option value="panda">熊猫优选（天猫旗舰）</option>
         <option value="xixi">京东店</option>
         <option value="manlong">亚马逊（跨境）</option>
         <option value="all">🌐 全店</option>
@@ -105,7 +105,7 @@ body{background:#dfe4ee;display:flex;justify-content:center;min-height:100vh}
 </div>
 
 <script>
-const K={yunqi:{n:"熊猫优选·天猫旗舰店",occ:"3.8%",adr:"¥101",rev:"¥4.1万",rev30:"¥108.4万"},xixi:{n:"熊猫优选·京东店",occ:"3.2%",adr:"¥99",rev:"¥3.6万",rev30:"¥88.9万"},manlong:{n:"熊猫优选·亚马逊店",occ:"4.1%",adr:"$14.2",rev:"$0.6万",rev30:"¥42.8万"},all:{n:"全店视图（3 店）",occ:"3.7%",adr:"¥100",rev:"¥8.3万",rev30:"¥240.1万"}};
+const K={panda:{n:"熊猫优选·天猫旗舰店",occ:"3.8%",adr:"¥101",rev:"¥4.1万",rev30:"¥108.4万"},xixi:{n:"熊猫优选·京东店",occ:"3.2%",adr:"¥99",rev:"¥3.6万",rev30:"¥88.9万"},manlong:{n:"熊猫优选·亚马逊店",occ:"4.1%",adr:"$14.2",rev:"$0.6万",rev30:"¥42.8万"},all:{n:"全店视图（3 店）",occ:"3.7%",adr:"¥100",rev:"¥8.3万",rev30:"¥240.1万"}};
 let APR=[
 {id:"a1",t:"差评回复草稿（天猫 2 分）",lv:"R9 · 必审",snap:"买家反映收纳箱色差。AI 草稿：致歉→已复核灯光校色→无理由退换+运费险（政策内）→邀评回流。",st:"pending",store:"天猫旗舰"},
 {id:"a2",t:"库存损耗 4.8% 超基线",lv:"R20 · 必审",snap:"快充数据线损耗超基线 1.5×。热力图：大促直播赠品单集中。建议赠品单独建 SKU 核算。",st:"pending",store:"天猫旗舰"},
@@ -164,7 +164,7 @@ ${APR.filter(a=>a.st==="pending").map(a=>`
 
 P.stores=()=>`
 <div class="card"><h3>🌐 一人多店 · 管理半径 3 → 5–8 个店铺</h3>
-${[["yunqi","熊猫优选·天猫旗舰店","3,214 SKU · 货架","3.8%","¥101","✓9 ◆1 ▲0",78],["xixi","熊猫优选·京东店","1,866 SKU · 货架","3.2%","¥99","✓6 ◆2 ▲0",71],["manlong","熊猫优选·亚马逊店","412 SKU · 跨境","4.1%","$14.2","✓8 ◆0 ▲1",84]].map(s=>`
+${[["panda","熊猫优选·天猫旗舰店","3,214 SKU · 货架","3.8%","¥101","✓9 ◆1 ▲0",78],["xixi","熊猫优选·京东店","1,866 SKU · 货架","3.2%","¥99","✓6 ◆2 ▲0",71],["manlong","熊猫优选·亚马逊店","412 SKU · 跨境","4.1%","$14.2","✓8 ◆0 ▲1",84]].map(s=>`
 <div class="item" onclick="document.getElementById('storeSel').value='${s[0]}';onStore('${s[0]}');go('today')" style="cursor:pointer">
 <b>${s[1]} <span class="tag t-blue" style="font-weight:400">${s[2]}</span></b>
 <span>转化 ${s[3]} · 客单 ${s[4]} · 昨夜 ${s[5]}</span>

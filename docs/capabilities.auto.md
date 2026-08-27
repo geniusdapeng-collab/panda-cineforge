@@ -1,6 +1,6 @@
 # panda-ecom · 能力导览（人类版）
 
-> WorkLoom 熊猫电商运营系统 · AI 前厅/客房/收益一体化（酒店垂直版）
+> WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）
 > 本文件由 `node scripts/generate-capabilities.mjs` 从代码事实**自动生成**（2026-08-27），
 > 请勿手改——能力变更后重跑生成器即可。Agent 版机器清单见 docs/capability-map.md。
 

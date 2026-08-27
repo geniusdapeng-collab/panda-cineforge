@@ -98,7 +98,7 @@
 |---|---|---|
 | A. `skills/official/` 顶层目录 | 技能是内容资产而非代码包；与 bundles/ 平级符合仓库直觉；loader 扫描挂载，底座代码零行业词汇 | ✅ 采纳 |
 | B. `packages/base/skills/` 内 | 该包是技能注册机制代码，混入内容资产职责不清 | ❌ 否决 |
-| C. 塞进 bundles/ecommerce | 方法论技能行业无关，放酒店 Bundle 违反"底座不预置行业"红线 | ❌ 否决 |
+| C. 塞进 bundles/ecommerce | 方法论技能行业无关，放电商 Bundle 违反"底座不预置行业"红线 | ❌ 否决 |
 
 **决策（A）**：`skills/official/industry-entry/`（落地四技能+模板）与 `skills/official/product-feedback/`（反哺分析技能）为官方套件家；`packages/base/skills/official.ts` 提供磁盘扫描加载器，seed 时入库。
 
@@ -114,9 +114,9 @@
 
 **决策**：四条红线缺一禁止发送——①opt-in（默认不发送，可随时关闭）②发送前完整预览可编辑 ③过 PII 脱敏管道且仅含能力缺口描述、不含客户经营数据 ④发送行为写入事件库留痕。传输：HTTPS 端点为主、邮件降级；GitHub Issues 会暴露客户信息，明确否决。团队侧 feedback-insight 技能**每日**定时聚类分析产出《产品迭代建议日报》，进审批队列，人审后才转 backlog。
 
-## D20：三模式真实运行态与模型可插拔契约（能力回流自酒店行业版）
+## D20：三模式真实运行态与模型可插拔契约（能力回流自电商行业版）
 
-**背景**：酒店行业版（workloom 仓库）样板间工程中，三模式（ask 问询 / agent 逐步商量 / quest 自主执行）完成真实化并经受真机演示检验。该能力属行业无关的底座能力，回流主仓。
+**背景**：电商行业版（workloom 仓库）样板间工程中，三模式（ask 问询 / agent 逐步商量 / quest 自主执行）完成真实化并经受真机演示检验。该能力属行业无关的底座能力，回流主仓。
 
 **决策**：
 1. **统一 LLM 调用面**：server 内 `llmCall()` 单点装配——`LLM_PROVIDER≠mock` 且凭据齐备即全链真实（意图分类 B8 / 任务规划 B9 / ask 应答合成）；默认 mock 全链确定性兜底（via=rule 留痕，D4 全流程可跑）。模型出站强制脱敏（L6.2）不可绕过。

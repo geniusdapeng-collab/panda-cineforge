@@ -8,7 +8,7 @@ import { eventHash, safeParseReplayAwareEvent } from "@workloom/base/workdata";
 const DATABASE_URL = process.env.DATABASE_URL ?? "postgres://postgres:workloom@localhost:5432/workloom";
 const GATEWAY_URL = process.env.DATABASE_GATEWAY_URL ?? "postgres://workloom_gateway:workloom_dev_gateway@localhost:5432/workloom";
 const TENANT_ID = "tenant-demo";
-const WS_ID = "ws-yunqi";
+const WS_ID = "ws-panda";
 const WS_NAME = "熊猫优选集团";
 const FENCE_VERSION = "ecom-baseline/v1"; // 与 bundles/ecommerce/fences/ecom-baseline.yml 一致
 const GENESIS_HASH = "GENESIS";

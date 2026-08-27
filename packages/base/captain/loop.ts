@@ -303,7 +303,10 @@ export async function runBreakerBeat(
       [scope.workspaceId],
     );
     const after = ((r.rows[0]?.payload?.decision as Record<string, unknown> | undefined)?.after ?? {}) as Record<string, unknown>;
-    return { occ: Number(after.occ ?? NaN), adr: Number(after.adr ?? NaN) };
+    // 行业中性口径：按宪章 kpi_floor 声明的指标键提取（电商=margin_rate/acos，其他行业自定义），缺失记 NaN 不熔断
+    const out: Record<string, number> = {};
+    for (const metric of Object.keys(charter.circuit_breaker.kpi_floor)) out[metric] = Number(after[metric] ?? NaN);
+    return out;
   });
   const verdict = evalCircuitBreaker(charter, kpi as Record<string, number>);
   if (!verdict.tripped || verdict.alreadyTightened) {

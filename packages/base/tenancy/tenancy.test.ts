@@ -68,7 +68,7 @@ describe("越版守卫（H-10：403 + 升级提示）", () => {
 describe("演示身份 JWT", () => {
   const identity: Identity = {
     memberId: "mem-001-id", memberNo: "MEM-001", name: "王店长", role: "owner",
-    tenantId: "tenant-demo", workspaceId: "ws-yunqi", plan: "pro",
+    tenantId: "tenant-demo", workspaceId: "ws-demo", plan: "pro",
   };
 
   it("签发→校验往返一致", async () => {
@@ -96,7 +96,7 @@ d("PG 集成成员读（H-9 跨工作区返回空）", async () => {
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
 
   it("种子工作区读到 3 成员（王店长 owner）", async () => {
-    const ms = await listMembers(pool, { tenantId: "tenant-demo", workspaceId: "ws-yunqi" });
+    const ms = await listMembers(pool, { tenantId: "tenant-demo", workspaceId: "ws-demo" });
     expect(ms.length).toBe(3);
     expect(ms[0]).toMatchObject({ memberNo: "MEM-001", name: "王店长", role: "owner" });
   });

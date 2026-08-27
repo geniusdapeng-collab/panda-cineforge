@@ -82,7 +82,7 @@ const quality = [
   has("setup") && { name: "一键安装（bootstrap）", how: "`pnpm setup`", desc: "克隆后一条命令装好全部能力：环境/依赖/PG/迁移种子/桌面栈，幂等" },
   has("suite") && { name: "主测试套件", how: "`pnpm suite`", desc: "数百条场景用例逐条执行" },
   has("suite:geo") && { name: "GEO 域套件", how: "`pnpm suite:geo`", desc: "GEO 双域专项" },
-  has("suite:ecommerce") && { name: "酒店域套件", how: "`pnpm suite:ecommerce`", desc: "酒店域专项" },
+  has("suite:ecommerce") && { name: "电商域套件", how: "`pnpm suite:ecommerce`", desc: "电商域专项" },
   has("release:gate") && { name: "发布门禁", how: "`pnpm release:gate`", desc: "未全过禁止发布（硬性）" },
   has("db:verify-chain") && { name: "五元事件验链", how: "`pnpm db:verify-chain`", desc: "事件链完整性校验" },
   has("agent:tour") && { name: "Agent 能力巡游", how: "`pnpm agent:tour`", desc: "AI Agent 一键自检全部能力" },
