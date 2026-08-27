@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkLoom 熊猫电商运营系统 · PC 工作台（熊猫优选集团样板间）</title>
+<style>
+:root{--navy:#1B2A4E;--navy2:#24365f;--gold:#C9A45C;--bg:#F4F6FA;--card:#fff;--ink:#1c2333;--sub:#6b7690;--green:#2e9e6b;--amber:#d9930d;--red:#d64545;--line:#e6eaf2;--blue:#3f6fe0}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+body{background:var(--bg);color:var(--ink)}
+#app{display:flex;min-height:100vh}
+aside{width:224px;background:var(--navy);color:#cdd6ea;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+aside .logo{padding:20px 18px 14px;color:#fff;font-size:17px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.08)}
+aside .logo small{display:block;font-size:11px;color:var(--gold);font-weight:400;margin-top:3px}
+aside .sec{padding:14px 18px 6px;font-size:11px;color:#7f8db3;letter-spacing:1px}
+aside a{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13.5px;color:#cdd6ea;cursor:pointer;border-left:3px solid transparent;text-decoration:none}
+aside a:hover{background:var(--navy2);color:#fff}
+aside a.on{background:var(--navy2);color:#fff;border-left-color:var(--gold)}
+aside a .b{margin-left:auto;background:var(--red);color:#fff;font-size:10px;border-radius:8px;padding:1px 7px}
+main{flex:1;min-width:0}
+.topbar{background:#fff;border-bottom:1px solid var(--line);padding:12px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50}
+.topbar h1{font-size:16px}
+.mode{font-size:11px;background:#eef2fb;color:var(--blue);border-radius:10px;padding:3px 10px}
+.store{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}
+select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;background:#fff}
+.live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--green);animation:p 1.6s infinite}
+@keyframes p{50%{opacity:.3}}
+.page{padding:22px 24px 60px;display:none}
+.page.on{display:block}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h3{font-size:13px;color:var(--sub);font-weight:500;margin-bottom:8px}
+.kpi{font-size:26px;font-weight:700}
+.kpi small{font-size:12px;color:var(--sub);font-weight:400;margin-left:6px}
+.delta{font-size:12px;margin-top:4px}.up{color:var(--green)}.down{color:var(--red)}.warn{color:var(--amber)}
+.tag{display:inline-block;font-size:11px;border-radius:8px;padding:2px 8px;margin-right:6px}
+.t-green{background:#e5f5ec;color:var(--green)}.t-amber{background:#fbf1da;color:var(--amber)}.t-red{background:#fbe5e5;color:var(--red)}.t-blue{background:#e8effc;color:var(--blue)}.t-gray{background:#eef1f6;color:var(--sub)}.t-gold{background:#f7efdd;color:var(--gold)}
+.list .row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+.list .row:last-child{border-bottom:none}
+.list .row:hover{background:#fafbfe}
+.row .t{color:var(--sub);font-size:12px;flex-shrink:0;width:52px}
+.row .main{flex:1;min-width:0}.row .main b{display:block;font-size:13px}.row .main span{font-size:12px;color:var(--sub)}
+.btn{border:none;border-radius:9px;padding:7px 16px;font-size:13px;cursor:pointer;background:var(--navy);color:#fff}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn.gold{background:var(--gold)}
+.btn.sm{padding:4px 12px;font-size:12px;border-radius:7px}
+.btn:disabled{opacity:.45;cursor:default}
+.bar{height:8px;border-radius:4px;background:#edf0f6;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--blue)}
+.ringwrap{display:flex;gap:18px;align-items:center}
+.ring{width:86px;height:86px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;position:relative}
+.ring b{font-size:18px}.ring span{font-size:11px;color:var(--sub);font-weight:400}
+.cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.col-h{font-size:12px;font-weight:600;padding:8px 12px;border-radius:9px;margin-bottom:8px}
+.ch-g{background:#e5f5ec;color:var(--green)}.ch-a{background:#fbf1da;color:var(--amber)}.ch-r{background:#fbe5e5;color:var(--red)}
+.mini{background:#fafbfe;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:8px;cursor:pointer}
+.mini:hover{border-color:var(--gold)}
+.mini b{display:block;font-size:12.5px;margin-bottom:2px}
+.mini span{color:var(--sub);font-size:11.5px}
+.modal-mask{position:fixed;inset:0;background:rgba(20,28,48,.45);display:none;align-items:center;justify-content:center;z-index:99}
+.modal-mask.on{display:flex}
+.modal{background:#fff;border-radius:16px;width:640px;max-width:92vw;max-height:84vh;overflow-y:auto;padding:24px 26px}
+.modal h2{font-size:17px;margin-bottom:4px}
+.modal .sub{font-size:12.5px;color:var(--sub);margin-bottom:14px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:7px 14px;font-size:13px;margin:12px 0}
+.kv b{color:var(--sub);font-weight:500}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.flow .st{background:#eef2fb;color:var(--navy);font-size:12px;border-radius:8px;padding:5px 10px}
+.flow .st.done{background:#e5f5ec;color:var(--green)}
+.flow .st.cur{background:var(--gold);color:#fff}
+.flow .ar{color:#b8c0d4}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:10px 22px;font-size:13px;display:none;z-index:120}
+.toast.on{display:block;animation:up .25s}
+@keyframes up{from{transform:translate(-50%,10px);opacity:0}}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--sub);font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;gap:8px;font-size:12px;margin:7px 0}
+.hbar .lb{width:120px;color:var(--sub);flex-shrink:0}
+.hbar .bar{flex:1}
+.hbar .vl{width:70px;text-align:right}
+.note{font-size:12px;color:var(--sub);background:#fafbfe;border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin-top:14px}
+.search{display:flex;gap:8px;margin-bottom:14px}
+.search input{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px 14px;font-size:13px}
+.gesture{display:flex;gap:10px;margin-top:14px}
+.gesture .btn{flex:1;padding:10px}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.cols3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+<aside>
+  <div class="logo">WorkLoom 织元<small>电商智能经营系统 · 样板间</small></div>
+  <div class="sec">经营驾驶</div>
+  <a data-p="today" class="on">📊 今日驾驶舱</a>
+  <a data-p="goals">🎯 经营目标</a>
+  <a data-p="stores">🏪 多店管理</a>
+  <a data-p="report">📈 经营分析</a>
+  <div class="sec">订单与平台</div>
+  <a data-p="orders">🧾 订单穿透</a>
+  <a data-p="channels">📡 平台运营</a>
+  <a data-p="price">💰 定价与毛利</a>
+  <a data-p="parity">🛡️ 价格健康</a>
+  <div class="sec">买家与口碑</div>
+  <a data-p="reviews">⭐ 口碑与差评 <span class="b">2</span></a>
+  <a data-p="phone">📞 多语种客服</a>
+  <a data-p="crm">👥 会员与复购</a>
+  <div class="sec">仓储与发货</div>
+  <a data-p="front">📦 出库与波次</a>
+  <a data-p="house">🧹 库存与质检</a>
+  <div class="sec">夜班</div>
+  <a data-p="night">🌙 夜班驾驶舱</a>
+  <a data-p="handover">🔁 交接班</a>
+  <div class="sec">组织与安全</div>
+  <a data-p="approvals">✋ 审批队列 <span class="b">3</span></a>
+  <a data-p="fence">⛓️ 围栏 R1–R20</a>
+  <a data-p="skills">🧩 技能市场</a>
+  <a data-p="memory">🧠 组织记忆</a>
+  <a data-p="incident">🧯 断点看板</a>
+  <a data-p="staff">🧑‍🤝‍🧑 排班与安全</a>
+  <a data-p="archive">🗂️ 一店一档</a>
+</aside>
+<main>
+  <div class="topbar">
+    <h1 id="ptitle">今日驾驶舱</h1>
+    <span class="mode" id="modeTag">产业带货架电商模式</span>
+    <div class="store">门店：
+      <select id="storeSel" onchange="onStore(this.value)">
+        <option value="yunqi">熊猫优选·天猫旗舰店（3,214 SKU）</option>
+        <option value="xixi">熊猫优选·京东店（1,866 SKU）</option>
+        <option value="manlong">熊猫优选·亚马逊店（412 SKU · 跨境）</option>
+        <option value="all">🌐 全店视图（3 店）</option>
+      </select>
+    </div>
+    <span class="live"><i></i>样板间管家在线 · 数据每 5 分钟刷新</span>
+  </div>
+  <div id="pages"></div>
+</main>
+</div>
+<div class="modal-mask" id="mask" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 模拟数据（实际可替换） ================= */
+const D = {
+  kpi: {
+    yunqi: {occ:"3.8%",adr:"¥101",rev:"¥4.1万",rev30:"¥108.4万",dOcc:"+0.3pt",dAdr:"+2.2%",dRev:"+5.8%",dRev30:"达成 78%"},
+    xixi: {occ:"3.2%",adr:"¥99",rev:"¥3.6万",rev30:"¥88.9万",dOcc:"+0.2pt",dAdr:"+1.1%",dRev:"+2.4%",dRev30:"达成 71%"},
+    manlong: {occ:"4.1%",adr:"$14.2",rev:"$0.6万",rev30:"¥42.8万",dOcc:"+0.4pt",dAdr:"-0.8%",dRev:"+6.1%",dRev30:"达成 84%"},
+  },
+  package: {
+    done:[["对账零差异","订单×平台×结算三轮一致 · 02:14"],["夜班调价 ×2","快充头 ¥129→¥131（R7 ≤3% auto）"],["竞对价格卡 ×3","倍思/绿联/品胜"],["跨境店会话 ×412","AI 托管应答 398 · 转人工 14"],["FAQ 夜间应答 ×6","多语种客服独立处理"],["出库波次加急 ×2","大促截单优先排序"]],
+    pend:[["差评回复草稿","天猫 2 分 · 收纳箱色差 · R9 必审","apr1"]],
+    esc:[],
+  },
+  alerts:[["amber","⚠️ 差评 SLA 倒计时","天猫 RV-33102 已 19h 未回复（2h SLA 将自动升级 R9）"],["red","🛡️ 拼多多倒挂熔断","发布价 ¥99 < 他平台最低 ¥129×90%（R18 block · 昨 14:20）"],["green","✅ ERP 库存已恢复","同步失败自动下架 → 人工核验回架（R20 闭环）"]],
+  approvals:[
+    {id:"apr1",t:"差评回复草稿（天猫 2 分）",lv:"R9 · review",snap:"买家反映收纳箱色差。AI 草稿：致歉→已复核灯光校色→无理由退换+运费险（政策内）→邀评回流。",st:"pending"},
+    {id:"apr2",t:"库存月损耗 4.8% 超基线（R20）",lv:"R20 · review",snap:"快充数据线损耗率 4.8% > 基线 3%×1.5。热力图：大促直播赠品单集中。建议：赠品单独建 SKU 核算。",st:"pending"},
+    {id:"apr3",t:"调价越线审批：双11 快充头 ¥119→¥131（+10.1%）",lv:"R8/R1 · review",snap:"超单日 8% 上限。依据：去年双11 转化率 6.8%、竞对 ¥139、当前备货进度 71%。",st:"pending"},
+    {id:"apr4",t:"采购补货：快充数据线 ×2,000（¥12,800）",lv:"R11 · review",snap:"低于安全库存 7 天。主供应商 ¥6.4/条 vs 备选 ¥6.1/条，建议备选（账期 30 天）。",st:"approved"},
+    {id:"apr5",t:"调价上限放宽提案 8%→10%",lv:"单调守卫",snap:"系统拒绝：基线围栏只可在收紧方向演进（F2.3）。店主已驳回留痕。",st:"rejected"},
+  ],
+  fence:[
+    ["R1","商品单日涨幅 ≤8%","auto","sku_price · price.adjust"],["R2","毛利红线 32% 熔断","block","sku_price · price.adjust"],
+    ["R3","新店铺首发必审","review","channel · price.adjust/content.publish"],["R4","广告日预算 ≥¥5,000 必审","review","ads · ads.budget"],
+    ["R5","高危承诺一律人审","block","cs · cs.promise"],["R6","差评 ≤3 分必审","review","review · review.reply"],
+    ["R7","夜班微调 ≤3% 自动","auto","sku_price · price.adjust（夜班）"],["R8","夜班越线必审","review","sku_price · price.adjust（夜班）"],
+    ["R9","差评 2h 未响应升级","review","review · alert.escalate"],["R10","安全禁区：AI 只告警","block","safety · safety.handle"],
+    ["R11","采购 ≥¥5,000 必审","review","supplier · procurement.order"],["R12","纠纷升级关键词转人工","block","cs · cs.escalate"],
+    ["R13","涉费承诺必审","review","buyer · buyer.promise"],["R14","赔偿事项必审","review","order · compensation.claim"],
+    ["R15","直播+新平台双首发必审","review","campaign · live.stream.publish"],["R16","夜班高危禁区","block","order/sku · desktop.gui/refund/reassign"],
+    ["R17","竞品跟卖与盗图巡检","block","competitor · competitor.scan"],["R18","跨平台价格倒挂熔断","block","channel · price.publish"],
+    ["R19","买家触达合规","block","crm · crm.touch"],["R20","库存损耗/同步失败 >基线 1.5× 必审","review","inventory · inventory.loss"],
+  ],
+  skills:[
+    ["cs-peak-mode","大促客服洪峰技能","流量峰值预案/洪峰排班",1],["gmv-manager","GMV 经营专家","数据收集/调价建议/效果归因",1],["pricing-matrix","价格矩阵","大促策略/价格日历",1],
+    ["channel-reconciler","平台对账","三轮比对/差异提示",1],["overbooking-parity-guard","倒挂超卖看门狗","15min 巡检/熔断/自动下架",1],
+    ["review-crisis","差评危机处置","实时监控/安抚草稿/SLA",1],["review-asset-mining","好评资产挖矿","卖点聚类/内容反哺",1],
+    ["pre-sale-convert","售前转化跟单","商品卡内嵌/优惠券/跟单话术",1],["refund-flow","退换退款自助流","退货/换货/价保全链路",1],
+    ["customer-service","客服技能","FAQ 自生长/首响30s",1],["cs-multilang","多语种客服","8 语种 24h/三级转人工",1],
+    ["morning-briefing","清晨简报","决策包三栏投影",1],["handover-manager","交接班","待办自动成单/签收",1],
+    ["inspection-suite","出库质检","清单数字化/AI 初检",1],["overseas-warehouse","海外仓调度","时效分层/逆向退货",1],
+    ["staff-scheduler","智能排班","预测驱动/合规拦截",1],["inventory-procurement","库存采购","库存四态/比价/补货",1],
+    ["finance-reporting","财务报表","自然语言取数/店主月报",1],["retention-manager","复购召回","画像筛选/关怀话术",1],
+    ["buyer-profile-crm","买家画像 CRM","偏好记忆/复购运营",1],["logistics-query","物流查询","轨迹追踪/异常查单",1],
+    ["safety-compliance","安全合规","禁区告警/三级应急",1],["content-marketing","内容营销","小红书抖音选题文案",1],
+    ["ai-live-assistant","AI 直播助手","直播排期/口播合规",1],["incident-postmortem","断点根因闭环","四分类/固化联动/收敛周报",1],
+    ["ops-playbook","大促爆单冲刺包","团队自建 · 冲刺 SOP",2],["industry-best","差评安抚话术集","行业共享 · 已脱敏待装",0],
+  ],
+  memory:[
+    ["pattern","3C 配件周末转化率高，周六 10:00 前提价 5% 转化损失最小","86%","E-20031 等 ×3"],
+    ["sop","差评致歉结构 v2：致歉→核实→整改→邀评回流；禁用档案外承诺","90%","E-20102 等 ×3"],
+    ["pattern","夜班 R7 微调集中 23:00–01:00 欧美盘收尾窗口，30 天零越线","82%","E-20088 等 ×3"],
+    ["preference","王店主调价偏好：大促提前 14 天布局、单次 ≤5%","75%","E-20012 等 ×2"],
+    ["pattern","买家咨询 TOP3：发货时效/退货政策/价保，占会话 60%+","88%","E-20401 等 ×3"],
+    ["sop","平台直连中断：自动下架→人工核验→恢复→复盘","78%","E-20986 等 ×2"],
+    ["pattern","快充数据线损耗偏高（直播赠品单集中），赠品已单独建 SKU","70%","E-21055 等 ×2"],
+    ["sop","断点根因四分类纪律：未分类不许结案；≥3 次/周触发固化","84%","E-20771 等 ×2"],
+  ],
+  incidents:[
+    ["08-14 01:20","拼多多 API 限流改价失败","适配器降级重试 · 38s","数据缺失","补录限流退避字段 → 次周同类 0"],
+    ["08-17 22:40","订单收件信息不全（缺电话）","AI 自动联系买家补充","规则未覆盖","生成确认 SOP 草稿进审批"],
+    ["08-18 02:50","ERP 库存同步断连","人工接管录单到场","能力边界","登记人工保留区+应急预案更新"],
+    ["08-19 15:10","买家要求定制刻字","AI 识别复杂度→转远程店主","真随机","纳入应急演练剧本"],
+  ],
+  goals:[["转化率",0.04,0.038,"78%"],["客单价",105,101,"74%"],["月 GMV",1200000,1084000,"76%"],["复购率",0.28,0.284,"达成 101%"]],
+  faq:[["海外仓时效多久","周问 5 次","待确认"],["支持越南语客服吗","周问 4 次","待确认"],["几天无理由退货","已入库 · 首响 2.8s","已确认"],["买贵了能补差吗","已入库 · 首响 2.5s","已确认"]],
+};
+const TITLES={today:"今日驾驶舱",goals:"经营目标",stores:"多店管理",report:"经营分析",orders:"订单全流程穿透",channels:"平台运营",price:"定价与毛利矩阵",parity:"价格健康（倒挂/超卖）",reviews:"口碑与差评",phone:"AI 多语种客服",crm:"会员与复购",front:"出库与智能波次",house:"库存与质检",night:"夜班驾驶舱",handover:"交接班",approvals:"审批队列",fence:"围栏引擎 R1–R20",skills:"技能市场",memory:"组织记忆",incident:"断点看板",staff:"排班与安全",archive:"一店一档"};
+const storeName={yunqi:"熊猫优选·天猫旗舰店",xixi:"熊猫优选·京东店",manlong:"熊猫优选·亚马逊店",all:"全店视图"};
+const storeMode={yunqi:"产业带货架电商模式",xixi:"平台自营模式",manlong:"跨境 DDP 模式",all:"店主驾驶舱 · 多模式混合"};
+let curStore="yunqi";
+
+/* ================= 工具 ================= */
+const el=h=>h;
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2200)}
+function openModal(html){document.getElementById("modal").innerHTML=html;document.getElementById("mask").classList.add("on")}
+function closeModal(){document.getElementById("mask").classList.remove("on")}
+function onStore(v){curStore=v;document.getElementById("modeTag").textContent=storeMode[v];render(curPage);toast("已切换："+storeName[v])}
+function bar(pct,color){return `<div class="bar"><i style="width:${pct}%;background:${color||'var(--blue)'}"></i></div>`}
+function ring(label,pct,color){return `<div class="ring" style="background:conic-gradient(${color} ${pct*3.6}deg,#edf0f6 0)"><b>${pct}%</b><span>${label}</span></div>`}
+
+/* ================= 页面渲染 ================= */
+const P={};
+P.today=()=>{const k=D.kpi[curStore]||D.kpi.yunqi;return `
+<div class="grid g4">
+ <div class="card"><h3>今日转化率</h3><div class="kpi">${k.occ}</div><div class="delta up">▲ ${k.dOcc} vs 上周同日</div></div>
+ <div class="card"><h3>客单价</h3><div class="kpi">${k.adr}</div><div class="delta up">▲ ${k.dAdr}（夜班微调 ×2）</div></div>
+ <div class="card"><h3>日 GMV</h3><div class="kpi">${k.rev}</div><div class="delta up">▲ ${k.dRev}</div></div>
+ <div class="card"><h3>本月 GMV</h3><div class="kpi">${k.rev30}</div><div class="delta warn">🎯 目标 ${k.dRev30}</div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>🌙 夜班决策包 · 今晨 08:30 投递（夜班班组自治成果）</h3>
+<div class="cols3">
+ <div><div class="col-h ch-g">✓ 已完成 ${D.package.done.length}</div>${D.package.done.map(x=>`<div class="mini" onclick="toast('事件溯源：哈希链可验证')"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div>
+ <div><div class="col-h ch-a">◆ 待审批 ${D.package.pend.length}</div>${D.package.pend.map(x=>`<div class="mini" onclick="go('approvals')"><b>${x[0]}</b><span>${x[1]} · 点击去审批 →</span></div>`).join("")}</div>
+ <div><div class="col-h ch-r">▲ 需介入 ${D.package.esc.length}</div><div class="mini" style="text-align:center;color:var(--green);padding:26px 10px">🎉 昨夜零需介入<br><span style="color:var(--sub)">连续 6 天</span></div></div>
+</div></div>
+<div class="card" style="margin-top:14px"><h3>⚡ 实时告警（样板间管家每 5 分钟写入新事件）</h3><div class="list">
+${D.alerts.map(a=>`<div class="row"><span class="tag t-${a[0]}">●</span><div class="main"><b>${a[1]}</b><span>${a[2]}</span></div><button class="btn sm ghost" onclick="toast('已打开事件详情（模拟）')">详情</button></div>`).join("")}
+</div></div>
+<div class="note">样板间说明：功能/流程/交互 1:1 真实，业务数据为模拟数据（实际可替换）。你可以点任意卡片下钻。</div>`};
+
+P.goals=()=>`
+<div class="grid g2">
+<div class="card"><h3>🎯 8 月目标 vs 实时达成（${storeName[curStore]}）</h3>
+<div class="ringwrap">${ring("转化率",78,"var(--blue)")}${ring("客单价",74,"var(--gold)")}${ring("复购率",76,"var(--green)")}${ring("GMV",78,"var(--navy)")}</div>
+<table style="margin-top:14px"><tr><th>指标</th><th>月目标</th><th>当前</th><th>时序进度</th><th>状态</th></tr>
+${D.goals.map(g=>`<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td>${bar(parseInt(g[3]))}</td><td><span class="tag t-amber">略落后时序</span></td></tr>`).join("")}</table></div>
+<div class="card"><h3>🔍 偏差归因（自动）</h3>
+<div class="mini" onclick="toast('已下钻到归因事件 E-21102')"><b>近 7 天转化率低于目标 0.6pt</b><span>归因：竞对品胜降价事件 ×2 · 大促后退款 ×3</span></div>
+<div class="mini"><b>💡 联动补救建议（gmv-manager 生成，review 级）</b><span>本周末快充头 ¥129→¥134（+3.8%，R1 内 auto 可执行）；同步小红书「出行快充好物」内容加热</span></div>
+<button class="btn gold" onclick="toast('已生成审批卡，进审批队列');go('approvals')">提交审批</button>
+<button class="btn ghost" onclick="toast('目标向导：年度→月/平台/SKU 自动分解（模拟）')" style="margin-left:8px">调整目标</button>
+<div class="note">目标不再是年初口号：每周可追踪、可归因、可联动作战。跨店对比见「多店管理」。</div></div></div>`;
+
+P.stores=()=>`
+<div class="card"><h3>🌐 店主驾驶舱 · 三店同屏（管理半径 3 → 5–8 个店铺）</h3>
+<table><tr><th>店铺</th><th>模式</th><th>转化率</th><th>客单价</th><th>日 GMV</th><th>月目标达成</th><th>昨夜决策包</th><th>断点率(周)</th><th>操作</th></tr>
+<tr><td><b>熊猫优选·天猫旗舰店</b><br><span style="color:var(--sub);font-size:12px">3,214 SKU</span></td><td><span class="tag t-blue">货架</span></td><td>3.8%</td><td>¥101</td><td>¥4.1万</td><td>${bar(78)}</td><td><span class="tag t-green">✓9</span><span class="tag t-amber">◆1</span><span class="tag t-gray">▲0</span></td><td>0.8 ↓</td><td><button class="btn sm" onclick="onStore('yunqi');go('today')">进入</button></td></tr>
+<tr><td><b>熊猫优选·京东店</b><br><span style="color:var(--sub);font-size:12px">1,866 SKU</span></td><td><span class="tag t-gold">自营</span></td><td>3.2%</td><td>¥99</td><td>¥3.6万</td><td>${bar(71)}</td><td><span class="tag t-green">✓6</span><span class="tag t-amber">◆2</span><span class="tag t-gray">▲0</span></td><td>1.2 ↓</td><td><button class="btn sm" onclick="onStore('xixi');go('today')">进入</button></td></tr>
+<tr><td><b>熊猫优选·亚马逊店</b><br><span style="color:var(--sub);font-size:12px">412 SKU</span></td><td><span class="tag t-red">跨境</span></td><td>4.1%</td><td>$14.2</td><td>$0.6万</td><td>${bar(84,'var(--green)')}</td><td><span class="tag t-green">✓8</span><span class="tag t-gray">◆0</span><span class="tag t-red">▲1</span></td><td>0.5 ↓</td><td><button class="btn sm" onclick="onStore('manlong');go('today')">进入</button></td></tr></table></div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>📨 跨店待审批收件箱（合并视图）</h3><div class="list">
+<div class="row" onclick="go('approvals')"><span class="tag t-amber">天猫旗舰</span><div class="main"><b>差评回复草稿（天猫 2 分）</b><span>R9 必审 · 10 分钟前</span></div>→</div>
+<div class="row" onclick="go('approvals')"><span class="tag t-amber">京东店</span><div class="main"><b>买家触达审批（30 天第 3 次，R19 收紧）</b><span>跨境 patch · 25 分钟前</span></div>→</div>
+<div class="row" onclick="go('approvals')"><span class="tag t-red">亚马逊</span><div class="main"><b>▲ 断点：API 限流 ×1</b><span>适配器降级重试已完成 · 待根因分类</span></div>→</div></div></div>
+<div class="card"><h3>🔔 告警收敛（同源合并，只推该看的）</h3><div class="list">
+<div class="row"><span class="tag t-red">●</span><div class="main"><b>亚马逊店 ▲需介入 ×1</b><span>夜间 API 限流 · 适配器已处置，待结案分类</span></div></div>
+<div class="row"><span class="tag t-amber">●</span><div class="main"><b>天猫差评 SLA 19h</b><span>2h SLA 将自动升级（R9）</span></div></div>
+<div class="row"><span class="tag t-green">●</span><div class="main"><b>三店夜班全部正常交付</b><span>连续 6 天 · 一键制动可用</span></div></div></div></div></div>`;
+
+P.report=()=>`
+<div class="card"><h3>📈 经营分析 · 自然语言取数（报表范式：从做表到问问题）</h3>
+<div class="search"><input id="nlq" value="这个月各平台收入占比和扣点成本"><button class="btn" onclick="toast('查询完成：0.4s（模拟）')">问</button></div>
+<table><tr><th>平台</th><th>收入占比</th><th>收入</th><th>扣点率</th><th>扣点成本</th><th>净贡献</th></tr>
+<tr><td>天猫</td><td>${bar(38)}</td><td>¥41.2万</td><td>5%</td><td>¥2.1万</td><td>¥39.1万</td></tr>
+<tr><td>京东</td><td>${bar(34)}</td><td>¥36.9万</td><td>8%</td><td>¥3.0万</td><td>¥33.9万</td></tr>
+<tr><td>拼多多</td><td>${bar(16)}</td><td>¥17.3万</td><td>3%</td><td>¥0.5万</td><td>¥16.8万</td></tr>
+<tr><td>抖音</td><td>${bar(12,'var(--green)')}</td><td>¥13.0万</td><td>5%</td><td>¥0.7万</td><td><b style="color:var(--green)">¥12.3万</b></td></tr></table>
+<div class="note">💡 AI 洞察：拼多多扣点最低但客单价偏低——建议组合装提升客单（gmv-manager 已生成方案）。店主月报可一键导出。</div>
+<button class="btn" style="margin-top:10px" onclick="toast('店主月报已生成并发送（模拟）')">一键导出店主月报</button></div>
+<div class="grid g3" style="margin-top:14px">
+<div class="card"><h3>30 天转化率曲线</h3>${[["第1周",71],["第2周",78],["第3周",83],["第4周",81]].map(w=>`<div class="hbar"><span class="lb">${w[0]}</span>${bar(w[1],'var(--blue)')}<span class="vl">${w[1]}%</span></div>`).join("")}</div>
+<div class="card"><h3>调价效果归因</h3><div class="mini"><b>8/12 夜班微调 +2.9%</b><span>后 24h 订单 +7（事件同库归因）</span></div><div class="mini"><b>8/16 周末溢价 +5.1%</b><span>后 24h 订单 +12</span></div><div class="mini"><b>8/19 竞对跟进 +1.8%</b><span>后 24h 订单 +3</span></div></div>
+<div class="card"><h3>挽回流失（本月累计）</h3><div class="hbar"><span class="lb">调价及时</span>${bar(70,'var(--green)')}<span class="vl">¥2.3万</span></div><div class="hbar"><span class="lb">差评响应</span>${bar(80,'var(--green)')}<span class="vl">¥1.3万</span></div><div class="hbar"><span class="lb">超卖漏卖</span>${bar(90,'var(--green)')}<span class="vl">¥1.1万</span></div><div class="hbar"><span class="lb">对账差异</span>${bar(95,'var(--green)')}<span class="vl">¥0.8万</span></div></div></div>`;
+
+P.orders=()=>`
+<div class="card"><h3>🧾 订单全流程穿透（从下单到发票，每环可溯源）</h3>
+<div class="search"><input value="手机号后四位 6641"><button class="btn" onclick="toast('已定位订单 OD-882134')">穿透查询</button></div>
+<h3 style="margin-bottom:6px">OD-20260824-7781 · 张女士 · 65W 快充头 ×1 · 天猫</h3>
+<div class="flow">
+<span class="st done">平台下单<br><small>昨 21:03</small></span><span class="ar">→</span>
+<span class="st done">自动确认<br><small>信息完整 · 21:03</small></span><span class="ar">→</span>
+<span class="st done">智能拣货 W-441<br><small>杭州仓现货命中</small></span><span class="ar">→</span>
+<span class="st done">出库<br><small>今 14:12 · 复核打包</small></span><span class="ar">→</span>
+<span class="st cur">物流在途<br><small>顺丰已揽收</small></span><span class="ar">→</span>
+<span class="st">签收</span><span class="ar">→</span><span class="st">电子发票</span>
+</div>
+<div class="kv"><b>执行者</b><span>自动确认=cs-agent · 拣货=warehouse-agent · 出库=warehouse-agent · 物流客服=cs-agent 跟踪</span>
+<b>围栏</b><span>全程 4 次过围栏均 auto 放行（R1/R13 各 1 次留痕）；催发货承诺 → R13 已审 ✓</span>
+<b>异常</b><span style="color:var(--green)">无 · 同步延迟 0（过去平台→ERP 延迟可达数小时）</span></div></div>
+<div class="card" style="margin-top:14px"><h3>今日订单流（实时）</h3><div class="list">
+${[["14:32","OD-882141 · 天猫 · 快充头 ×2","自动确认 ✓"],["14:18","OD-882140 · 京东 · 收纳箱 55L ×2","自动确认 ✓"],["13:55","OD-882139 · 抖音 · 置物架 ×1","收件信息不全 → AI 已联系买家补充 ✓"],["13:40","OD-882138 · 拼多多 · 数据线 ×3","自动确认 ✓"],["13:22","OD-882137 · 天猫 · 退款 ¥620","R14 必审 → 王店主已批准 ✓"]].map(o=>`<div class="row"><span class="t">${o[0]}</span><div class="main"><b>${o[1]}</b><span>${o[2]}</span></div><button class="btn sm ghost" onclick="toast('全链穿透视图已打开（模拟）')">穿透</button></div>`).join("")}
+</div></div>`;
+
+P.channels=()=>`
+<div class="grid g2">
+<div class="card"><h3>📡 全平台健康巡检（每 30 分钟自动）</h3>
+<table><tr><th>平台</th><th>价格一致</th><th>库存同步</th><th>内容新鲜度</th><th>活动</th><th>健康分</th></tr>
+<tr><td>天猫</td><td><span class="tag t-green">✓</span></td><td><span class="tag t-green">✓ 心跳正常</span></td><td><span class="tag t-amber">主图 8 个月未更新</span></td><td>超级品牌日</td><td>86</td></tr>
+<tr><td>京东</td><td><span class="tag t-green">✓</span></td><td><span class="tag t-green">✓</span></td><td><span class="tag t-green">✓</span></td><td>—</td><td>94</td></tr>
+<tr><td>拼多多</td><td><span class="tag t-red">倒挂熔断 ×1</span></td><td><span class="tag t-green">✓</span></td><td><span class="tag t-green">✓</span></td><td>—</td><td>78</td></tr>
+<tr><td>抖音</td><td><span class="tag t-green">✓</span></td><td><span class="tag t-green">✓</span></td><td><span class="tag t-amber">卖点与天猫雷同</span></td><td>直播排期 ×2</td><td>82</td></tr>
+<tr><td>小红书</td><td>—</td><td>—</td><td><span class="tag t-green">本周新发 ×3</span></td><td>种草</td><td>90</td></tr></table>
+<div class="note">整改建议已生成 ×2：天猫主图更换（好评挖矿推荐「开箱实拍」）、抖音卖点差异化。</div></div>
+<div class="card"><h3>📝 内容营销与直播（content-marketing / ai-live-assistant）</h3>
+<div class="mini"><b>本周已发布 ×3</b><span>小红书《出差党的快充装备清单》· 阅读 4.2k · 收藏 380</span></div>
+<div class="mini"><b>好评反哺选题</b><span>买家夸 TOP3：发货快/安装视频/客服耐心 → 已生成 5 个选题</span></div>
+<div class="mini"><b>直播排期：周六 20:00「3C 配件专场」</b><span>R15 双首发必审 · 口播稿合规校验通过（无最低价承诺）</span></div>
+<button class="btn gold" onclick="toast('直播方案审批卡已生成（R15）');go('approvals')">提交直播审批</button></div></div>`;
+
+P.price=()=>`
+<div class="grid g2">
+<div class="card"><h3>💰 连续调价事件流（价格 = 围栏内的连续函数）</h3><div class="list">
+${[["今 02:14","SKU-CHG-65W ¥129→¥131","夜班微调 R7 auto · 依据：竞对 ¥139"],["昨 23:40","SKU-CABLE-2M ¥29→¥30","夜班微调 R7 auto"],["昨 15:20","SKU-BOX-55L ¥79→¥82","白班 R1 auto · 周末转化升温"],["昨 10:05","SKU-CHG-65W ¥124→¥129","白班 R1 auto · 依据：近7日转化 3.4%"],["08-18 16:44","双11 快充头 ¥119→¥131 (+10.1%)","越线 → R8/R1 越线必审 ◆ 待批"]].map(x=>`<div class="row"><span class="t">${x[0]}</span><div class="main"><b>${x[1]}</b><span>${x[2]}</span></div></div>`).join("")}
+</div><div class="note">店主定边界（毛利红线 32% / 涨幅 ≤8% / 夜班 ≤3%），系统在边界内连续作业，越线必审、破红线物理熔断。</div></div>
+<div class="card"><h3>🗓️ 双11 价格矩阵建议（pricing-matrix）</h3>
+<table><tr><th>日期</th><th>快充头</th><th>收纳箱</th><th>数据线</th><th>依据</th></tr>
+<tr><td>11/1（日）</td><td>¥119 <span class="tag t-green">-8%</span></td><td>¥75 <span class="tag t-amber">◆审</span></td><td>¥26</td><td>去年双11 转化 6.8%</td></tr>
+<tr><td>11/10（二）</td><td>¥115 <span class="tag t-green">-11%</span></td><td>¥72</td><td>¥25</td><td>竞对 ¥129+</td></tr>
+<tr><td>11/11（三）</td><td>¥109</td><td>¥69</td><td>¥24</td><td>峰值日</td></tr>
+<tr><td>11/12（四）</td><td>¥124</td><td>¥79</td><td>¥28</td><td>回落</td></tr></table>
+<button class="btn" style="margin-top:10px" onclick="toast('双11 策略已提交审批（提前 14 天策略审批口径）')">采纳并发布（审批后生效）</button></div></div>`;
+
+P.parity=()=>`
+<div class="grid g4">
+<div class="card"><h3>倒挂告警（30 天）</h3><div class="kpi" style="color:var(--red)">2</div><div class="delta">全部 R17 熔断，0 实际发布</div></div>
+<div class="card"><h3>超卖风险拦截</h3><div class="kpi" style="color:var(--amber)">1</div><div class="delta">同步失败自动下架保护（R20）</div></div>
+<div class="card"><h3>平台同步失败率</h3><div class="kpi">0.3%</div><div class="delta up">行业平均约 2%（模拟）</div></div>
+<div class="card"><h3>挽回流失（月）</h3><div class="kpi" style="color:var(--green)">¥1.1万</div><div class="delta">倒挂+超卖漏卖合计（模拟）</div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>🛡️ 处置留痕（检出 → 处置 → 结果 三段式）</h3><div class="list">
+<div class="row"><span class="tag t-red">R18</span><div class="main"><b>拼多多 ¥99 倒挂熔断</b><span>08-16 14:20 检出：发布价 < 他平台最低 ¥129×90% · 熔断并告警</span></div><span class="tag t-green">16:05 已修复 ¥129</span></div>
+<div class="row"><span class="tag t-red">R20</span><div class="main"><b>ERP 库存同步失败 → 自动下架</b><span>08-23 02:40 直连心跳 ×3 失败 · 保护性下架（防超卖/漏卖）</span></div><span class="tag t-green">09:15 人工核验回架</span></div>
+<div class="row"><span class="tag t-amber">巡检</span><div class="main"><b>收纳箱平台图库存异常预警</b><span>可售 -1 风险 · 提前 40 分钟拦截 1 笔超卖</span></div><span class="tag t-green">已闭环</span></div>
+</div></div>`;
+
+P.reviews=()=>`
+<div class="grid g2">
+<div class="card"><h3>⭐ 差评处置（SLA 倒计时 + AI 草稿 + 三手势）</h3>
+<div class="mini" style="border-color:var(--amber)"><b>⏰ 天猫 RV-33102 · 2 分 · 「收纳箱色差」· 已 19h</b><span>2h SLA 将自动升级店主（R9）。AI 草稿：致歉→核实（已校色）→无理由退换→邀评回流</span>
+<div class="gesture"><button class="btn sm gold" onclick="toast('已发布回复（模拟）')">采纳发布</button><button class="btn sm ghost" onclick="toast('已进入编辑（模拟）')">修改</button><button class="btn sm ghost" onclick="toast('已升级电话处置（模拟）')">转人工电话</button></div></div>
+<div class="mini"><b>京东 RV-66413 · 2 分 · 已闭环 ✓</b><span>响应 38 分钟 · 买家追评「处理很快，下次还来」→ 案例已入组织记忆</span></div>
+<div class="note">差评响应从「数小时/隔天」到「分钟级」；差评防御窗口前移到物流在途与签收 48h（主动安抚 ×3 次/月）。</div></div>
+<div class="card"><h3>💎 好评资产挖矿 → 内容反哺</h3>
+<div class="hbar"><span class="lb">发货快/次日达</span>${bar(86,'var(--gold)')}<span class="vl">×142</span></div>
+<div class="hbar"><span class="lb">安装视频指导</span>${bar(64,'var(--gold)')}<span class="vl">×98</span></div>
+<div class="hbar"><span class="lb">包装扎实</span>${bar(48,'var(--gold)')}<span class="vl">×67</span></div>
+<div class="hbar"><span class="lb">客服耐心</span>${bar(40,'var(--gold)')}<span class="vl">×55</span></div>
+<div class="note">买家夸什么就放大什么：已自动生成小红书选题 ×5、抖音脚本 ×2。</div>
+<button class="btn" onclick="toast('选题已发送至 content-marketing（模拟）')">生成内容选题</button></div></div>`;
+
+P.phone=()=>`
+<div class="grid g4">
+<div class="card"><h3>30 天会话</h3><div class="kpi">4.2 万</div><div class="delta">日均 1,400 通</div></div>
+<div class="card"><h3>AI 独立应答</h3><div class="kpi" style="color:var(--green)">78%</div><div class="delta up">知识库命中即答</div></div>
+<div class="card"><h3>转人工</h3><div class="kpi">22%</div><div class="delta">投诉/纠纷升级 · 附上下文摘要</div></div>
+<div class="card"><h3>夜间打扰店主</h3><div class="kpi" style="color:var(--green)">0 次</div><div class="delta up">AI 托管，不叫醒</div></div>
+</div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>📞 实时会话摘要（五元留痕）</h3><div class="list">
+${[["13:42","「几天无理由退货」→ 命中即答","2.8s · 零人工"],["12:15","「支持越南语吗」→ 未命中→转人工","已附对话上下文"],["11:08","「发订单截图催发货」→ 截图识别关联订单","多模态管线 · 已建催单"],["09:50","「关税谁承担」→ 命中即答（英文）","2.5s · 8 语种"],["08:30","「命中投诉工商关键词」→ 硬阻断转人工","R12 红线 · 已留痕"]].map(x=>`<div class="row"><span class="t">${x[0]}</span><div class="main"><b>${x[1]}</b><span>${x[2]}</span></div></div>`).join("")}
+</div></div>
+<div class="card"><h3>🌱 FAQ 知识库自生长</h3>
+${D.faq.map(f=>`<div class="hbar"><span class="lb" style="width:130px">${f[0]}</span><span style="flex:1;font-size:12px;color:var(--sub)">${f[1]}</span>${f[2]==="待确认"?`<button class="btn sm gold" onclick="this.textContent='已入库 ✓';this.disabled=true;toast('FAQ 已确认入库，三通道即刻生效')">确认入库</button>`:`<span class="tag t-green">${f[2]}</span>`}</div>`).join("")}
+<div class="note">知识库不是人工录的静态 FAQ：未命中问题周问 ≥3 次自动成候选，店主一键确认——店越开越聪明。</div></div></div>`;
+
+P.crm=()=>`
+<div class="grid g2">
+<div class="card"><h3>👥 复购看板（retention-manager）</h3>
+<div class="mini"><b>沉睡会员唤醒名单 ×12</b><span>90 天未下单 · 按画像分组（3C 5/家居 4/跨境 3）</span></div>
+<div class="mini"><b>AI 关怀话术示例</b><span>「张女士，您 3 月买的收纳箱出 80L 加大号了，为您留了会员复购价…」</span></div>
+<div class="mini"><b>触达合规</b><span>本客 30 天已触达 1 次（上限 2 次，R19 红线，跨境 patch 更严）</span></div>
+<button class="btn gold" onclick="toast('回访批次已提交审批（R19 合规校验通过）');go('approvals')">审批后批量回访</button></div>
+<div class="card"><h3>🧾 买家画像（buyer-profile-crm）</h3>
+<div class="kv"><b>张女士</b><span>家居收纳 · 买过 4 次 · 偏好奶咖色/大容量 · 差评 0</span>
+<b>陈先生</b><span>3C 数码 · 买过 11 次 · 发票抬头已存/价保常客</span>
+<b>复购率</b><span>28.4%（目标 28%，P12 已挂钩追踪）</span>
+<b>本月会员新增</b><span>+46（店铺会员占比提升 +2.1pt）</span></div></div></div>`;
+
+P.front=()=>`
+<div class="grid g2">
+<div class="card"><h3>📦 今日出库看板</h3>
+<div class="grid g3"><div class="card" style="background:#fafbfe"><h3>待出库</h3><div class="kpi">86</div></div><div class="card" style="background:#fafbfe"><h3>已出库</h3><div class="kpi" style="color:var(--green)">214</div></div><div class="card" style="background:#fafbfe"><h3>已签收</h3><div class="kpi">168</div></div></div>
+<div class="list" style="margin-top:10px">
+<div class="row"><span class="t">14:12</span><div class="main"><b>W-441 · 快充头 ×1（加急）</b><span>买家发截图催单（截图识别）→ 优先出库 · 3.5 分钟办结</span></div><span class="tag t-green">✓</span></div>
+<div class="row"><span class="t">14:05</span><div class="main"><b>W-438 · 收纳箱 55L ×2</b><span>江浙沪次日达线路 · 面单自动带出</span></div><span class="tag t-green">✓</span></div>
+<div class="row"><span class="t">11:40</span><div class="main"><b>W-435 · 置物架 ×1</b><span>大件送装一体 · 附安装工具包与视频教程卡</span></div><span class="tag t-green">✓</span></div>
+</div></div>
+<div class="card"><h3>🧠 智能波次建议（画像+库存避坑）</h3>
+<div class="mini"><b>加急单 W-441（催发货）</b><span>建议插入当前波次首位：买家已建催单工单，SLA 16:00 截单</span></div>
+<div class="mini"><b>跨境集货 W-455（亚马逊 ×8）</b><span>建议合并集货：同目的地美西仓，节约头程运费 ¥120</span></div>
+<div class="mini"><b>大件 W-435（置物架）</b><span>建议走送装一体专线：200 城覆盖 · 安装时段已预约</span></div>
+<div class="note">波次从「仓库经验」变「订单画像 × 库存 × 线路时效数据库」——错发漏发显著下降（模拟）。</div></div></div>`;
+
+P.house=()=>`
+<div class="grid g2">
+<div class="card"><h3>🧹 出库质检（按截单紧急度排序，非波次顺序）</h3><div class="list">
+<div class="row"><span class="tag t-red">急</span><div class="main"><b>W-441 出库质检 → 16:00 截单</b><span>清单 5 项 · 已接单 11:20 · 拍照 AI 初检 pass</span></div><span class="tag t-green">✓ 8min</span></div>
+<div class="row"><span class="tag t-amber">中</span><div class="main"><b>W-446 常规质检</b><span>外观/数量/配件/包装/面单</span></div><span class="tag t-blue">进行中</span></div>
+<div class="row"><span class="tag t-amber">中</span><div class="main"><b>W-452 深度抽检（周计划）</b><span>收纳箱承重抽测+异味检测</span></div><span class="tag t-gray">待派</span></div>
+<div class="row"><span class="tag t-red">返工</span><div class="main"><b>W-430 错配返工</b><span>AI 初检异常（颜色错配）→ 自动返工单 → 复查 pass ✓</span></div><span class="tag t-green">闭环</span></div>
+</div>
+<h3 style="margin-top:12px">拣货组质量画像（30 天沉淀）</h3>
+<div class="hbar"><span class="lb">张姐</span>${bar(96,'var(--green)')}<span class="vl">错发率 0.2%</span></div>
+<div class="hbar"><span class="lb">李姐</span>${bar(88,'var(--green)')}<span class="vl">错发率 0.5%</span></div>
+<div class="hbar"><span class="lb">王姐(新)</span>${bar(72,'var(--amber)')}<span class="vl">错发率 1.2% · 配件遗漏 ×4</span></div>
+<div class="note">画像回流波次权重：加急单优先高画像；店主角色从检查者变教练。</div></div>
+<div class="card"><h3>🧺 库存四态（现货/在途/锁定/报损）</h3>
+<div class="hbar"><span class="lb">现货</span>${bar(52,'var(--blue)')}<span class="vl">6,680 件</span></div>
+<div class="hbar"><span class="lb">在途</span>${bar(22,'var(--gold)')}<span class="vl">1,980 件</span></div>
+<div class="hbar"><span class="lb">锁定</span>${bar(24,'var(--green)')}<span class="vl">860 件</span></div>
+<div class="hbar"><span class="lb">本月报损</span>${bar(4,'var(--red)')}<span class="vl">4.8% ⚠️ R20 已审</span></div>
+<div class="mini"><b>采购交付差异单</b><span>订单 2,000 到货 1,996（0.2%<2% 容差）→ 已对账核销</span></div>
+<div class="mini"><b>损耗热力图</b><span>快充数据线集中 · 直播赠品单 ×6 → 赠品单独建 SKU 核算</span></div>
+<div class="note">盘点从「计数」变「校验」：库存是事件流的衍生品。采购：数据线低于安全库存 → 补货建议+主备比价（R11 已审 ✓）。</div></div></div>`;
+
+P.night=()=>`
+<div class="grid g4">
+<div class="card"><h3>本月夜班</h3><div class="kpi">20 晚</div><div class="delta up">全部正常交付</div></div>
+<div class="card"><h3>夜班动作过围栏</h3><div class="kpi">100%</div><div class="delta">快照 v3 · 零越线</div></div>
+<div class="card"><h3>夜班人力成本</h3><div class="kpi" style="color:var(--green)">-70%</div><div class="delta up">年化省 2.8–4.2 万（模拟）</div></div>
+<div class="card"><h3>需介入</h3><div class="kpi">0.3/晚</div><div class="delta">仅 ▲ 项叫醒人类</div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>🌙 今晚班次 nr-2026-08-21 · 状态机实时</h3>
+<div class="flow" id="nightFlow">
+<span class="st done">18:00 候选清单<br><small>3 任务 ≈7 币</small></span><span class="ar">→</span>
+<span class="st done">人类确认开启<br><small>王店主 · 不经模型</small></span><span class="ar">→</span>
+<span class="st done">22:00 围栏快照 v3</span><span class="ar">→</span>
+<span class="st cur" id="nightCur">自治运行中<br><small>竞对采集 ✓ 对账中…</small></span><span class="ar">→</span>
+<span class="st">08:30 决策包</span>
+</div>
+<div style="margin-top:10px">
+<button class="btn" id="pauseBtn" onclick="toggleNight()">⏸ 一键暂停（≤60s 全端生效）</button>
+<button class="btn ghost" onclick="toast('夜班日报：动作时间线全留痕（模拟）')">查看日报</button>
+<button class="btn ghost" onclick="toast('R16 夜班高危禁区：GUI 操控/大额退款/改价越线 block')">高危禁区说明</button>
+</div></div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>近 7 晚三栏统计</h3>${[["08-15",8,1,0],["08-16",9,1,0],["08-17",7,2,0],["08-18",10,0,1],["08-19",9,1,0],["08-20",11,1,0],["昨夜",9,1,0]].map(n=>`<div class="hbar"><span class="lb">${n[0]}</span><span class="tag t-green">✓${n[1]}</span><span class="tag t-amber">◆${n[2]}</span><span class="tag ${n[3]?"t-red":"t-gray"}">▲${n[3]}</span><span style="flex:1"></span>${bar(80+n[1],'var(--green)')}</div>`).join("")}</div>
+<div class="card"><h3>夜班员工管理：从「管人」到「管班组」</h3>
+<div class="mini"><b>编队</b><span>reconcile（对账）· pricing（调价）· review（差评）· competitor（竞对）· cs-multilang（多语种客服）</span></div>
+<div class="mini"><b>人类夜班？</b><span>只处理 ▲需介入（本月 6 次，平均 0.3/晚）· 其余时间无需值守</span></div>
+<div class="mini"><b>出错可究</b><span>动作 100% 留痕+围栏快照版本可追溯（F2.6）</span></div>
+<div class="note">跨境店叙事：店主晚上关机，「把夜晚还给店主」，夜班盯欧美盘。</div></div></div>
+`;
+
+P.handover=()=>`
+<div class="card"><h3>🔁 交接班 · 从「人写转述」到「系统投影」（交接本已消失）</h3>
+<div class="cols3">
+<div><div class="col-h ch-a">未完成事项（系统自动成单）</div>
+<div class="mini"><b>W-441 加急出库跟进</b><span>催发货工单 ···001 · 今日 16:00 截单</span></div>
+<div class="mini"><b>OD-882139 收件信息待补</b><span>买家 21:00 后回复 · 已预留库存</span></div></div>
+<div><div class="col-h ch-r">异常事件（夜间必读）</div>
+<div class="mini"><b>00:40 美国买家纠纷升级</b><span>命中「投诉工商」→ R12 硬阻断转人工 ✓ 专家席已接入</span></div></div>
+<div><div class="col-h ch-g">待跟进客人</div>
+<div class="mini"><b>VIP 陈先生今日复购跟进</b><span>发票抬头已存/价保常客 · 推荐新品快充头</span></div>
+<div class="mini"><b>RV-33102 差评买家明早回访</b><span>无理由退换已发 · 回访话术已备</span></div></div>
+</div>
+<div style="margin-top:14px"><button class="btn gold" onclick="this.textContent='已签收 ✓（留痕可追责）';this.disabled=true;toast('交接签收完成：30 秒')">✍️ 电子签收（30 秒）</button>
+<span class="note" style="display:inline-block;margin-left:12px">交接质量不再看个人责任心；谁签收、何时、漏了什么，全部可追责。</span></div></div>`;
+
+P.approvals=()=>`
+<div class="card"><h3>✋ 审批队列（三手势：看快照 → 给理由 → 一个手势）</h3><div class="list" id="aprList">
+${D.approvals.map(a=>`<div class="row" onclick="aprDetail('${a.id}')"><span class="tag ${a.st==="pending"?"t-amber":a.st==="approved"?"t-green":"t-red"}">${a.st==="pending"?"◆ 待审":a.st==="approved"?"✓ 已批准":"✗ 已驳回"}</span><div class="main"><b>${a.t}</b><span>${a.lv}</span></div>→</div>`).join("")}
+</div><div class="note">机器做 99%，人只在最关键的 1% 出现——且 30 秒完成。审批全部写回事件库（谁/何时/何理由），驳回原因回流校准样本。</div></div>`;
+
+P.fence=()=>`
+<div class="grid g4">
+<div class="card"><h3>基线规则</h3><div class="kpi">R1–R20</div><div class="delta">ecom-baseline/v3</div></div>
+<div class="card"><h3>30 天判定</h3><div class="kpi">3,812 次</div><div class="delta">100% 动作过围栏</div></div>
+<div class="card"><h3>熔断拦截</h3><div class="kpi" style="color:var(--red)">7 次</div><div class="delta">倒挂 2/超售 1/高危 4</div></div>
+<div class="card"><h3>单调守卫</h3><div class="kpi">只紧不松</div><div class="delta">放宽提案 ×1 已被拒</div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>⛓️ 规则卡（点击看 dry-run 与版本史）</h3>
+<table><tr><th>ID</th><th>规则</th><th>级别</th><th>管辖范围</th><th>30 天命中</th></tr>
+${D.fence.map(r=>`<tr style="cursor:pointer" onclick="fenceDetail('${r[0]}')"><td><b>${r[0]}</b></td><td>${r[1]}</td><td><span class="tag ${r[2]==="auto"?"t-green":r[2]==="review"?"t-amber":"t-red"}">${r[2]}</span></td><td style="color:var(--sub)">${r[3]}</td><td>${Math.floor(Math.random()*40+2)}</td></tr>`).join("")}
+</table></div>`;
+
+P.skills=()=>`
+<div class="grid g3">
+<div class="card"><h3>🧩 官方技能（25 · 全部预装）</h3><div class="list" style="max-height:560px;overflow-y:auto">
+${D.skills.filter(s=>s[3]===1).map(s=>`<div class="row" onclick="skillDetail('${s[0]}','${s[1]}','${s[2]}')"><div class="main"><b>${s[1]}</b><span>${s[2]}</span></div><span class="tag t-green">已装</span></div>`).join("")}
+</div></div>
+<div class="card"><h3>👥 团队自建</h3><div class="list">
+${D.skills.filter(s=>s[3]===2).map(s=>`<div class="row" onclick="skillDetail('${s[0]}','${s[1]}','${s[2]}')"><div class="main"><b>${s[1]}</b><span>${s[2]}</span></div><span class="tag t-blue">已装</span></div>`).join("")}
+</div>
+<h3 style="margin-top:14px">🌐 行业共享（脱敏上架）</h3><div class="list">
+${D.skills.filter(s=>s[3]===0).map(s=>`<div class="row" onclick="skillDetail('${s[0]}','${s[1]}','${s[2]}')"><div class="main"><b>${s[1]}</b><span>${s[2]}</span></div><button class="btn sm gold" onclick="event.stopPropagation();this.textContent='已安装 ✓';this.disabled=true;toast('安装即绑定围栏（F8.2）')">一键加装</button></div>`).join("")}
+</div></div>
+<div class="card"><h3>📊 使用看板（30 天真实事件驱动）</h3>
+<div class="hbar"><span class="lb">gmv-manager</span>${bar(92,'var(--gold)')}<span class="vl">采纳 92%</span></div>
+<div class="hbar"><span class="lb">review-crisis</span>${bar(88,'var(--gold)')}<span class="vl">采纳 88%</span></div>
+<div class="hbar"><span class="lb">channel-reconciler</span>${bar(95,'var(--gold)')}<span class="vl">采纳 95%</span></div>
+<div class="hbar"><span class="lb">cs-multilang</span>${bar(78,'var(--gold)')}<span class="vl">独立 78%</span></div>
+<div class="hbar"><span class="lb">staff-scheduler</span>${bar(70,'var(--gold)')}<span class="vl">采纳 70%</span></div>
+<div class="note">💡 意识系统建议：「price.adjust 高频 21 次/周」→ 一键固化自动触发器（F8.4）。经验是资产，人走茶不凉。</div>
+<button class="btn" onclick="toast('已生成触发器 trg-auto-price-adjust（留痕）')">一键固化</button></div></div>`;
+
+P.memory=()=>`
+<div class="card"><h3>🧠 组织记忆（经验资产化 · 来源事件可归因）</h3>
+<table><tr><th>类型</th><th>内容（脱敏模式化）</th><th>置信度</th><th>来源事件</th><th>状态</th></tr>
+${D.memory.map(m=>`<tr><td><span class="tag ${m[0]==="sop"?"t-blue":m[0]==="pattern"?"t-gold":"t-gray"}">${m[0]}</span></td><td>${m[1]}</td><td>${m[2]}</td><td style="color:var(--blue);cursor:pointer" onclick="toast('来源事件链已展开（哈希链可验）')">${m[3]}</td><td><span class="tag t-green">active</span></td></tr>`).join("")}
+</table>
+<div class="note">行业流失率 30–50%，但经营体系不随人走：优秀店长的调价手感、客诉话术，全部沉淀为组织资产。新员工第一天就站在前任全部经验上。</div></div>`;
+
+P.incident=()=>`
+<div class="grid g4">
+<div class="card"><h3>本周断点</h3><div class="kpi">4</div><div class="delta up">环比 -33%</div></div>
+<div class="card"><h3>AI 自处置率</h3><div class="kpi" style="color:var(--green)">62%</div><div class="delta up">层级持续下沉</div></div>
+<div class="card"><h3>平均处置</h3><div class="kpi">3.2 min</div><div class="delta">远程视频 38s 最快</div></div>
+<div class="card"><h3>收敛趋势</h3><div class="kpi" style="color:var(--green)">↓ 4 周</div><div class="delta up">单调下降</div></div>
+</div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>🧯 断点流（三级兜底 + 根因强制四分类）</h3><div class="list">
+${D.incidents.map(i=>`<div class="row"><span class="t">${i[0]}</span><div class="main"><b>${i[1]}</b><span>${i[2]} · 根因：${i[3]} → ${i[4]}</span></div></div>`).join("")}
+</div></div>
+<div class="card"><h3>根因分布与收敛曲线</h3>
+<div class="hbar"><span class="lb">数据缺失</span>${bar(35,'var(--blue)')}<span class="vl">35%</span></div>
+<div class="hbar"><span class="lb">规则未覆盖</span>${bar(28,'var(--gold)')}<span class="vl">28%</span></div>
+<div class="hbar"><span class="lb">能力边界</span>${bar(25,'var(--amber)')}<span class="vl">25%</span></div>
+<div class="hbar"><span class="lb">真随机</span>${bar(12,'var(--gray)')}<span class="vl">12%</span></div>
+<div class="hbar" style="margin-top:12px"><span class="lb">W1→W4 断点率</span>${bar(100,'var(--red)')}</div>
+<div class="hbar"><span class="lb"></span>${bar(72,'var(--amber)')}</div>
+<div class="hbar"><span class="lb"></span>${bar(55,'var(--gold)')}</div>
+<div class="hbar"><span class="lb"></span>${bar(38,'var(--green)')}</div>
+<div class="note">「断点越来越少」是工程结果：未分类不许结案（按钮级强制）；同类 ≥3 次/周自动固化。这是 1 人管 5–8 家店的通行证。</div></div></div>`;
+
+P.staff=()=>`
+<div class="grid g2">
+<div class="card"><h3>🧑‍🤝‍🧑 本周排班（预测驱动 + 合规拦截）</h3>
+<table><tr><th>员工</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th><th>工时</th></tr>
+<tr><td>李客服</td><td>早</td><td>早</td><td>中</td><td>中</td><td>早</td><td>休</td><td>休</td><td>40h ✓</td></tr>
+<tr><td>赵客服</td><td>中</td><td>中</td><td>早</td><td>早</td><td>中</td><td>早</td><td>休</td><td>40h ✓</td></tr>
+<tr><td>张姐(仓储)</td><td>白</td><td>白</td><td>白</td><td>休</td><td>白</td><td>白</td><td>休</td><td>40h ✓</td></tr>
+<tr><td>李姐(仓储)</td><td>白</td><td>休</td><td>白</td><td>白</td><td>白</td><td>休</td><td>白</td><td>40h ✓</td></tr></table>
+<div class="mini" style="margin-top:10px"><b>⚠️ 合规拦截 ×1（R12）</b><span>赵客服本月加班已 34h（法定 36h）→ 系统自动拒绝再排周末加班，建议调休</span></div>
+<div class="mini"><b>预测依据</b><span>双11 会话量 +135% → 自动加强大促客服班次 ×2</span></div></div>
+<div class="card"><h3>🚨 安全禁区（R10：AI 只告警，绝不自行处置）</h3>
+<div class="mini"><b>应急三级树</b><span>L1 值班客服席 → L2 远程店主 → L3 平台服务商应急群</span></div>
+<div class="mini"><b>联动告警</b><span>资金/账号安全事件 → 平台风控联动 · AI 同步通知三级树</span></div>
+<div class="mini" style="border-color:var(--red)"><b>红线写死</b><span>火灾/治安/医疗事件：AI 只告警+联动，处置权永远在人类</span></div>
+<div class="note">安全的事，AI 知道自己不该做什么——这是写进围栏的，不是靠模型自觉。</div></div></div>`;
+
+P.archive=()=>`
+<div class="card"><h3>🗂️ 一店一档 · 五类 21 字段组（Agent 生成内容前必读三要素之一）</h3>
+<div class="grid g3">
+<div class="card" style="background:#fafbfe"><h3>基础类</h3><div class="kv"><b>店铺</b><span>熊猫优选集团 · 杭州 · 14 店铺 · 产业带卖家</span><b>细分</b><span>产业带卖家（factory_seller）</span><b>ERP</b><span>示例ERP（接口属工程确定性工作）</span></div></div>
+<div class="card" style="background:#fafbfe"><h3>业务类</h3><div class="kv"><b>毛利红线</b><span>32%（与 R2 同源）</span><b>价格带</b><span>3C 29–199 / 收纳 39–299 / 家居 199–1,299</span><b>扣点</b><span>天猫 5% / 京东 8% / 拼多多 3%</span><b>目标 goals</b><span>月 GMV 120 万 · 转化率 3.5%</span></div></div>
+<div class="card" style="background:#fafbfe"><h3>运营类</h3><div class="kv"><b>夜班窗口</b><span>22:00–08:00 · 决策包 08:30</span><b>库存 inventory</b><span>基线损耗 3% · 交付容差 2%</span><b>断点档案</b><span>连接器 ×2 · 应急三级树</span><b>FAQ</b><span>已确认 ×3 · 候选 ×2</span></div></div>
+<div class="card" style="background:#fafbfe"><h3>治理类</h3><div class="kv"><b>forbidden</b><span>毛利率 ≥32% · 不承诺档案外补偿</span><b>审批矩阵</b><span>退款 ≥1000 / 采购 ≥5000 / 赔偿只审 / 夜班高危 block</span></div></div>
+<div class="card" style="background:#fafbfe"><h3>记忆类</h3><div class="kv"><b>组织记忆</b><span>×8 条（pattern/sop/preference）</span><b>案例索引</b><span>差评处置 ×6 · 断点复盘 ×4</span></div></div>
+<div class="card" style="background:#fafbfe"><h3>FAQ 候选（待确认）</h3>${D.faq.filter(f=>f[2]==="待确认").map(f=>`<div class="hbar"><span style="flex:1;font-size:13px">「${f[0]}」${f[1]}</span><button class="btn sm gold" onclick="this.textContent='已入库 ✓';this.disabled=true;toast('已入库：IM/微信/电话三通道口径一致')">确认</button></div>`).join("")}</div>
+</div></div>`;
+
+/* ================= 弹窗详情 ================= */
+function aprDetail(id){const a=D.approvals.find(x=>x.id===id);openModal(`
+<h2>${a.t}</h2><div class="sub">${a.lv} · 快照只读（来自事件库，哈希链可验）</div>
+<div class="mini" style="font-size:13.5px">${a.snap}</div>
+<div class="kv"><b>发起</b><span>Agent 留痕（五元事件 + model_trace）</span><b>判定</b><span>围栏瀑布：deny 优先并集 · 异常按 block</span><b>状态</b><span>${a.st==="pending"?"◆ 待您审批":a.st==="approved"?"✓ 已批准":"✗ 已驳回（原因已回流校准）"}</span></div>
+${a.st==="pending"?`<div class="gesture"><button class="btn gold" onclick="decide('${a.id}',1)">👍 采纳</button><button class="btn ghost" onclick="decide('${a.id}',0)">👎 驳回（需填理由）</button><button class="btn ghost" onclick="closeModal()">稍后再说</button></div>`:`<button class="btn ghost" onclick="closeModal()">关闭</button>`}`)}
+function decide(id,ok){const a=D.approvals.find(x=>x.id===id);a.st=ok?"approved":"rejected";closeModal();render("approvals");toast(ok?"已采纳：审批已写回事件库（谁/何时/何理由）":"已驳回：原因将作为校准样本回流")}
+function fenceDetail(r){openModal(`<h2>${r} 规则卡</h2><div class="sub">ecom-baseline/v3 · is_baseline=true · 单调守卫（只紧不松）</div>
+<div class="kv"><b>30 天命中</b><span>${Math.floor(Math.random()*40+2)} 次（全部留痕含版本号）</span><b>dry-run</b><span>回放最近 10 条历史动作：熔断 0 · 挂起 1 · 放行 9</span><b>版本史</b><span>v1 → v2（+R7–R16）→ v3（+R17–R20）· 旧版 rolled_back 可回滚</span><b>收紧提案</b><span>上层 patch 只可收紧；放宽提案将被守卫拒绝（演示样本见审批队列 apr5）</span></div>
+<button class="btn ghost" onclick="closeModal()">关闭</button>`)}
+function skillDetail(key,name,desc){openModal(`<h2>${name}</h2><div class="sub">${key} · ${desc} · 官方技能（F8.1）</div>
+<div class="kv"><b>触发</b><span>事件驱动 + 周期触发（详见技能卡）</span><b>方法</b><span>场景→数据→判定→动作四段式，全程五元留痕</span><b>围栏绑定</b><span>安装即绑定（F8.2），调用照常过围栏瀑布（L8.3）</span><b>验收用例</b><span>正常路径 / 异常路径 / 围栏触发 三类齐全</span><b>30 天使用</b><span>采纳率见看板 · 驳回模式回流迭代</span></div>
+<button class="btn" onclick="toast('${name} 已是最新');closeModal()">已安装 ✓</button> <button class="btn ghost" onclick="closeModal()">关闭</button>`)}
+
+var nightPaused=false;
+function toggleNight(){nightPaused=!nightPaused;document.getElementById("nightCur").innerHTML=nightPaused?"已暂停（1ms 生效）<br><small>断点续跑待命</small>":"自治运行中<br><small>竞对采集 ✓ 对账中…</small>";document.getElementById("pauseBtn").textContent=nightPaused?"▶ 恢复（断点续跑）":"⏸ 一键暂停（≤60s 全端生效）";toast(nightPaused?"夜班已暂停：挂起线程 1（实测 1ms）":"夜班已恢复：断点续跑")}
+
+/* ================= 路由 ================= */
+let curPage="today";
+function go(p){curPage=p;render(p);document.querySelectorAll("aside a").forEach(a=>a.classList.toggle("on",a.dataset.p===p));window.scrollTo(0,0)}
+function render(p){document.getElementById("ptitle").textContent=TITLES[p];document.getElementById("pages").innerHTML=`<div class="page on">${P[p]()}</div>`}
+document.querySelectorAll("aside a").forEach(a=>a.onclick=()=>go(a.dataset.p));
+render("today");
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{
+  "name": "panda-ecom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "@workloom/base": "workspace:*",
+    "@workloom/connectors": "workspace:*",
+    "@workloom/runtime": "workspace:*",
+    "@workloom/shared": "workspace:*",
+    "pg": "8.23.0",
+    "yaml": "2.9.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-note.js && concurrently -k -n server,web \"pnpm -C apps/server dev\" \"pnpm -C apps/web dev\"",
+    "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
+    "db:seed": "tsx --env-file=.env scripts/seed.ts",
+    "demo": "TOOL_UNVERIFIED_RATE=0 tsx --env-file=.env scripts/demo.ts",
+    "doctor": "bash scripts/doctor.sh",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "db:verify-chain": "tsx --env-file=.env scripts/verify-chain.ts",
+    "suite": "TOOL_UNVERIFIED_RATE=0 tsx --env-file=.env scripts/suite.ts",
+    "demo:twin": "tsx --env-file=.env scripts/simulate-twin.ts",
+    "demo:twin:snapshot": "bash scripts/snapshot-twin.sh",
+    "demo:twin:restore": "bash scripts/restore-twin.sh",
+    "demo:twin:live": "tsx --env-file=.env scripts/twin-genie.ts",
+    "release:gate": "tsx --env-file=.env scripts/release-gate.ts",
+    "agent:tour": "bash scripts/agent-tour.sh",
+    "preview:all": "bash scripts/preview-all.sh",
+    "capabilities": "node scripts/generate-capabilities.mjs",
+    "capabilities:check": "node scripts/generate-capabilities.mjs --check",
+    "capabilities:pptx": "python3 scripts/build-capability-pptx.py",
+    "postinstall": "node scripts/postinstall-note.js || true",
+    "oss:watch": "bash scripts/oss-watch.sh",
+    "oss:plan": "bash scripts/oss-watch.sh --show",
+    "db:seed:boost": "tsx --env-file=.env scripts/seed-boost.ts",
+    "computer": "tsx packages/base/computer-use/cli.ts",
+    "computer:preflight": "bash packages/base/computer-use/toolkit/preflight_check.sh",
+    "computer:start": "bash packages/base/computer-use/toolkit/start_desktop.sh",
+    "computer:stop": "bash packages/base/computer-use/toolkit/stop_desktop.sh",
+    "computer:serve": "tsx packages/base/computer-use/serve.ts",
+    "computer:mcp": "tsx packages/base/computer-use/mcp.ts",
+    "computer:smoke": "tsx packages/base/computer-use/smoke.ts",
+    "setup": "bash scripts/bootstrap.sh",
+    "setup:full": "bash scripts/bootstrap.sh --with-computer"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "node-pty"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "concurrently": "^9.1.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "yaml": "2.9.0"
+  },
+  "description": "WorkLoom 熊猫电商运营系统 · AI 前厅/客房/收益一体化（酒店垂直版）"
+}

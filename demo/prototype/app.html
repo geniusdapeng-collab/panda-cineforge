@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>WorkLoom 电商经营 App（熊猫优选集团样板间）</title>
+<style>
+:root{--navy:#1B2A4E;--gold:#C9A45C;--bg:#F2F4F9;--card:#fff;--ink:#1c2333;--sub:#707a94;--green:#2e9e6b;--amber:#d9930d;--red:#d64545;--line:#e7ebf3;--blue:#3f6fe0}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,"PingFang SC",sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:#dfe4ee;display:flex;justify-content:center;min-height:100vh}
+.phone{width:400px;max-width:100vw;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;box-shadow:0 0 40px rgba(20,30,60,.25)}
+@media(max-width:430px){body{background:var(--bg)}.phone{box-shadow:none}}
+.statusbar{background:var(--navy);color:#fff;padding:14px 18px 16px}
+.statusbar .row1{display:flex;align-items:center;gap:8px}
+.statusbar .store{flex:1;font-size:16px;font-weight:700}
+.statusbar select{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:8px;padding:5px 8px;font-size:12px}
+.statusbar select option{color:#1c2333}
+.live{font-size:11px;color:#9fe8c4;margin-top:5px}
+.live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ce08f;margin-right:5px;animation:p 1.6s infinite}
+@keyframes p{50%{opacity:.3}}
+.content{flex:1;overflow-y:auto;padding:14px 14px 90px}
+.page{display:none}.page.on{display:block}
+.card{background:var(--card);border-radius:16px;padding:15px 16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(30,40,70,.05)}
+.card h3{font-size:13px;color:var(--sub);font-weight:500;margin-bottom:10px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.kpis b{display:block;font-size:17px}
+.kpis span{font-size:10.5px;color:var(--sub)}
+.kpis .up{color:var(--green);font-size:10px}
+.pkg-h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:10px}
+.pkg-cols .grp{margin-bottom:10px}
+.grp .gh{font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;margin-bottom:6px;display:inline-block}
+.g-g{background:#e5f5ec;color:var(--green)}.g-a{background:#fbf1da;color:var(--amber)}.g-r{background:#fbe5e5;color:var(--red)}
+.item{background:#f8fafd;border-radius:10px;padding:9px 11px;font-size:12.5px;margin-bottom:6px}
+.item b{display:block}.item span{color:var(--sub);font-size:11.5px}
+.tag{display:inline-block;font-size:10.5px;border-radius:7px;padding:2px 7px}
+.t-green{background:#e5f5ec;color:var(--green)}.t-amber{background:#fbf1da;color:var(--amber)}.t-red{background:#fbe5e5;color:var(--red)}.t-blue{background:#e8effc;color:var(--blue)}.t-gold{background:#f7efdd;color:var(--gold)}
+.alert{display:flex;gap:9px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:12.5px;align-items:flex-start}
+.alert:last-child{border:none}
+.btn{border:none;border-radius:10px;padding:10px;font-size:14px;cursor:pointer;background:var(--navy);color:#fff;width:100%}
+.btn.gold{background:var(--gold)}.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn.sm{padding:7px 10px;font-size:12px;width:auto;border-radius:8px}
+.gest{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.navbar{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 0 10px;z-index:60}
+.navbar a{text-align:center;font-size:10.5px;color:var(--sub);cursor:pointer;padding-top:4px}
+.navbar a b{display:block;font-size:19px;margin-bottom:2px;font-weight:400}
+.navbar a.on{color:var(--navy);font-weight:600}
+.navbar .nb{position:relative}
+.navbar .nb em{position:absolute;top:0;right:calc(50% - 16px);background:var(--red);color:#fff;font-size:9px;border-radius:8px;padding:1px 5px;font-style:normal}
+.sheet{position:absolute;inset:0;background:rgba(20,28,48,.4);display:none;align-items:flex-end;z-index:99}
+.sheet.on{display:flex}
+.sheet .body{background:#fff;border-radius:20px 20px 0 0;width:100%;padding:20px 18px 30px;max-height:82%;overflow-y:auto}
+.sheet h2{font-size:16px;margin-bottom:4px}
+.sheet .sub{font-size:12px;color:var(--sub);margin-bottom:12px}
+.kv{display:grid;grid-template-columns:84px 1fr;gap:7px 12px;font-size:12.5px;margin:10px 0}
+.kv b{color:var(--sub);font-weight:500}
+.toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:9px 20px;font-size:12.5px;display:none;z-index:120;white-space:nowrap}
+.toast.on{display:block}
+.ring{width:64px;height:64px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700}
+.ring b{font-size:14px}.ring span{font-size:9px;color:var(--sub);font-weight:400}
+.rings{display:flex;justify-content:space-around}
+.hbar{display:flex;align-items:center;gap:8px;font-size:12px;margin:7px 0}
+.hbar .lb{width:86px;color:var(--sub);flex-shrink:0}
+.bar{flex:1;height:7px;border-radius:4px;background:#edf0f6;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px}
+.hbar .vl{width:56px;text-align:right;font-size:11px}
+.flow{display:flex;flex-direction:column;gap:0}
+.fs{display:flex;gap:10px;align-items:flex-start}
+.fs .dot{width:11px;height:11px;border-radius:50%;background:#cfd6e6;margin-top:4px;flex-shrink:0}
+.fs.done .dot{background:var(--green)}.fs.cur .dot{background:var(--gold);box-shadow:0 0 0 4px #f7efdd}
+.fs .ln{width:2px;background:var(--line);margin-left:5px;height:16px}
+.fs .tx{font-size:12.5px;padding-bottom:4px}.fs .tx span{display:block;font-size:11px;color:var(--sub)}
+.push{background:linear-gradient(135deg,#1B2A4E,#2c4170);color:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px}
+.push .pt{font-size:11px;color:#9fb4dd;margin-bottom:4px}
+.push .pb{font-size:14px;font-weight:600}
+.push .ps{font-size:12px;color:#c8d4ee;margin-top:4px}
+.genie{background:#fff8ec;border:1px dashed var(--gold);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.genie h4{font-size:12.5px;color:var(--amber);margin-bottom:8px}
+.genie .chs{display:flex;flex-wrap:wrap;gap:6px}
+.genie .chip{background:#fff;border:1px solid var(--gold);color:var(--amber);border-radius:14px;font-size:11.5px;padding:5px 11px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <div class="row1">
+      <div class="store" id="storeName">熊猫优选集团</div>
+      <select id="storeSel" onchange="onStore(this.value)">
+        <option value="yunqi">熊猫优选（天猫旗舰）</option>
+        <option value="xixi">京东店</option>
+        <option value="manlong">亚马逊（跨境）</option>
+        <option value="all">🌐 全店</option>
+      </select>
+    </div>
+    <div class="live"><i></i>样板间管家在线 · 夜班班组盯欧美盘 · 数据每 5 分钟刷新</div>
+  </div>
+  <div class="content" id="content"></div>
+  <div class="navbar">
+    <a data-p="today" class="on"><b>🏠</b>今日</a>
+    <a data-p="apr" class="nb"><b>✋</b>审批<em id="aprBadge">3</em></a>
+    <a data-p="stores"><b>🏨</b>门店</a>
+    <a data-p="me"><b>👤</b>我的</a>
+  </div>
+  <div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="body" id="sheetBody"></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const K={yunqi:{n:"熊猫优选·天猫旗舰店",occ:"3.8%",adr:"¥101",rev:"¥4.1万",rev30:"¥108.4万"},xixi:{n:"熊猫优选·京东店",occ:"3.2%",adr:"¥99",rev:"¥3.6万",rev30:"¥88.9万"},manlong:{n:"熊猫优选·亚马逊店",occ:"4.1%",adr:"$14.2",rev:"$0.6万",rev30:"¥42.8万"},all:{n:"全店视图（3 店）",occ:"3.7%",adr:"¥100",rev:"¥8.3万",rev30:"¥240.1万"}};
+let APR=[
+{id:"a1",t:"差评回复草稿（天猫 2 分）",lv:"R9 · 必审",snap:"买家反映收纳箱色差。AI 草稿：致歉→已复核灯光校色→无理由退换+运费险（政策内）→邀评回流。",st:"pending",store:"天猫旗舰"},
+{id:"a2",t:"库存损耗 4.8% 超基线",lv:"R20 · 必审",snap:"快充数据线损耗超基线 1.5×。热力图：大促直播赠品单集中。建议赠品单独建 SKU 核算。",st:"pending",store:"天猫旗舰"},
+{id:"a3",t:"双11 快充头 ¥119→¥131（+10.1%）",lv:"越线 · 必审",snap:"超 8% 上限。依据：去年双11 转化率 6.8%、竞对 ¥139、备货进度 71%。",st:"pending",store:"天猫旗舰"},
+{id:"a4",t:"亚马逊店买家触达（30 天第 3 次）",lv:"R19 跨境 patch",snap:"跨境围栏收紧：30 天 >2 次营销触达需审。内容：黑五老客户复购券邀约。",st:"pending",store:"亚马逊"},
+];
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2200)}
+function openSheet(h){document.getElementById("sheetBody").innerHTML=h;document.getElementById("sheet").classList.add("on")}
+function closeSheet(){document.getElementById("sheet").classList.remove("on")}
+function onStore(v){document.getElementById("storeName").textContent=K[v].n;render(cur);toast("已切换："+K[v].n)}
+function ring(l,p,c){return `<div class="ring" style="background:conic-gradient(${c} ${p*3.6}deg,#edf0f6 0)"><b>${p}%</b><span>${l}</span></div>`}
+function bar(p,c){return `<div class="bar"><i style="width:${p}%;background:${c}"></i></div>`}
+
+const P={};
+P.today=()=>{const k=K[document.getElementById("storeSel").value];return `
+<div class="card"><div class="kpis">
+<div><b>${k.occ}</b><span>转化率</span><div class="up">▲0.3pt</div></div>
+<div><b>${k.adr}</b><span>客单价</span><div class="up">▲2.2%</div></div>
+<div><b>${k.rev}</b><span>日 GMV</span><div class="up">▲5.8%</div></div>
+<div><b>${k.rev30}</b><span>月 GMV</span><div class="up">目标 78%</div></div>
+</div></div>
+<div class="push"><div class="pt">🌙 夜班决策包 · 今晨 08:30</div><div class="pb">✓已完成 9 · ◆待审批 1 · ▲需介入 0</div><div class="ps">对账零差异 · 夜班调价 ×2（R7 auto）· 跨境店会话 ×412（AI 托管 398）· 连续 6 天零需介入</div></div>
+<div class="card"><h3>✓ 昨夜已完成（点击下钻溯源）</h3>
+<div class="item" onclick="toast('五元事件 + 哈希链可验证（模拟）')"><b>对账零差异</b><span>订单×平台×结算三轮一致 · 02:14</span></div>
+<div class="item" onclick="toast('调价留痕：before/after/竞对依据齐全')"><b>夜班微调 ×2</b><span>快充头 ¥129→¥131（R7 ≤3% auto）</span></div>
+<div class="item"><b>跨境店夜间 AI 托管应答 ×398</b><span>零打扰店主 · 摘要已归档</span></div></div>
+<div class="card"><h3>⚡ 实时提醒</h3>
+<div class="alert"><span class="tag t-amber">SLA</span><div>天猫差评已 19h 未回复，5h 后自动升级（R9）<br><span style="color:var(--sub);font-size:11px">AI 草稿已备好，点「审批」30 秒处理</span></div></div>
+<div class="alert"><span class="tag t-red">R18</span><div>拼多多 ¥99 倒挂已熔断（昨 14:20），16:05 已修复 ¥129</div></div>
+<div class="alert"><span class="tag t-green">R20</span><div>ERP 同步失败自动下架保护 → 已人工核验回架</div></div></div>
+<div class="genie"><h4>🧞 样板间管家 · 现场演示（点一个，剧情即刻发生）</h4>
+<div class="chs">
+<span class="chip" onclick="genie('差评危机','天猫新 2 分差评：收纳箱色差。AI 已起草回复，进审批队列')">制造差评</span>
+<span class="chip" onclick="genie('倒挂熔断','拼多多发布价 ¥99 触发 R18 熔断，已拦截并告警')">制造倒挂</span>
+<span class="chip" onclick="genie('订单高峰','50 笔新订单自动确认（大促洪峰，库存校验通过）')">订单高峰</span>
+<span class="chip" onclick="genie('断点处置','亚马逊店 API 限流改价失败 → 适配器降级重试成功 → 根因「能力边界」')">断点处置</span>
+</div></div>`};
+
+P.apr=()=>`
+<div class="card"><h3>✋ 审批队列 · 三手势（看快照 → 给理由 → 一个手势）</h3>
+<div class="note" style="font-size:11.5px;color:var(--sub);margin-bottom:8px">机器做 99%，你只在最关键的 1% 出现——每次 30 秒。</div>
+${APR.filter(a=>a.st==="pending").map(a=>`
+<div class="item" style="border:1px solid var(--line)">
+<b>${a.t}</b><span>${a.store} · ${a.lv}</span>
+<div style="font-size:12px;color:var(--ink);margin-top:6px;background:#fff;border-radius:8px;padding:8px">${a.snap}</div>
+<div class="gest">
+<button class="btn sm gold" onclick="decide('${a.id}',1)">👍 采纳</button>
+<button class="btn sm ghost" onclick="decide('${a.id}',0)">👎 驳回</button>
+<button class="btn sm ghost" onclick="toast('快照溯源：五元事件+围栏判定留痕（模拟）')">溯源</button>
+</div></div>`).join("")||'<div class="item" style="text-align:center;color:var(--green);padding:20px">🎉 队列清空 · 全部审批完毕</div>'}
+</div>
+<div class="card"><h3>历史审批（全部留痕可追责）</h3>
+<div class="item"><b>✓ 退款 ¥620 已批准</b><span>王店主 · 昨 13:22 · 理由「物流破损属实」</span></div>
+<div class="item"><b>✗ 调价上限放宽 8%→10% 已驳回</b><span>单调守卫拒绝（基线只紧不松）· 店主留痕</span></div>
+<div class="item"><b>✓ 采购 ¥12,800 已批准</b><span>备选供应商比价 -¥0.3/件</span></div></div>`;
+
+P.stores=()=>`
+<div class="card"><h3>🌐 一人多店 · 管理半径 3 → 5–8 个店铺</h3>
+${[["yunqi","熊猫优选·天猫旗舰店","3,214 SKU · 货架","3.8%","¥101","✓9 ◆1 ▲0",78],["xixi","熊猫优选·京东店","1,866 SKU · 货架","3.2%","¥99","✓6 ◆2 ▲0",71],["manlong","熊猫优选·亚马逊店","412 SKU · 跨境","4.1%","$14.2","✓8 ◆0 ▲1",84]].map(s=>`
+<div class="item" onclick="document.getElementById('storeSel').value='${s[0]}';onStore('${s[0]}');go('today')" style="cursor:pointer">
+<b>${s[1]} <span class="tag t-blue" style="font-weight:400">${s[2]}</span></b>
+<span>转化 ${s[3]} · 客单 ${s[4]} · 昨夜 ${s[5]}</span>
+<div class="hbar"><span class="lb" style="width:70px">目标达成</span>${bar(s[6],s[6]>80?"var(--green)":"var(--gold)")}<span class="vl">${s[6]}%</span></div>
+</div>`).join("")}</div>
+<div class="card"><h3>🧯 断点率跨店对比（收敛曲线）</h3>
+<div class="hbar"><span class="lb">天猫旗舰</span>${bar(40,"var(--green)")}<span class="vl">0.8/周 ↓</span></div>
+<div class="hbar"><span class="lb">京东店</span>${bar(60,"var(--gold)")}<span class="vl">1.2/周 ↓</span></div>
+<div class="hbar"><span class="lb">亚马逊(跨境)</span>${bar(25,"var(--green)")}<span class="vl">0.5/周 ↓</span></div>
+<div class="note" style="font-size:11.5px;color:var(--sub);margin-top:8px">断点不是事故是资产：四分类强制闭环，同类 ≥3 次/周自动固化——第 5 家店比第 1 家更好管。</div></div>
+<div class="card"><h3>🔔 跨店告警收敛（只推该看的）</h3>
+<div class="alert"><span class="tag t-red">亚马逊</span><div>▲ API 限流 ×1 · 适配器已处置，待根因分类</div></div>
+<div class="alert"><span class="tag t-amber">天猫旗舰</span><div>差评 SLA 19h · 5h 后自动升级</div></div>
+<div class="alert"><span class="tag t-green">全部</span><div>三店夜班连续 6 天正常交付</div></div></div>`;
+
+P.me=()=>`
+<div class="card"><h3>🎯 8 月目标追踪（目标不再躺在 Excel 里）</h3>
+<div class="rings">${ring("转化率",78,"var(--blue)")}${ring("客单价",74,"var(--gold)")}${ring("复购率",76,"var(--green)")}${ring("GMV",78,"var(--navy)")}</div>
+<div class="item" style="margin-top:10px"><b>偏差归因（自动）</b><span>近 7 天转化率 -0.6pt ← 竞对降价 ×2 + 大促后退款 ×3</span></div>
+<div class="item"><b>💡 联动补救（gmv-manager）</b><span>周末 3C 配件 +3.8%（R1 内）+ 小红书内容加热 → 已生成审批卡</span></div></div>
+<div class="card"><h3>🌙 夜班班组（一键制动）</h3>
+<div class="item"><b>今晚编队</b><span>对账 · 调价 · 差评 · 竞对 · 多语种客服 · 快照 v3</span></div>
+<div class="item"><b>状态</b><span id="nightSt">自治运行中 · 已 2,147 动作零越线</span></div>
+<button class="btn" id="nb" onclick="toggleNight()">⏸ 一键暂停（≤60s 全端生效）</button></div>
+<div class="card"><h3>🧠 本周系统新学会（经验资产化）</h3>
+<div class="item"><b>「海外仓时效」FAQ 候选</b><span>周问 5 次未命中 → 点确认即刻入库（三通道生效）</span><button class="btn sm gold" style="margin-top:6px" onclick="this.textContent='已入库 ✓';this.disabled=true;toast('知识库生长 +1：下周该问题 3 秒必答')">确认入库</button></div>
+<div class="item"><b>固化建议</b><span>price.adjust 高频 21 次/周 → 一键生成自动触发器</span></div>
+<div class="item"><b>组织记忆 ×8</b><span>差评致歉 SOP v2 · 3C 周末规律 · 店主调价偏好…</span></div></div>
+<div class="card"><h3>🔐 信任与安全</h3>
+<div class="item"><b>哈希链验真</b><span>1,450 条事件逐条可重算 · 含系统自己的操作</span></div>
+<div class="item"><b>围栏 R1–R20</b><span>一切动作 100% 过判定 · 异常默认熔断</span></div>
+<div class="item"><b>数据边界</b><span>业务数据为模拟数据（实际可替换）；功能/流程/交互 1:1 真实</span></div></div>`;
+
+let nightPaused=false;
+function toggleNight(){nightPaused=!nightPaused;document.getElementById("nightSt").textContent=nightPaused?"已暂停（实测 1ms）· 断点续跑待命":"自治运行中 · 已 2,147 动作零越线";document.getElementById("nb").textContent=nightPaused?"▶ 恢复夜班（断点续跑）":"⏸ 一键暂停（≤60s 全端生效）";toast(nightPaused?"夜班已暂停":"夜班已恢复")}
+function decide(id,ok){const a=APR.find(x=>x.id===id);a.st=ok?"approved":"rejected";const n=APR.filter(x=>x.st==="pending").length;document.getElementById("aprBadge").textContent=n;document.getElementById("aprBadge").style.display=n?"":"none";render("apr");toast(ok?"已采纳：审批写回事件库":"已驳回：理由将回流校准")}
+function genie(t,m){toast("🧞 "+t+"："+m);if(t==="差评危机"){APR.unshift({id:"a"+Date.now(),t:"差评回复草稿（天猫 2 分·新）",lv:"R9 · 必审",snap:"管家现场生成：买家投诉收纳箱色差，AI 致歉草稿+无理由退换已备好。",st:"pending",store:"天猫旗舰"});const n=APR.filter(x=>x.st==="pending").length;document.getElementById("aprBadge").textContent=n;document.getElementById("aprBadge").style.display=""}}
+
+let cur="today";
+function go(p){cur=p;document.getElementById("content").innerHTML=`<div class="page on">${P[p]()}</div>`;document.querySelectorAll(".navbar a").forEach(a=>a.classList.toggle("on",a.dataset.p===p));document.getElementById("content").scrollTop=0}
+function render(p){document.getElementById("content").innerHTML=`<div class="page on">${P[p]()}</div>`}
+document.querySelectorAll(".navbar a").forEach(a=>a.onclick=()=>go(a.dataset.p));
+go("today");
+</script>
+</body>
+</html>

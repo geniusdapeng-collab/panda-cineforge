@@ -1,0 +1,165 @@
+{
+  "$id": "workloom://bundles/ecommerce/schemas/archive",
+  "title": "店铺档案 + 集团一档字段组（电商行业版 v1 · §2.2 槽①）",
+  "description": "一店一档（14 店铺 × 30+ 字段组）+ 集团一档（多币种结算/预算大盘/组织编制）。分两层：shop 层每店一份，group 层集团一份。分两期策略——一期保激活（required 仅 shop_profile+forbidden，对齐起飞前检查单 F2.10），二期随种子客户 know-how 入库渐进完备。Agent 生成内容前必读『档案+阶段+目标』三要素（L3.7），缺一拒绝执行。围栏 R1–R30 阈值均与对应字段组同源。",
+  "type": "object",
+  "required": [
+    "shop_profile",
+    "forbidden"
+  ],
+  "properties": {
+    "shop_profile": {
+      "type": "object",
+      "description": "【基础信息】店铺基础信息",
+      "properties": {
+        "name": { "type": "string" },
+        "platform": { "type": "string", "description": "所属平台（taobao/tmall/jd/pdd/douyin/kuaishou/xhs/shipinhao/amazon/temu/tiktok_shop/shopee/dtc）" },
+        "site": { "type": "string", "description": "站点（跨境：us/eu/jp/sea 等）" },
+        "category": { "type": "string", "description": "主营类目" },
+        "segment": { "type": "string", "description": "客群类型：waist_single（单平台多店腰部卖家）/ cn_multi（国内多平台大卖）/ global_group（跨境超级大卖集团）——决定客群级 Patch 模板" },
+        "open_date": { "type": "string" },
+        "shop_new": { "type": "boolean", "description": "新店标记（R8 首发必审判定输入）" }
+      }
+    },
+    "platform_credential_ref": {
+      "type": "object",
+      "description": "【基础信息】平台凭据引用（仅存密钥保管库引用 ID，不落明文；shop-authority 技能同源）"
+    },
+    "brand_guideline": {
+      "type": "object",
+      "description": "【基础信息】品牌规范（文案口径 tone/禁用词 banned_words/图片规范 image_rules/直播话术规范 live_rules）"
+    },
+    "product_matrix": {
+      "type": "object",
+      "description": "【基础信息】商品矩阵（在售 SPU/SKU 数、爆款清单 hero_skus、价格带分布）"
+    },
+    "business": {
+      "type": "object",
+      "description": "【经营基线】价格带与毛利红线",
+      "properties": {
+        "price_bands": { "type": "object", "description": "各类目价格带（price-band-position 技能输入）" },
+        "margin_floor": { "type": "number", "description": "毛利红线系数（R2 熔断同源，默认 1.15）" },
+        "floor_price": { "type": "object", "description": "分 SKU 保底价（L1.6 硬约束）" },
+        "refund_policy": { "type": "object", "description": "退换政策边界（R26 超政策承诺判定同源）" }
+      }
+    },
+    "ads_guardrail": {
+      "type": "object",
+      "description": "【广告红线】广告预算与 ACoS 红线：日预算上限 daily_budget_cap（R4 同源）/分 SKU 盈亏平衡 ACoS acos_breakeven（R3 同源）/大促战备预算档 promo_budget_tier"
+    },
+    "inventory_params": {
+      "type": "object",
+      "description": "【库存参数】安全库存 safety_stock/补货提前期 lead_time_days/周转红线 turnover_days_cap（R6 同源）/断货预警天数 stockout_alert_days（R7 同源）/测款首单上限 test_order_cap（R25 同源）"
+    },
+    "cs_sla": {
+      "type": "object",
+      "description": "【客服 SLA】响应时长/差评响应 2h SLA（R9 同源）/升级关键词表 escalation_keywords（R12 同源）/多语言覆盖语种/夜班托管标记 night_trusteeship"
+    },
+    "compliance_zone": {
+      "type": "object",
+      "description": "【合规禁区】平台规则红线（违禁词表/类目资质要求/知识产权清单 ip_registry）——R11/R24 阻断判定输入"
+    },
+    "forbidden": {
+      "type": "array",
+      "description": "【治理】禁用承诺清单（L1.6 硬约束，优先级高于任何 Skill 与模型推理；起飞前检查单要求 ≥1 条）",
+      "items": {
+        "type": "object",
+        "required": ["rule"],
+        "properties": {
+          "rule": { "type": "string", "description": "如：亚马逊 US 站 X 类目不低于 $19.99" },
+          "scope": { "type": "string" }
+        }
+      }
+    },
+    "approval_matrix": {
+      "type": "object",
+      "description": "【治理】审批权限矩阵（金额×风险分级 → auto/review/block/L4 归口；R5/R10/R20 阈值同源，跨境店铺 USD 口径）"
+    },
+    "compensation_policy": {
+      "type": "object",
+      "description": "【治理】补偿口径（客诉补偿上限/退款权限/差评补偿话术边界；R10 判定输入）"
+    },
+    "promo_calendar": {
+      "type": "object",
+      "description": "【经营节奏】平台大促日历与价保窗口 price_protect_windows（R13 同源）/活动报名计划/战备模式档位 promo_war_tier（R27 同源）"
+    },
+    "suppliers": {
+      "type": "array",
+      "description": "【供应链】供应商名录（含备选与分级评分；supplier-scorecard 比价对象，采购单 R20 分级审批引用）",
+      "items": { "type": "object" }
+    },
+    "logistics": {
+      "type": "object",
+      "description": "【供应链】履约链路（国内快递/头程货代/海外仓/FBA 仓配映射；shipment 异常处置预案）"
+    },
+    "warehouse_profile": {
+      "type": "object",
+      "description": "【供应链】仓库档案（仓别/库容/库龄基线/滞销处置规则；warehouse-age-watch 同源）"
+    },
+    "competitors": {
+      "type": "array",
+      "description": "【竞争】竞对清单（名称/平台/参考价带/跟卖监控对象）——competitor-radar 采集与 R19 判定输入",
+      "items": { "type": "object" }
+    },
+    "live_profile": {
+      "type": "object",
+      "description": "【内容直播】直播档案（排期/主播话术边界/涉费承诺禁区——R21 判定输入）"
+    },
+    "content_assets": {
+      "type": "object",
+      "description": "【内容直播】内容资产索引（素材库/品牌资产 brand-asset-lib/UGC 授权清单）"
+    },
+    "member_crm": {
+      "type": "object",
+      "description": "【用户资产】会员体系（分层规则/触达频率上限——防打扰合规/私域引流边界）"
+    },
+    "data_governance": {
+      "type": "object",
+      "description": "【治理】数据合规（PII 字段清单/脱敏网关配置/数据出境审批流——R22 判定输入）"
+    },
+    "fx_settlement": {
+      "type": "object",
+      "description": "【集团一档·跨境】多币种结算（币种清单/结汇路径/汇率波动重定价阈值 fx_reprice_threshold——R14 同源/套保策略 fx-hedge-advisor 输入）"
+    },
+    "tax_vat_profile": {
+      "type": "object",
+      "description": "【集团一档·跨境】税务档案（各国 VAT 注册号/关税口径/EPR 注册/美国销售税——R15 重算触发同源；vat-specialist 常驻）"
+    },
+    "group_budget": {
+      "type": "object",
+      "description": "【集团一档】预算大盘（年度/月度 GMV 与费用预算/分平台广告预算池/大单采购 L4 审批线——R20 ≥$10 万升 L4 同源）"
+    },
+    "group_org": {
+      "type": "object",
+      "description": "【集团一档】组织编制（81 人数字军团编制表：指挥层/中台/两军战队映射、人机配比、岗位空缺替补策略）"
+    },
+    "audience": {
+      "type": "object",
+      "description": "【记忆】客群画像（人群包/复购周期/价格敏感度）"
+    },
+    "history_curve": {
+      "type": "object",
+      "description": "【记忆】历史经营曲线（GMV/毛利/ACoS/周转 月度）"
+    },
+    "account_health": {
+      "type": "object",
+      "description": "【记忆】账号绩效基线（ODR/迟发率/有效追踪率等——R29 越限判定基线）"
+    },
+    "memory": {
+      "type": "object",
+      "description": "【记忆】案例索引与组织记忆锚点（处置案例引用/复盘链接；case 记忆落地前的配置层索引）"
+    },
+    "inspection": {
+      "type": "object",
+      "description": "巡检只读快照（探针输入：listings/prices/stock/reviews/violations 采样；缺项探针报 nodata 不编造）"
+    },
+    "faq_kb": {
+      "type": "object",
+      "description": "【运营】FAQ 知识库（service-front-copilot 同源）：高频问题 top50（question/answer/来源会话归因/confirmed 运营确认标记）/萃取状态 last_mined_at/待审候选 pending_candidates"
+    },
+    "goals": {
+      "type": "object",
+      "description": "【经营目标】年度/月度目标（GMV/毛利/ACoS/周转/差评率/复购率）+ 分解到平台/店铺/SKU + 追踪口径（target-breakdown 按周回写达成率与预测偏差）"
+    }
+  }
+}

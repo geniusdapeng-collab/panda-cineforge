@@ -1,0 +1,752 @@
+{
+  "id": "panda-ops-center",
+  "name": "熊猫运营中心 · 四层数字职场",
+  "theme": {
+    "floorA": "#ffd6c7",
+    "floorB": "#ffe8e0",
+    "wall": "#ffb3c2",
+    "accent": "#ff2442",
+    "night": false
+  },
+  "grid": {
+    "w": 14,
+    "h": 14
+  },
+  "floors": [
+    {
+      "key": "command",
+      "name": "集团指挥层",
+      "headcount": 4,
+      "zone": {
+        "x": 5,
+        "y": 0.6,
+        "w": 3.8,
+        "h": 2
+      }
+    },
+    {
+      "key": "domestic",
+      "name": "国内战区",
+      "headcount": 26,
+      "zone": {
+        "x": 0.6,
+        "y": 3.3,
+        "w": 4.4,
+        "h": 8.4
+      }
+    },
+    {
+      "key": "cross-border",
+      "name": "跨境战区",
+      "headcount": 21,
+      "zone": {
+        "x": 8.9,
+        "y": 3.3,
+        "w": 4.4,
+        "h": 7.4
+      }
+    },
+    {
+      "key": "middle-platform",
+      "name": "共享中台",
+      "headcount": 27,
+      "zone": {
+        "x": 0.7,
+        "y": 11.9,
+        "w": 12.6,
+        "h": 1.8
+      }
+    },
+    {
+      "key": "cs-center",
+      "name": "客服中心（夜班班组主场 22:00-08:00）",
+      "headcount": 3,
+      "zone": {
+        "x": 11,
+        "y": 11.2,
+        "w": 2.4,
+        "h": 2.2
+      }
+    }
+  ],
+  "stations": [
+    {
+      "id": "st-group-ceo",
+      "presetKey": "group-ceo",
+      "x": 6.8,
+      "y": 0.9,
+      "kind": "counter"
+    },
+    {
+      "id": "st-biz-analyst",
+      "presetKey": "biz-analyst",
+      "x": 5.2,
+      "y": 1.4,
+      "kind": "desk"
+    },
+    {
+      "id": "st-budget-controller",
+      "presetKey": "budget-controller",
+      "x": 8.4,
+      "y": 1.4,
+      "kind": "desk"
+    },
+    {
+      "id": "st-digital-hr",
+      "presetKey": "digital-hr",
+      "x": 6.8,
+      "y": 2.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tmall-head",
+      "presetKey": "tmall-head",
+      "x": 0.9,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tmall-ops",
+      "presetKey": "tmall-ops",
+      "x": 1.9500000000000002,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tmall-ads",
+      "presetKey": "tmall-ads",
+      "x": 3,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tmall-cs",
+      "presetKey": "tmall-cs",
+      "x": 4.050000000000001,
+      "y": 3.6,
+      "kind": "counter"
+    },
+    {
+      "id": "st-jd-head",
+      "presetKey": "jd-head",
+      "x": 0.9,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-jd-ops",
+      "presetKey": "jd-ops",
+      "x": 1.9500000000000002,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-jd-cs",
+      "presetKey": "jd-cs",
+      "x": 3,
+      "y": 4.95,
+      "kind": "counter"
+    },
+    {
+      "id": "st-pdd-head",
+      "presetKey": "pdd-head",
+      "x": 4.050000000000001,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-pdd-ops",
+      "presetKey": "pdd-ops",
+      "x": 0.9,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-pdd-cs",
+      "presetKey": "pdd-cs",
+      "x": 1.9500000000000002,
+      "y": 6.300000000000001,
+      "kind": "counter"
+    },
+    {
+      "id": "st-douyin-head",
+      "presetKey": "douyin-head",
+      "x": 3,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-douyin-ads",
+      "presetKey": "douyin-ads",
+      "x": 4.050000000000001,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-douyin-live",
+      "presetKey": "douyin-live",
+      "x": 0.9,
+      "y": 7.65,
+      "kind": "desk"
+    },
+    {
+      "id": "st-douyin-video",
+      "presetKey": "douyin-video",
+      "x": 1.9500000000000002,
+      "y": 7.65,
+      "kind": "desk"
+    },
+    {
+      "id": "st-douyin-cs",
+      "presetKey": "douyin-cs",
+      "x": 3,
+      "y": 7.65,
+      "kind": "counter"
+    },
+    {
+      "id": "st-kuaishou-head",
+      "presetKey": "kuaishou-head",
+      "x": 4.050000000000001,
+      "y": 7.65,
+      "kind": "desk"
+    },
+    {
+      "id": "st-kuaishou-ads",
+      "presetKey": "kuaishou-ads",
+      "x": 0.9,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-kuaishou-cs",
+      "presetKey": "kuaishou-cs",
+      "x": 1.9500000000000002,
+      "y": 9,
+      "kind": "counter"
+    },
+    {
+      "id": "st-xhs-head",
+      "presetKey": "xhs-head",
+      "x": 3,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-xhs-content",
+      "presetKey": "xhs-content",
+      "x": 4.050000000000001,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-xhs-cs",
+      "presetKey": "xhs-cs",
+      "x": 0.9,
+      "y": 10.35,
+      "kind": "counter"
+    },
+    {
+      "id": "st-channels-head",
+      "presetKey": "channels-head",
+      "x": 1.9500000000000002,
+      "y": 10.35,
+      "kind": "desk"
+    },
+    {
+      "id": "st-channels-cs",
+      "presetKey": "channels-cs",
+      "x": 3,
+      "y": 10.35,
+      "kind": "counter"
+    },
+    {
+      "id": "st-tmallg-head",
+      "presetKey": "tmallg-head",
+      "x": 4.050000000000001,
+      "y": 10.35,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tmallg-ops",
+      "presetKey": "tmallg-ops",
+      "x": 0.9,
+      "y": 11.700000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tmallg-cs",
+      "presetKey": "tmallg-cs",
+      "x": 1.9500000000000002,
+      "y": 11.700000000000001,
+      "kind": "counter"
+    },
+    {
+      "id": "st-amz-us-head",
+      "presetKey": "amz-us-head",
+      "x": 9.2,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-amz-eu-head",
+      "presetKey": "amz-eu-head",
+      "x": 10.25,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-amz-jp-head",
+      "presetKey": "amz-jp-head",
+      "x": 11.299999999999999,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-amz-ppc",
+      "presetKey": "amz-ppc",
+      "x": 12.35,
+      "y": 3.6,
+      "kind": "desk"
+    },
+    {
+      "id": "st-amz-listing",
+      "presetKey": "amz-listing",
+      "x": 9.2,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-amz-account",
+      "presetKey": "amz-account",
+      "x": 10.25,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-amz-fba",
+      "presetKey": "amz-fba",
+      "x": 11.299999999999999,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-temu-head",
+      "presetKey": "temu-head",
+      "x": 12.35,
+      "y": 4.95,
+      "kind": "desk"
+    },
+    {
+      "id": "st-temu-pricing",
+      "presetKey": "temu-pricing",
+      "x": 9.2,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tts-us-head",
+      "presetKey": "tts-us-head",
+      "x": 10.25,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tts-sea-head",
+      "presetKey": "tts-sea-head",
+      "x": 11.299999999999999,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tts-creator",
+      "presetKey": "tts-creator",
+      "x": 12.35,
+      "y": 6.300000000000001,
+      "kind": "desk"
+    },
+    {
+      "id": "st-tts-live",
+      "presetKey": "tts-live",
+      "x": 9.2,
+      "y": 7.65,
+      "kind": "desk"
+    },
+    {
+      "id": "st-shopee-head",
+      "presetKey": "shopee-head",
+      "x": 10.25,
+      "y": 7.65,
+      "kind": "desk"
+    },
+    {
+      "id": "st-shopee-cs",
+      "presetKey": "shopee-cs",
+      "x": 11.299999999999999,
+      "y": 7.65,
+      "kind": "counter"
+    },
+    {
+      "id": "st-ae-head",
+      "presetKey": "ae-head",
+      "x": 12.35,
+      "y": 7.65,
+      "kind": "desk"
+    },
+    {
+      "id": "st-shein-supply",
+      "presetKey": "shein-supply",
+      "x": 9.2,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-dtc-webmaster",
+      "presetKey": "dtc-webmaster",
+      "x": 10.25,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-dtc-seo",
+      "presetKey": "dtc-seo",
+      "x": 11.299999999999999,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-dtc-edm",
+      "presetKey": "dtc-edm",
+      "x": 12.35,
+      "y": 9,
+      "kind": "desk"
+    },
+    {
+      "id": "st-dtc-ads",
+      "presetKey": "dtc-ads",
+      "x": 9.2,
+      "y": 10.35,
+      "kind": "desk"
+    },
+    {
+      "id": "st-data-warehouse",
+      "presetKey": "data-warehouse",
+      "x": 1,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-sku-pl-accountant",
+      "presetKey": "sku-pl-accountant",
+      "x": 1.9,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-competitor-radar",
+      "presetKey": "competitor-radar",
+      "x": 2.8,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-market-intel",
+      "presetKey": "market-intel",
+      "x": 3.7,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-selection-analyst",
+      "presetKey": "selection-analyst",
+      "x": 4.6,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-spu-master",
+      "presetKey": "spu-master",
+      "x": 5.5,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-listing-factory",
+      "presetKey": "listing-factory",
+      "x": 6.4,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-localization-editor",
+      "presetKey": "localization-editor",
+      "x": 7.3,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-demand-planner",
+      "presetKey": "demand-planner",
+      "x": 8.2,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-procurement-buyer",
+      "presetKey": "procurement-buyer",
+      "x": 9.1,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-cn-warehouse",
+      "presetKey": "cn-warehouse",
+      "x": 10,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-overseas-warehouse",
+      "presetKey": "overseas-warehouse",
+      "x": 10.9,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-freight-forwarder",
+      "presetKey": "freight-forwarder",
+      "x": 11.8,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-reverse-logistics",
+      "presetKey": "reverse-logistics",
+      "x": 12.700000000000001,
+      "y": 12.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-multi-reconciler",
+      "presetKey": "multi-reconciler",
+      "x": 1,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-fx-settler",
+      "presetKey": "fx-settler",
+      "x": 1.9,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-vat-specialist",
+      "presetKey": "vat-specialist",
+      "x": 2.8,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-cash-forecaster",
+      "presetKey": "cash-forecaster",
+      "x": 3.7,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-rule-sentinel",
+      "presetKey": "rule-sentinel",
+      "x": 4.6,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-ip-shield",
+      "presetKey": "ip-shield",
+      "x": 5.5,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-account-guardian",
+      "presetKey": "account-guardian",
+      "x": 6.4,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-creative-studio",
+      "presetKey": "creative-studio",
+      "x": 7.3,
+      "y": 13.2,
+      "kind": "desk"
+    },
+    {
+      "id": "st-brand-private",
+      "presetKey": "brand-private",
+      "x": 8.2,
+      "y": 13.2,
+      "kind": "monitor"
+    },
+    {
+      "id": "st-kb-trainer",
+      "presetKey": "kb-trainer",
+      "x": 9.1,
+      "y": 13.2,
+      "kind": "monitor"
+    },
+    {
+      "id": "st-service-qc",
+      "presetKey": "service-qc",
+      "x": 10,
+      "y": 13.2,
+      "kind": "monitor"
+    },
+    {
+      "id": "st-mm-engineer",
+      "presetKey": "mm-engineer",
+      "x": 10.9,
+      "y": 13.2,
+      "kind": "monitor"
+    },
+    {
+      "id": "st-live-producer",
+      "presetKey": "live-producer",
+      "x": 11.8,
+      "y": 13.2,
+      "kind": "monitor"
+    },
+    {
+      "id": "st-cs-en",
+      "presetKey": "cs-en",
+      "x": 11.4,
+      "y": 11.6,
+      "kind": "counter"
+    },
+    {
+      "id": "st-cs-eu",
+      "presetKey": "cs-eu",
+      "x": 12.3,
+      "y": 12.2,
+      "kind": "counter"
+    },
+    {
+      "id": "st-cs-apac",
+      "presetKey": "cs-apac",
+      "x": 11.6,
+      "y": 12.9,
+      "kind": "counter"
+    }
+  ],
+  "props": [
+    {
+      "kind": "board",
+      "x": 6.8,
+      "y": 0.4,
+      "label": "集团经营指挥屏"
+    },
+    {
+      "kind": "whiteboard",
+      "x": 5,
+      "y": 0.5,
+      "label": "五级审批路由"
+    },
+    {
+      "kind": "board",
+      "x": 0.5,
+      "y": 3.4,
+      "label": "国内战区 · GMV 龙虎榜"
+    },
+    {
+      "kind": "board",
+      "x": 9,
+      "y": 3.4,
+      "label": "跨境战区 · 时区作战图"
+    },
+    {
+      "kind": "board",
+      "x": 0.6,
+      "y": 11.8,
+      "label": "中台 · 数据口径墙"
+    },
+    {
+      "kind": "board",
+      "x": 12.9,
+      "y": 11.2,
+      "label": "客服中心 · 多语言监控墙"
+    },
+    {
+      "kind": "camera",
+      "x": 2.2,
+      "y": 8.6,
+      "label": "直播间"
+    },
+    {
+      "kind": "greenscreen",
+      "x": 3.4,
+      "y": 8.9
+    },
+    {
+      "kind": "light",
+      "x": 1.3,
+      "y": 9.2
+    },
+    {
+      "kind": "clapper",
+      "x": 2.8,
+      "y": 9.5,
+      "label": "短视频工位"
+    },
+    {
+      "kind": "monitor",
+      "x": 10.2,
+      "y": 11,
+      "label": "海外仓/FBA 库存屏"
+    },
+    {
+      "kind": "monitor",
+      "x": 13.1,
+      "y": 3.6,
+      "label": "汇率看板"
+    },
+    {
+      "kind": "luggage",
+      "x": 12.8,
+      "y": 9.8,
+      "label": "头程货盘"
+    },
+    {
+      "kind": "plant",
+      "x": 0.6,
+      "y": 0.7
+    },
+    {
+      "kind": "plant",
+      "x": 13.3,
+      "y": 0.7
+    },
+    {
+      "kind": "sofa",
+      "x": 6.2,
+      "y": 6.4,
+      "label": "大促作战室"
+    },
+    {
+      "kind": "coffee",
+      "x": 7.3,
+      "y": 6.7
+    }
+  ],
+  "ceoDesk": {
+    "x": 6.8,
+    "y": 0.9
+  },
+  "lounge": {
+    "x": 6.6,
+    "y": 6.6
+  },
+  "entrance": {
+    "x": 13.2,
+    "y": 13.4
+  }
+}

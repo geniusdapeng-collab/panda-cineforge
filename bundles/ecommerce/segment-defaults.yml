@@ -1,0 +1,299 @@
+# 三客群默认安装清单（§2.2 槽⑤班组装配的客群化默认配置）
+# 用途：新工作区按客群一键初始化——预装技能（ordered：首屏展示顺序=销售叙事顺序）、启用 preset、围栏 patch。
+# 纪律：清单只决定「默认装什么、什么前置」，运行时仍全量过围栏瀑布（L8.3）；客户后续可自助加装技能市场任意技能。
+version: ecommerce-segment-defaults/v1
+segments:
+
+  # ========== 单平台多店腰部卖家（一个人管 3 家店）· 卖 ROI ==========
+  waist_single:
+    label: 单平台多店腰部卖家
+    pitch: 一个人管3家店，一年多赚30万
+    fence_patch: fences/patches/waist-seller-patch.yml
+    presets: [tmall-head, tmall-ops, tmall-ads, tmall-cs, biz-analyst, budget-controller, selection-analyst, demand-planner, procurement-buyer, sku-pl-accountant, competitor-radar, creative-studio, listing-factory, rule-sentinel, account-guardian]
+    skills_ordered:  # 首屏顺序 = 卖点排序：清晨决策→利润守护→调价→广告→评价售后→库存补货→复盘
+      - morning-briefing  # 旗舰：清晨决策包，一人多店的开工仪式
+      - door-open-check
+      - sku-pl  # SKU 级利润账，知道哪个链接真赚钱
+      - sku-profit-ledger
+      - margin-guard
+      - profit-warn
+      - dynamic-reprice  # 调价自动化（R1 10% 自治半径）
+      - pricing-matrix
+      - price-band-position
+      - ads-audit  # 广告浪费钱第一时间发现
+      - ads-budget-pacing
+      - budget-watch
+      - ztc-campaign
+      - ylmf-campaign
+      - ppc-keyword-mining
+      - keyword-seo
+      - listing-factory
+      - listing-compliance
+      - detail-page-studio
+      - review-reply
+      - review-defense-window  # 差评 2h 黄金窗口（R9）
+      - rating-recovery
+      - aftersale-defender
+      - refund-flow
+      - stockout-guard  # 断货=排名清零，补货前置（R7）
+      - safety-stock-calc
+      - replenishment-model
+      - purchase-order-auto
+      - competitor-product-track
+      - weekly-ops-report
+
+  # ========== 国内多平台大卖（八大平台一盘棋）· 卖堵漏 ==========
+  cn_multi:
+    label: 国内多平台大卖
+    pitch: 八大平台一盘棋，漏的钱全部堵上
+    fence_patch: fences/patches/cn-multi-patch.yml
+    presets: [tmall-head, tmall-ops, tmall-ads, tmall-cs, jd-head, jd-ops, jd-cs, pdd-head, pdd-ops, pdd-cs, douyin-head, douyin-ads, douyin-live, douyin-video, douyin-cs, kuaishou-head, kuaishou-ads, kuaishou-cs, xhs-head, xhs-content, xhs-cs, channels-head, channels-cs, biz-analyst, budget-controller, selection-analyst, demand-planner, procurement-buyer, sku-pl-accountant, competitor-radar, creative-studio, listing-factory, rule-sentinel, account-guardian, data-warehouse, cn-warehouse, spu-master, kb-trainer, service-qc]
+    skills_ordered:  # 首屏顺序 = 卖点排序：多店矩阵→对账堵漏→价格倒挂→广告→内容直播→供应链→大促作战→组织复盘
+      - morning-briefing
+      - door-open-check
+      - sku-pl
+      - sku-profit-ledger
+      - margin-guard
+      - profit-warn
+      - dynamic-reprice
+      - pricing-matrix
+      - price-band-position
+      - ads-audit
+      - ads-budget-pacing
+      - budget-watch
+      - ztc-campaign
+      - ylmf-campaign
+      - ppc-keyword-mining
+      - keyword-seo
+      - listing-factory
+      - listing-compliance
+      - detail-page-studio
+      - review-reply
+      - review-defense-window
+      - rating-recovery
+      - aftersale-defender
+      - refund-flow
+      - stockout-guard
+      - safety-stock-calc
+      - replenishment-model
+      - purchase-order-auto
+      - competitor-product-track
+      - weekly-ops-report
+      - multi-shop-matrix  # 旗舰：多店矩阵一屏统管
+      - multi-platform-reconciler  # 八大平台对账，漏的钱全部堵上
+      - price-parity-watch  # 跨平台倒挂防护（R18 收紧 10%）
+      - cross-platform-arbitrage  # 平台间流量/价格套利机会挖掘
+      - qianchuan-campaign
+      - jn-campaign
+      - dayparting
+      - acos-fuse
+      - ads-autopilot
+      - hero-product-guard
+      - new-product-launch
+      - product-test-launch
+      - trend-radar
+      - selection-ledger
+      - overstock-clearance
+      - clearance-pricing
+      - cn-express-optimize
+      - shipping-exception
+      - logistics-query
+      - reverse-logistics
+      - order-follow
+      - pre-sale-convert
+      - cs-peak-mode
+      - service-qc
+      - kb-trainer
+      - dispute-escalation
+      - xhs-seeding
+      - short-video-script
+      - video-batch-produce
+      - live-copilot
+      - live-schedule
+      - live-script
+      - live-compliance
+      - review-asset-mining
+      - sentiment-alert
+      - anti-violation
+      - platform-rule-track
+      - compliance-sentinel
+      - risk-radar
+      - anomaly-attribution
+      - incident-postmortem
+      - sop-forge
+      - handover-manager
+      - staff-performance
+      - target-breakdown
+      - activity-enroll
+      - coupon-strategy
+      - promo-planner
+      - promo-stockup
+      - promo-war-room  # 大促战情室，峰值作战指挥
+
+  # ========== 跨境多平台超级大卖集团 · 卖数字军团 ==========
+  global_group:
+    label: 跨境多平台超级大卖集团
+    pitch: 81人数字军团，24小时盯全球盘
+    fence_patch: fences/patches/global-group-patch.yml
+    presets: [account-guardian, ae-head, amz-account, amz-eu-head, amz-fba, amz-jp-head, amz-listing, amz-ppc, amz-us-head, biz-analyst, brand-private, budget-controller, cash-forecaster, channels-cs, channels-head, cn-warehouse, competitor-radar, creative-studio, cs-apac, cs-en, cs-eu, data-warehouse, demand-planner, digital-hr, douyin-ads, douyin-cs, douyin-head, douyin-live, douyin-video, dtc-ads, dtc-edm, dtc-seo, dtc-webmaster, freight-forwarder, fx-settler, group-ceo, ip-shield, jd-cs, jd-head, jd-ops, kb-trainer, kuaishou-ads, kuaishou-cs, kuaishou-head, listing-factory, live-producer, localization-editor, market-intel, mm-engineer, multi-reconciler, overseas-warehouse, pdd-cs, pdd-head, pdd-ops, procurement-buyer, reverse-logistics, rule-sentinel, selection-analyst, service-qc, shein-supply, shopee-cs, shopee-head, sku-pl-accountant, spu-master, temu-head, temu-pricing, tmall-ads, tmall-cs, tmall-head, tmall-ops, tmallg-cs, tmallg-head, tmallg-ops, tts-creator, tts-live, tts-sea-head, tts-us-head, vat-specialist, xhs-content, xhs-cs, xhs-head]
+    skills_ordered:  # 首屏顺序 = 卖点排序：夜班全球盘→多币种财税→跨境广告→防跟卖→全球履约→集团报表→全量 160 技能
+      - night-eu-us-watch  # 旗舰：欧美白天=中国深夜，夜班班组主场
+      - multi-currency-settle  # 多币种结算对账（R14/R22 USD 口径）
+      - fx-reprice
+      - fx-hedge-advisor
+      - vat-duty-calc  # VAT/关税重算（R15 常态激活）
+      - us-sales-tax
+      - cs-multilang
+      - amz-sp
+      - amz-sb-sd
+      - hijack-watch  # 跟卖取证驱赶（R19）
+      - listing-translate
+      - fba-replenish  # FBA 补货 30-60 天链路不断货
+      - overseas-wh-balancer
+      - freight-forward
+      - board-report
+      - night-ops-suite
+      - margin-guard
+      - sku-pl
+      - risk-radar
+      - decision-brief
+      - a-plus-content
+      - account-health
+      - acos-fuse
+      - activity-enroll
+      - ads-audit
+      - ads-autopilot
+      - ads-budget-pacing
+      - aftersale-defender
+      - ai-tour
+      - anchor-script-optimize
+      - anomaly-attribution
+      - anti-violation
+      - appeal-kit
+      - audience-persona
+      - biz-dashboard
+      - blue-ocean-mining
+      - brand-asset-lib
+      - budget-watch
+      - bundle-design
+      - cash-sandbox
+      - clearance-pricing
+      - clip-distribute
+      - cn-express-optimize
+      - competitor-product-track
+      - compliance-sentinel
+      - content-calendar
+      - cost-structure-audit
+      - coupon-strategy
+      - creative-iteration
+      - creator-outreach
+      - cross-platform-arbitrage
+      - cs-night-shift
+      - cs-peak-mode
+      - cs-voice
+      - data-compliance
+      - data-quality-watch
+      - dayparting
+      - demand-forecast
+      - detail-page-studio
+      - dispute-escalation
+      - door-open-check
+      - dtc-seo
+      - dynamic-reprice
+      - edm-automation
+      - gift-strategy
+      - handover-manager
+      - hero-product-guard
+      - image-standards
+      - incident-postmortem
+      - inspection-suite
+      - inventory-cashline
+      - ip-shield
+      - jn-campaign
+      - kb-trainer
+      - keyword-seo
+      - last-mile-track
+      - listing-compliance
+      - listing-factory
+      - listing-ip-scan
+      - live-compliance
+      - live-copilot
+      - live-review
+      - live-schedule
+      - live-script
+      - live-traffic-boost
+      - logistics-query
+      - member-ops
+      - meta-google-ads
+      - morning-briefing
+      - multi-platform-reconciler
+      - multi-shop-matrix
+      - multimodal-service
+      - new-product-launch
+      - new-shop-launch
+      - order-follow
+      - order-level-audit
+      - overstock-clearance
+      - payment-terms
+      - platform-rule-track
+      - policy-change-impact
+      - ppc-keyword-mining
+      - pre-sale-convert
+      - price-band-position
+      - price-parity-watch
+      - pricing-matrix
+      - product-iteration
+      - product-test-launch
+      - profit-warn
+      - promo-planner
+      - promo-stockup
+      - promo-war-room
+      - purchase-order-auto
+      - qa-zone-ops
+      - qianchuan-campaign
+      - quality-feedback
+      - quick-return-supply
+      - rating-recovery
+      - refund-flow
+      - replenishment-model
+      - reputation-report
+      - reverse-logistics
+      - review-asset-mining
+      - review-defense-window
+      - review-reply
+      - safety-stock-calc
+      - seasonal-switch
+      - selection-ledger
+      - sentiment-alert
+      - service-front-copilot
+      - service-qc
+      - settlement-track
+      - shipping-cost-audit
+      - shipping-exception
+      - shop-authority
+      - shop-health-check
+      - short-video-script
+      - sku-lifecycle
+      - sku-profit-ledger
+      - slow-mover-alert
+      - sop-forge
+      - spu-master-data
+      - staff-performance
+      - staff-replace-diagnosis
+      - stockout-guard
+      - supplier-scorecard
+      - target-breakdown
+      - tax-invoice
+      - temu-pricing
+      - tiktok-ads
+      - tmall-global-ops
+      - trend-radar
+      - ugc-mining
+      - video-batch-produce
+      - vip-care
+      - warehouse-age-watch
+      - weekly-ops-report
+      - wh-map
+      - xhs-seeding
+      - ylmf-campaign
+      - ztc-campaign
