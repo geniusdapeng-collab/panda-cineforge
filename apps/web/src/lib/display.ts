@@ -71,6 +71,21 @@ export const INTENT_TEXT: Record<string, string> = {
   complaint: "投诉",
 };
 
+// —— 客服会话意图 ——
+export const CS_INTENT_TEXT: Record<string, string> = {
+  pre_sale: "售前",
+  aftersale: "售后",
+  logistics: "物流",
+  complaint: "投诉",
+  consult: "咨询",
+};
+
+// —— 语种码 ——
+export const LANG_TEXT: Record<string, string> = {
+  zh: "中文", en: "英语", ja: "日语", es: "西班牙语", de: "德语",
+  fr: "法语", pt: "葡萄牙语", ko: "韩语",
+};
+
 // —— 围栏级别 ——
 export const FENCE_LEVEL_TEXT: Record<string, string> = {
   auto: "自动放行",
@@ -101,14 +116,44 @@ export const COMMON_STATUS_TEXT: Record<string, string> = {
   expired: "已过期",
   rolled_back: "已回滚",
   ready: "就绪",
+  queued: "排队中",
 };
 
 // —— 线程模式 ——
 export const THREAD_MODE_TEXT: Record<string, string> = {
-  quest: "主线任务",
+  quest: "任务",
   ask: "问询",
-  agent: "委托执行",
+  agent: "托管",
 };
+
+// —— 经营阶段 ——
+export const STAGE_TEXT: Record<string, string> = {
+  launch: "上新期",
+  growth: "成长期",
+  burst: "爆款期",
+  stable: "稳定期",
+  decline: "衰退期",
+  clearance: "清仓期",
+  promo_prep: "大促备战",
+  promo_peak: "大促峰值",
+};
+
+/** 经营阶段 → 中文展示名（未收录走兜底分词） */
+export function stageText(stage: string | null | undefined): string {
+  return dictText(STAGE_TEXT, stage);
+}
+
+// —— 成员角色 ——
+export const ROLE_TEXT: Record<string, string> = {
+  owner: "所有者",
+  manager: "管理员",
+  readonly: "只读",
+};
+
+/** 成员角色 → 中文展示名 */
+export function roleText(role: string | null | undefined): string {
+  return dictText(ROLE_TEXT, role);
+}
 
 /** 动作码 → 中文（底座通用域） */
 export const ACTION_TEXT: Record<string, string> = {
@@ -390,6 +435,11 @@ export function actorText(id: string): string {
   const hit = ACTOR_TEXT[id];
   if (hit) return hit;
   if (/^(MEM|E|T|VID|R|G)-/.test(id)) return id; // 编号类保留
+  if (id.startsWith("agt-")) {
+    const root = id.slice(4);
+    const rootHit = ACTOR_TEXT[root];
+    if (rootHit) return rootHit;
+  }
   if (id.endsWith("-agent")) {
     const root = id.slice(0, -6);
     return `${ACTOR_TEXT[root] ?? root.replace(/[-_]/g, " ")} Agent`;
@@ -457,6 +507,9 @@ const PAYLOAD_KEY_TEXT: Record<string, string> = {
   note: "备注", gmv: "GMV", acos: "ACoS", margin_rate: "毛利率", qty: "数量", amount: "金额",
   warehouse: "仓库", days_cover: "可售天数", rating: "评分", score: "评分", status: "状态",
   intent: "意图", lang: "语种", currency: "币种",
+  cards: "竞对卡片", hijack_suspects: "疑似跟卖", price_band_shift: "价格带偏移",
+  diff_rate: "差异率", gmv_sample: "GMV 样本", resolved: "已解决",
+  first_response_sec: "首响秒数", multimodal: "多模态",
 };
 export function payloadText(after: unknown, maxLen = 160): string {
   if (after == null) return "";

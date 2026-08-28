@@ -9,7 +9,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../lib/trpc";
-import { APPROVAL_STATUS_TEXT, actionText, dictText, shortId , payloadText } from "../../lib/display";
+import { APPROVAL_STATUS_TEXT, actionText, dictText, roleText, shortId , payloadText } from "../../lib/display";
 import { Bridge } from "../../shell/Bridge";
 import {
   BannerAlert,
@@ -117,7 +117,7 @@ export default function P4() {
   /* ---------- 左栏：待办队列（分级） ---------- */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">待办收件箱 · INBOX</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">待办收件箱</div>
       {(["双人", "必审", "逐步审"] as const).map((tier) => {
         const items = pending.filter((a) => tierOf(a) === tier);
         if (items.length === 0) return null;
@@ -161,7 +161,7 @@ export default function P4() {
   /* ---------- 右栏：为什么这样改（WhyPanel）+ IM 同步 ---------- */
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">决策链路 · WHY</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">决策链路</div>
       {selected?.event ? (
         <>
           <div className="mb-3 rounded-lg border border-line bg-card p-3">
@@ -187,7 +187,7 @@ export default function P4() {
           </div>
           <div className="rounded-lg border border-line bg-card p-3">
             <div className="mb-1.5 text-caption font-bold text-holo">IM 卡片同步（P4E4）</div>
-            <div className="text-caption text-ink2">渠道 inapp（本地回环 D7）· 审批人映射 {role}</div>
+            <div className="text-caption text-ink2">渠道 站内（本地回环 D7）· 审批人映射 {roleText(role)}</div>
             <div className="mt-1 font-mono text-micro text-ink3">
               幂等键 {shortId(selected.approval_id)} · 同事件同渠道不重复推送（L5.3）· 回调签名校验（E5.2）
             </div>
@@ -205,7 +205,7 @@ export default function P4() {
       <div className="flex min-h-full flex-col">
         <div className="mb-3 flex items-center gap-3">
           <h2 className="text-h1 font-black tracking-wider">审批中心</h2>
-          <span className="text-[11px] tracking-[.2em] text-ink3">P4 · DECISION INBOX</span>
+          <span className="text-[11px] tracking-[.2em] text-ink3">P4 · 审批中心</span>
           <span className="flex-1" />
           {canApprove && batchable.length > 0 && (
             batchArmed ? (

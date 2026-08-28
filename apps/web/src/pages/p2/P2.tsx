@@ -155,7 +155,7 @@ export default function P2() {
   /* ---------- 左栏：会话列表（P2E1 状态点浏览，单击切换） ---------- */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话 · THREADS</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话</div>
       {threads.map((t) => (
         <a
           key={t.id}
@@ -185,7 +185,7 @@ export default function P2() {
   /* ---------- 右栏：ThreadInspector（P2E5 只读；成员点击 → P8 后续卡） ---------- */
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">线程信息 · INSPECTOR</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">线程信息</div>
       {thread && (
         <div className="space-y-3">
           <div className="rounded-lg border border-line bg-card p-3">
@@ -212,7 +212,7 @@ export default function P2() {
           </div>
           <div className="rounded-lg border border-line bg-card p-3">
             <div className="mb-1.5 text-caption font-bold text-holo">参与成员</div>
-            <div className="text-body text-ink2">{thread.agent_id ?? "值班 Agent"}</div>
+            <div className="text-body text-ink2">{thread.agent_id ? actorText(thread.agent_id) : "值班 Agent"}</div>
             <div className="mt-0.5 font-mono text-micro text-ink3">发起 {thread.created_by}</div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function P2() {
         {/* ThreadHeader（P2-④：mode/路由置信度可见） */}
         <div className="mb-3 flex items-center gap-2.5">
           <h2 className="text-h1 font-black tracking-wider">任务执行</h2>
-          <span className="text-[11px] tracking-[.2em] text-ink3">P2 · QUEST</span>
+          <span className="text-[11px] tracking-[.2em] text-ink3">P2 · 任务中心</span>
           {thread && (
             <>
               <span className="rounded border border-gold/60 bg-gold/10 px-1.5 py-0.5 text-micro font-black text-gold">

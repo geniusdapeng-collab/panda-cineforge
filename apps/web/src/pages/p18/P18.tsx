@@ -34,7 +34,7 @@ export default function P18() {
 
   return (
     <Bridge left={<PageNav current="P18" />}>
-      <PageHead title="多店驾驶舱" tag="P18 · OWNER COCKPIT" extra={<Tag tone="gold">一人管 14 店</Tag>} />
+      <PageHead title="多店驾驶舱" tag="P18 · 多店驾驶舱" extra={<Tag tone="gold">一人管 14 店</Tag>} />
       {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
         <div className="space-y-3">
           <SystemDivider time="全店经营快照" summary="各店最新日报（GMV/订单/毛利率）+ 昨夜决策包三栏 + 事件规模" />

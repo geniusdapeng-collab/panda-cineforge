@@ -85,7 +85,7 @@ export default function P23() {
 
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">集团口径 · MATRIX</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">集团口径</div>
       <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">
         14 店铺横跨国内外 13 个平台、在架 SKU 8,600+；店长对店铺 GMV 负责，向作战军负责人汇报、再向集团CEO——三级汇报线。
       </div>
@@ -97,7 +97,7 @@ export default function P23() {
 
   return (
     <Bridge left={<PageNav current="P23" />} right={right}>
-      <PageHead title="店铺矩阵看板" tag="P23 · SHOP MATRIX" extra={<Tag tone="gold">14 店铺 · 13 平台</Tag>} />
+      <PageHead title="店铺矩阵看板" tag="P23 · 店铺矩阵" extra={<Tag tone="gold">14 店铺 · 13 平台</Tag>} />
 
       <div className="mb-3 grid grid-cols-4 gap-3">
         <Stat label="店铺总数" value={SHOPS.length} hint="国内军 8 · 跨境军 6" />

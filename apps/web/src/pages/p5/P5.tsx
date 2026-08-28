@@ -100,7 +100,7 @@ export default function P5() {
   /* ---------- 左栏：版本历史 + 生效范围 ---------- */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">航路变更记录 · VERSIONS</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">航路变更记录</div>
       {versions.map((v) => (
         <div key={`${v.version}-${v.status}`} className={`mb-1.5 rounded-lg border px-3 py-2.5 ${
           v.status === "active" ? "border-gline bg-gold/6" : "border-line bg-card"
@@ -125,7 +125,7 @@ export default function P5() {
   /* ---------- 右栏：NL 新增群规 + dry-run 报告 ---------- */
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">新增群规 · NL→RULE</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">新增群规（自然语言转规则）</div>
       {readonly ? (
         <div className="rounded-lg border border-line bg-card p-3 text-caption text-ink3">
           只读视图（p5_readonly）：无群规管理权，编辑/新增入口已隐藏（E2.6/L5.1）
@@ -203,7 +203,7 @@ export default function P5() {
       <div className="flex min-h-full flex-col">
         <div className="mb-3 flex items-baseline gap-3">
           <h2 className="text-h1 font-black tracking-wider">规则与权限</h2>
-          <span className="text-[11px] tracking-[.2em] text-ink3">P5 · FENCE CONTROL</span>
+          <span className="text-[11px] tracking-[.2em] text-ink3">P5 · 围栏管控</span>
         </div>
 
         {banner && <div className="mb-3"><BannerAlert level={banner.level} actionLabel="知道了" onAction={() => setBanner(null)}>{banner.text}</BannerAlert></div>}

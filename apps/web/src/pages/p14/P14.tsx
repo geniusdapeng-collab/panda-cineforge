@@ -16,7 +16,7 @@ interface ArchiveShape {
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">平台治理 · OPS</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">平台治理</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">倒挂/断货处置见 P11；刊登与图评整改由刊登工厂产出。多平台「三失」（失控/失时/失准）在此收口。</div>
   </>
 );
@@ -51,7 +51,7 @@ export default function P14() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P14" />}>
-      <PageHead title="平台运营" tag="P14 · PLATFORMS" extra={<Tag tone="holo">每 30 分钟自动巡检</Tag>} />
+      <PageHead title="平台运营" tag="P14 · 平台运营" extra={<Tag tone="holo">每 30 分钟自动巡检</Tag>} />
       {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
         <div className="space-y-3">
           <SystemDivider time="平台巡检快照" summary="价格一致性 / 库存同步 / 在线状态（店铺档案 inspection 探针输入）" />

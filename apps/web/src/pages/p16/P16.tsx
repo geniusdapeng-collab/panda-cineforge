@@ -8,6 +8,7 @@ import { Bridge } from "../../shell/Bridge";
 import { EmptyState, SkeletonBlock, SystemDivider } from "../../components/hud";
 import { PageNav } from "../../components/PageNav";
 import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../../components/Twin";
+import { CS_INTENT_TEXT, LANG_TEXT, dictText } from "../../lib/display";
 
 interface FaqKb {
   top_questions?: Array<{ q: string; a: string; confirmed: boolean }>;
@@ -17,7 +18,7 @@ interface FaqKb {
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">客服监控 · CS WALL</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">客服监控</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">日均 4.2 万条会话、8 语种覆盖；夜班班组主场：北京时间 22:00–08:00 恰为欧美日间高峰。高危承诺一律人审。</div>
   </>
 );
@@ -55,7 +56,7 @@ export default function P16() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P16" />}>
-      <PageHead title="客服监控墙" tag="P16 · CS WALL" extra={<Tag tone="go">8 语种 · 24h 在线</Tag>} />
+      <PageHead title="客服监控墙" tag="P16 · 监控墙" extra={<Tag tone="go">8 语种 · 24h 在线</Tag>} />
       {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-4 gap-3">
@@ -71,8 +72,8 @@ export default function P16() {
             const ok = ev.decision.after?.resolved === true;
             return (
               <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone={ok ? "go" : "holo"}>{ok ? "已解决" : "跟进中"}</Tag>}>
-                <b className="text-ink2">「{String(ev.decision.after?.intent ?? "咨询")}」</b>
-                <span className="text-ink3"> · {String(ev.decision.after?.lang ?? "中文")} · 首响 {String(ev.decision.after?.first_response_sec ?? "—")}s{ev.decision.after?.multimodal ? ` · ${String(ev.decision.after.multimodal)}` : ""}</span>
+                <b className="text-ink2">「{ev.decision.after?.intent ? dictText(CS_INTENT_TEXT, String(ev.decision.after.intent)) : "咨询"}」</b>
+                <span className="text-ink3"> · {ev.decision.after?.lang ? dictText(LANG_TEXT, String(ev.decision.after.lang)) : "中文"} · 首响 {String(ev.decision.after?.first_response_sec ?? "—")}s{ev.decision.after?.multimodal ? ` · ${String(ev.decision.after.multimodal)}` : ""}</span>
               </Row>
             );
           })}

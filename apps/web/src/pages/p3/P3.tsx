@@ -118,7 +118,7 @@ export default function P3() {
           <div className="flex items-center gap-2">
             <a href="/" className="text-caption text-holo no-underline">← 工作台</a>
             <span className="text-h2 font-black text-ink">掌上日报</span>
-            <span className="text-micro tracking-[.2em] text-ink3">P3 · HANDOFF</span>
+            <span className="text-micro tracking-[.2em] text-ink3">P3 · 交接日报</span>
           </div>
 
           {banner && <BannerAlert level={banner.level} actionLabel="好" onAction={() => setBanner(null)}>{banner.text}</BannerAlert>}

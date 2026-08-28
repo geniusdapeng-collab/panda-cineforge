@@ -27,7 +27,7 @@ import {
   SystemDivider,
   type NightPillState,
 } from "../../components/hud";
-import { THREAD_MODE_TEXT, dictText } from "../../lib/display";
+import { THREAD_MODE_TEXT, actorText, dictText, roleText, stageText } from "../../lib/display";
 
 /* ---------- 类型（与 server router 对齐） ---------- */
 interface ThreadRow {
@@ -165,7 +165,7 @@ export default function P1() {
   /* ---------- 左栏：会话列表（分组渲染） ---------- */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话 · THREADS</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话</div>
       {!isCommunity && nightConfigured && (
         <div className="mb-1.5 cursor-pointer rounded-lg border border-holo/35 bg-holo/5 px-3 py-2.5">
           <div className="flex items-center justify-between">
@@ -216,7 +216,7 @@ export default function P1() {
   /* ---------- 右栏：上下文面板 ---------- */
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">上下文 · CONTEXT</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">上下文</div>
       {/* 档案 chips */}
       <div className="mb-3 rounded-lg border border-line bg-card p-3">
         <div className="mb-1.5 text-caption font-bold text-holo">店铺档案</div>
@@ -226,7 +226,7 @@ export default function P1() {
               profile.archive.property.name, profile.archive.property.city,
               profile.archive.property.shops ? `${profile.archive.property.shops} 店铺` : null,
               profile.archive.property.platforms ? `${profile.archive.property.platforms} 平台` : null,
-              profile.stage ? `阶段：${profile.stage}` : null,
+              profile.stage ? `阶段：${stageText(profile.stage)}` : null,
             ].filter(Boolean).map((c) => (
               <span key={c as string} className="rounded border border-holo/35 bg-holo/5 px-1.5 py-0.5 text-micro text-holo">{c}</span>
             ))}
@@ -251,7 +251,7 @@ export default function P1() {
             <div key={m.memberNo} className="flex items-center gap-2 text-body">
               <span className="flex h-6 w-6 items-center justify-center rounded-full border border-gold/60 bg-gold/10 text-micro text-goldhi">{m.name.slice(0, 1)}</span>
               <span className="text-ink2">{m.name}</span>
-              <span className="font-mono text-micro text-ink3">{m.role}</span>
+              <span className="font-mono text-micro text-ink3">{roleText(m.role)}</span>
             </div>
           ))}
           {agents.map((a) => (
@@ -283,7 +283,7 @@ export default function P1() {
         <div className="mb-3 flex items-baseline gap-3">
           <h2 className="text-h1 font-black tracking-wider">晨报 · 经营主页</h2>
           <span className="text-[11px] tracking-[.2em] text-ink3">
-            P1 · MORNING BRIEFING{isCommunity ? " · 社区版" : ""}{demo ? ` · demo=${demo}` : ""}
+            P1 · 晨报{isCommunity ? " · 社区版" : ""}{demo ? ` · demo=${demo}` : ""}
           </span>
         </div>
 
@@ -356,7 +356,7 @@ export default function P1() {
             {/* 最近 Agent 行动消息（演示：取最新线程摘要） */}
             {threads[0] && (
               <AgentActionMessage
-                sender={threads[0].agent_id ?? "值班 Agent"}
+                sender={threads[0].agent_id ? actorText(threads[0].agent_id) : "值班 Agent"}
                 version=""
                 action={dictText(THREAD_MODE_TEXT, threads[0].mode)}
                 eventId={threads[0].id}
@@ -404,7 +404,7 @@ export default function P1() {
           <DispatchBar
             state={dispatchState}
             value={draft}
-            chips={[profile?.archive?.property?.name ?? "熊猫优选集团", `阶段：${profile?.stage ?? "—"}`]}
+            chips={[profile?.archive?.property?.name ?? "熊猫优选集团", `阶段：${stageText(profile?.stage)}`]}
             onCancelRoute={() => setDispatchState(draft ? "typing" : "empty")}
             onChange={(v) => { setDraft(v); setDispatchState(v ? "typing" : "empty"); }}
             onSubmit={() => void dispatch(draft)}

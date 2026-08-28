@@ -116,7 +116,7 @@ export function Bridge({
             {/* 左侧会话列表（P1 注入真实分组数据；缺省占位=演示线程种子口径） */}
             <aside className="w-col-left border-r border-line p-3">
               {left ?? (<>
-              <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话 · THREADS</div>
+              <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话</div>
               {[
                 { id: "T-101", title: "周五旺季调价", status: "completed", cls: "text-go" },
                 { id: "T-102", title: "差评应急回复", status: "pending_review", cls: "text-warn" },
@@ -143,7 +143,7 @@ export function Bridge({
             <aside className="w-col-right border-l border-line p-3">
               {right ?? (
                 <>
-                  <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">上下文 · CONTEXT</div>
+                  <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">上下文</div>
                   <div className="rounded-lg border border-line bg-card p-3 text-xs leading-relaxed text-ink3">
                     档案 / 阶段 / 目标三要素投影位（L3.7）。阶段三接线。
                   </div>

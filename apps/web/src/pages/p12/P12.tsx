@@ -62,13 +62,13 @@ export default function P12() {
 
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">年度目标 · YEAR</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">年度目标</div>
       <div className="rounded-lg border border-line bg-card p-3 text-xs leading-relaxed text-ink2">
         <div>GMV <b className="text-gold">{yi(goals?.year?.gmv_cny)}</b> + <b className="text-gold">${typeof goals?.year?.gmv_usd === "number" ? (goals.year.gmv_usd / 1e8).toFixed(0) : "—"}亿</b></div>
         <div>毛利率 <b className="text-gold">{pct(goals?.year?.margin_rate)}</b> · ACoS ≤ <b className="text-gold">{pct(goals?.year?.acos)}</b> · 周转 <b className="text-gold">{goals?.year?.turnover_days ?? "—"} 天</b></div>
         <div>差评率 ≤ <b>{pct(goals?.year?.bad_review_rate)}</b> · 复购率 <b>{pct(goals?.year?.repurchase_rate)}</b></div>
       </div>
-      <div className="mb-2 mt-3 px-1 text-[11px] tracking-[.2em] text-ink3">平台分解 · PLATFORMS</div>
+      <div className="mb-2 mt-3 px-1 text-[11px] tracking-[.2em] text-ink3">平台分解</div>
       {Object.entries(goals?.breakdown?.platforms ?? {}).map(([k, v]) => (
         <div key={k} className="mb-2">
           <div className="flex justify-between text-[11px] text-ink3"><span>{k}</span><span className="font-mono">{pct(v)}</span></div>
@@ -85,7 +85,7 @@ export default function P12() {
     <Bridge left={<PageNav current="P12" />} right={right}>
       <div className="mb-3 flex items-center gap-3">
         <h2 className="text-h1 font-black tracking-wider">经营目标</h2>
-        <span className="text-[11px] tracking-[.2em] text-ink3">P12 · GOALS</span>
+        <span className="text-[11px] tracking-[.2em] text-ink3">P12 · 经营目标</span>
         <span className="flex-1" />
         {monthGoal?.note ? <span className="rounded-lg border border-line bg-card px-2.5 py-1 text-[11px] text-gold">{monthGoal.note}</span> : null}
       </div>

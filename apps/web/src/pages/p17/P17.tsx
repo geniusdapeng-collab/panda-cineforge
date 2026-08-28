@@ -18,7 +18,7 @@ interface Warehouses {
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">仓网履约 · WMS</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">仓网履约</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">库存是事件流的衍生品：出库=订单履约，余额逐日连续勾稽；盘点从「计数」退化为「校验」。库龄与断货预警直达采购沙盘。</div>
   </>
 );
@@ -53,7 +53,7 @@ export default function P17() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P17" />}>
-      <PageHead title="海外仓地图" tag="P17 · WAREHOUSE MAP" extra={<Tag tone="holo">在库货值 {warehouses?.stock_value_cny ? `¥${(warehouses.stock_value_cny / 1e8).toFixed(1)}亿` : "—"}</Tag>} />
+      <PageHead title="海外仓地图" tag="P17 · 海外仓" extra={<Tag tone="holo">在库货值 {warehouses?.stock_value_cny ? `¥${(warehouses.stock_value_cny / 1e8).toFixed(1)}亿` : "—"}</Tag>} />
       {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-4 gap-3">

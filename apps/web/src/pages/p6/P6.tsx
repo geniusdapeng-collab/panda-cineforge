@@ -272,7 +272,7 @@ export default function P6() {
     <Bridge
       left={
         <>
-          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">技能中心 · ARMORY</div>
+          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">技能中心</div>
           {[
             ["#sec-official", "✦ 官方技能", `金边 · ${officials.length}`],
             ["#sec-team", "✧ 团队技能", `银边 · ${teams.length}`],
@@ -298,7 +298,7 @@ export default function P6() {
       }
       right={
         <>
-          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">资产飞轮 · FLYWHEEL</div>
+          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">资产飞轮</div>
           <div className="rounded-lg border border-line bg-card p-3 text-caption leading-relaxed text-ink2">
             执行 → 沉淀（技能/记忆）→ 复用（Agent 调用）→ 再执行；审批手势与驳回原因回流为评估数据（F8.7）。
           </div>

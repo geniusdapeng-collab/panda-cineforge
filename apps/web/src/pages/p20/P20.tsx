@@ -50,7 +50,7 @@ function renderValue(v: unknown, depth = 0): React.ReactNode {
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">档案即配置 · ARCHIVE</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">档案即配置</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">改档案即改系统行为边界：毛利红线与 R2 同源、审批矩阵与 R4/R12 同源、断货预警线与 R7 同源。</div>
   </>
 );
@@ -70,7 +70,7 @@ export default function P20() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P20" />}>
-      <PageHead title="店铺档案" tag="P20 · ARCHIVE" extra={<Tag tone="gold">一店一档 ×14</Tag>} />
+      <PageHead title="店铺档案" tag="P20 · 店铺档案" extra={<Tag tone="gold">一店一档 ×14</Tag>} />
       {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : !archive ? (
         <EmptyState icon="🗂️" title="档案未建立" hint="店铺档案是 Agent 生成内容前的必读三要素之一（L3.7）。" />
       ) : (

@@ -11,7 +11,7 @@ import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../../compone
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">评价防线 · REVIEW</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">评价防线</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">差评防御窗口前移到签收后 2 小时；处置案例沉淀组织记忆，同类问题越来越少是工程结果。</div>
   </>
 );
@@ -40,7 +40,7 @@ export default function P15() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P15" />}>
-      <PageHead title="评价与差评防御" tag="P15 · REVIEWS" extra={<Tag tone="warn">差评 2h SLA · R9</Tag>} />
+      <PageHead title="评价与差评防御" tag="P15 · 口碑防御" extra={<Tag tone="warn">差评 2h SLA · R9</Tag>} />
       {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-4 gap-3">

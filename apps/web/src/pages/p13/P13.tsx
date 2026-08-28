@@ -12,7 +12,7 @@ import { Ev, fmtTime, PageHead, Row, Stat, Tag, Note } from "../../components/Tw
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">订单穿透 · TRAIL</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">订单穿透</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">每环含执行者（人/Agent）、耗时、围栏判定与依据。异常环节一眼定位——订单状态再不用打电话问技术。</div>
   </>
 );
@@ -46,7 +46,7 @@ export default function P13() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P13" />}>
-      <PageHead title="订单全流程穿透" tag="P13 · ORDER TRAIL" extra={
+      <PageHead title="订单全流程穿透" tag="P13 · 订单穿透" extra={
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (q.trim()) void openTrail(q.trim()); }}>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="输入订单号（如 OD-882134）"
             className="w-52 rounded-lg border border-line bg-card px-3 py-1.5 text-xs text-ink2 outline-none focus:border-gline" />

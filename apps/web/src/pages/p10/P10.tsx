@@ -66,7 +66,7 @@ export default function P10() {
 
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">根因分布 · ROOT CAUSE</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">根因分布</div>
       {dist.map(([k, n]) => (
         <div key={k} className="mb-2 rounded-lg border border-line bg-card p-2.5">
           <div className="flex items-center justify-between text-xs">
@@ -88,7 +88,7 @@ export default function P10() {
     <Bridge left={<PageNav current="P10" />} right={right}>
       <div className="mb-3 flex items-center gap-3">
         <h2 className="text-h1 font-black tracking-wider">断点看板</h2>
-        <span className="text-[11px] tracking-[.2em] text-ink3">P10 · INCIDENT LOOP</span>
+        <span className="text-[11px] tracking-[.2em] text-ink3">P10 · 断点闭环</span>
         <span className="flex-1" />
         <span className="rounded-lg border border-line bg-card px-2.5 py-1 text-[11px] text-ink3">
           30 天断点 <b className="text-gold">{incidents.length}</b> 起 · 周报 <b className="text-gold">{weekly.length}</b> 期

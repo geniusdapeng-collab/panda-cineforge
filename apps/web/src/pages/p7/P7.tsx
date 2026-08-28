@@ -138,7 +138,7 @@ export default function P7() {
     <Bridge
       left={
         <>
-          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">装配中心 · DOCK</div>
+          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">装配中心</div>
           {[
             ["#sec-profiles", "🛰 Profile 切换器", `${data?.profiles.length ?? 0} 套注册`],
             ["#sec-slots", "🧩 六装配槽", selected ? `${selected.filledCount}/6 已装配` : "—"],
@@ -154,7 +154,7 @@ export default function P7() {
       }
       right={
         <>
-          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">平台化证明 · PROOF</div>
+          <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">平台化证明</div>
           <div className="rounded-lg border border-line bg-card p-3 text-caption leading-relaxed text-ink2">
             第三行业落地 = 填五要素 + 过校验，底座代码零改动（§2.3/§2.4）。换行业 = 换一套成员、群规与皮肤。
           </div>

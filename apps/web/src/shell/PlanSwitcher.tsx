@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ensureDemoLogin, setToken, trpc } from "../lib/trpc";
 
 const PLAN_LABEL: Record<string, string> = {
-  community: "社区版", pro: "Pro", teams: "Teams", vpc: "VPC",
+  community: "社区版", pro: "专业版", teams: "团队版", vpc: "专有云版",
 };
 const PLAN_ORDER = ["community", "pro", "teams", "vpc"] as const;
 
@@ -80,7 +80,7 @@ export function PlanSwitcher({ onPlan }: { onPlan?: (plan: string) => void }) {
             >
               <span>{PLAN_LABEL[p]}</span>
               <span className="text-[10px] text-ink3">
-                {p === "community" ? "无夜班/巡检/Quest" : p === "pro" ? "完整夜班+巡检" : p === "teams" ? "+集团共享记忆" : "+内网 seam"}
+                {p === "community" ? "无夜班/巡检/任务" : p === "pro" ? "完整夜班+巡检" : p === "teams" ? "+集团共享记忆" : "+内网专线"}
               </span>
             </button>
           ))}

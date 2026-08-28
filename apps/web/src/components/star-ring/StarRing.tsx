@@ -17,6 +17,7 @@ import { demoRailMessages } from "../../lib/demo-conversation";
 import { useLocation, useNavigate } from "react-router";
 import { ensureDemoLogin, trpc } from "../../lib/trpc";
 import { AgentActionMessage, HumanBubble } from "../hud/messages";
+import { COMMON_STATUS_TEXT, THREAD_MODE_TEXT, dictText } from "../../lib/display";
 
 /** 路由 → 情境快捷钮（前缀匹配；越靠上越优先） */
 const CONTEXT_CHIPS: Array<[prefix: string, chips: string[]]> = [
@@ -166,14 +167,14 @@ export function StarRing() {
         } else {
           pushMsg({
             role: "agent", action: "已转立项处理", receipt: "unverified", refId: r.threadId,
-            text: `该问句被路由为任务（${r.mode ?? "quest"}），线程 ${r.threadId ?? "—"} 已建立，可到 P2 任务中心跟进。`,
+            text: `该问句被路由为任务（${dictText(THREAD_MODE_TEXT, r.mode ?? "quest")}），线程 ${r.threadId ?? "—"} 已建立，可到 P2 任务中心跟进。`,
             linkTo: r.threadId ? `/p2/${encodeURIComponent(r.threadId)}` : undefined,
           });
         }
       } else {
         pushMsg({
           role: "agent", action: "值班 Agent 已接单", receipt: "unverified", refId: r.threadId,
-          text: `已立项 ${r.threadId ?? "—"}（状态 ${r.status ?? "queued"}）：「${text}」。点击跳任务中心跟进执行。`,
+          text: `已立项 ${r.threadId ?? "—"}（${dictText(COMMON_STATUS_TEXT, r.status ?? "queued")}）：「${text}」。点击跳任务中心跟进执行。`,
           linkTo: r.threadId ? `/p2/${encodeURIComponent(r.threadId)}` : undefined,
         });
       }
@@ -217,7 +218,7 @@ export function StarRing() {
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          title="展开 Ask 对话栏"
+          title="展开 AI 助手对话栏"
           className="relative flex h-11 w-11 cursor-pointer items-center justify-center rounded-full gold-grad shadow-[0_0_24px_rgba(255,160,60,.5)]"
         >
           <ClapperIcon />
@@ -227,7 +228,7 @@ export function StarRing() {
             </span>
           )}
         </button>
-        <div className="text-[10px] tracking-[.25em] text-gold [writing-mode:vertical-rl]">ASK · AI 助手</div>
+        <div className="text-[10px] tracking-[.25em] text-gold [writing-mode:vertical-rl]">AI 助手</div>
         <div className="flex-1" />
         <button
           type="button"
@@ -250,7 +251,7 @@ export function StarRing() {
           <ClapperIcon size={18} />
         </span>
         <div className="min-w-0">
-          <div className="text-caption font-black tracking-wider text-gold">Ask · AI 助手</div>
+          <div className="text-caption font-black tracking-wider text-gold">AI 助手</div>
           <div className="font-mono text-[10px] text-ink3">{pathname} · 全局常驻</div>
         </div>
         {pendingCount > 0 && (

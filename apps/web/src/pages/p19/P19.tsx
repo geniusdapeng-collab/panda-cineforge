@@ -21,7 +21,7 @@ interface ReportResult { kind: string; rows: Array<Record<string, unknown>> }
 
 const rightPanel = (
   <>
-    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">经营问数 · BI</div>
+    <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">经营问数</div>
     <div className="rounded-lg border border-gline bg-card p-3 text-xs leading-relaxed text-ink3">从做报表到问问题：数据已在事件库，报表是提问的即时答案。自由问答随 LLM 取数接线开放。</div>
   </>
 );
@@ -48,7 +48,7 @@ export default function P19() {
 
   return (
     <Bridge right={rightPanel} left={<PageNav current="P19" />}>
-      <PageHead title="经营问数" tag="P19 · REVENUE" extra={<Tag tone="holo">问数即答</Tag>} />
+      <PageHead title="经营问数" tag="P19 · 经营问数" extra={<Tag tone="holo">问数即答</Tag>} />
       <div className="mb-3 flex flex-wrap gap-2">
         {QUESTIONS.map((x) => (
           <button key={x.key} type="button" onClick={() => setQ(x.key)}

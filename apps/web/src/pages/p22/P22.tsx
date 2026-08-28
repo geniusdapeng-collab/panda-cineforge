@@ -85,7 +85,7 @@ function QrPlaceholder() {
   }
   return (
     <svg viewBox="-1 -1 14 14" className="h-[84px] w-[84px] rounded border border-line bg-[#eaf1ff] p-1" aria-label="二维码占位">
-      <path d={cells.join("")} fill="#0a1230" />
+      <path d={cells.join("")} fill="#33262b" />
     </svg>
   );
 }
@@ -367,7 +367,7 @@ export default function P22() {
   /* ---------- 左栏 ---------- */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">服务前台 · SERVICE DESK</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">服务前台</div>
       {([
         ["kb", "📚 知识中台", `集合 ${collections.length} · 待审 ${pending.length}`],
         ["tickets", "🎫 工单台", `在列 ${tickets.length}`],
@@ -398,7 +398,7 @@ export default function P22() {
   /* ---------- 右栏 ---------- */
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">数据口径 · GOVERNANCE</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">数据口径</div>
       <div className="rounded-lg border border-line bg-card p-3 text-caption leading-relaxed text-ink2">
         全部数据来自 <span className="font-mono text-micro text-holo">trpc.service.*</span>；写操作落五元事件，批准生效联动 approvals 审批台（kb.publish，D16）。
       </div>

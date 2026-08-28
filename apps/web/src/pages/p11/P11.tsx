@@ -61,7 +61,7 @@ export default function P11() {
 
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">30 天守护 · GUARD</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">30 天守护</div>
       {[
         { label: "价格倒挂预警（R18）", n: parityBlocks.length, cls: "text-warn" },
         { label: "断货预警（R7）", n: stockBlocks.length, cls: "text-warn" },
@@ -83,7 +83,7 @@ export default function P11() {
     <Bridge left={<PageNav current="P11" />} right={right}>
       <div className="mb-3 flex items-center gap-3">
         <h2 className="text-h1 font-black tracking-wider">商品价格矩阵</h2>
-        <span className="text-[11px] tracking-[.2em] text-ink3">P11 · PRICE MATRIX</span>
+        <span className="text-[11px] tracking-[.2em] text-ink3">P11 · 价格矩阵</span>
       </div>
 
       {!ready ? (

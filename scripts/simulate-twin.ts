@@ -998,7 +998,7 @@ async function main(): Promise<void> {
     { id: "mem-pat-night-cs", scope: "workspace", kind: "pattern", conf: 0.82, content: "跨境店会话高峰在北京时间 22:00–02:00（欧美白天），夜班班组托管解决率 82%，零排队", src: csIds.slice(0, 3) },
     { id: "mem-sop-review-apology", scope: "workspace", kind: "sop", conf: 0.9, content: "差评致歉结构 v2：共情→核实→整改→邀约回流；禁用「全网最低/百分百满意」等档案外承诺（R9 2h SLA）", src: reviewIds.slice(0, 3) },
     { id: "mem-sop-acos-fuse", scope: "workspace", kind: "sop", conf: 0.78, content: "利润保险丝 SOP：ACoS 连续 3 天 > 盈亏平衡点 → 自动降预算 30% → 请示运营总监 → 复盘关键词结构", src: reconIds.slice(0, 2) },
-    { id: "mem-pref-owner-pricing", scope: "agent", kind: "preference", conf: 0.75, content: "周董调价偏好：大促提前 3 天布局、单次降价 ≤8% 为宜、毛利红线 x1.15 不放行", src: priceIds.slice(0, 2) },
+    { id: "mem-pref-owner-pricing", scope: "agent", kind: "preference", conf: 0.75, content: "董事长调价偏好：大促提前 3 天布局、单次降价 ≤8% 为宜、毛利红线 x1.15 不放行", src: priceIds.slice(0, 2) },
     { id: "mem-pat-faq-topics", scope: "workspace", kind: "pattern", conf: 0.88, content: "买家咨询 TOP3：充电宝上飞机/物流时效/跨境关税，占会话 55%+，知识库命中即答", src: csIds.slice(2, 5) },
     { id: "mem-pat-fba-replenish", scope: "workspace", kind: "pattern", conf: 0.7, content: "FBA-美西补货提前期 35 天口径偏紧，黑五前 IPI 波动大，建议安全库存上浮至 18 天", src: reconIds.slice(1, 3) },
     { id: "mem-sop-hijack-triage", scope: "workspace", kind: "sop", conf: 0.84, content: "跟卖处置纪律：夜间巡检发现 → 截图/test buy 取证 → 品牌驱赶函请示（R19）→ 复盘 Listing 护城河", src: reviewIds.slice(3, 5) },

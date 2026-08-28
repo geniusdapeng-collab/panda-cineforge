@@ -45,9 +45,9 @@ const WS_SLUG = "panda-group";
 const FENCE_VERSION = "ecom-baseline/v1"; // 与 bundles/ecommerce/fences/ecom-baseline.yml 的 version 一致
 
 const MEMBERS = [
-  { id: "MEM-001", name: "周正邦（创始人·董事长）", role: "owner" },
-  { id: "MEM-002", name: "林晓薇（运营总监）", role: "manager" },
-  { id: "MEM-003", name: "赵启铭（财务总监）", role: "readonly" },
+  { id: "MEM-001", name: "董事长（创始人）", role: "owner" },
+  { id: "MEM-002", name: "运营总监", role: "manager" },
+  { id: "MEM-003", name: "财务总监", role: "readonly" },
 ] as const;
 
 const EVENT_BASE = 8800; // 事件编号 E-8801 起（PRD 展示口径）

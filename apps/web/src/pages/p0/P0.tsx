@@ -356,7 +356,7 @@ export default function P0() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") void send(input); }}
-            placeholder={`像跟 ${data?.ceoName ?? "CEO"} 说话一样输入……（ask 问询 / 安排任务 / 逐步商量）`}
+            placeholder={`像跟 ${data?.ceoName ?? "CEO"} 说话一样输入……（问询 / 安排任务 / 逐步商量）`}
             className="flex-1 rounded-full border border-line bg-card px-4 py-2.5 text-sm text-ink outline-none placeholder:text-ink3 focus:border-gline"
           />
           <button disabled={busy} onClick={() => void send(input)}

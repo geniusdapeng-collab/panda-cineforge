@@ -253,7 +253,7 @@ function RosterHome() {
   /* 左栏：名册导航 + 在线概览 */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">团队成员 · ROSTER</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">团队成员</div>
       <div className="mb-1.5 rounded-lg border border-line bg-card px-3 py-2.5">
         <div className="text-caption font-bold text-ink">人类成员 · {humans.length}</div>
         <div className="mt-0.5 text-micro text-ink3">{humans.filter((h) => h.online).length} 人在线（近 24h 留痕）</div>
@@ -273,7 +273,7 @@ function RosterHome() {
   /* 右栏：权限与约束说明（P8-⑤ 权限约束） */
   const right = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">约束 · CONSTRAINTS</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">约束</div>
       <div className="space-y-2">
         <div className="rounded-lg border border-line bg-card p-3 text-micro leading-relaxed text-ink2">
           <b className="text-holo">Agent 是一等公民（IM.3）</b>
@@ -296,7 +296,7 @@ function RosterHome() {
       <div className="flex min-h-full flex-col">
         <div className="mb-3 flex items-baseline gap-3">
           <h2 className="text-h1 font-black tracking-wider">团队成员</h2>
-          <span className="text-[11px] tracking-[.2em] text-ink3">P8 · CREW · 人机混编通讯录 IM.3</span>
+          <span className="text-[11px] tracking-[.2em] text-ink3">P8 · 人机混编通讯录 IM.3</span>
         </div>
 
         {failed && (
@@ -409,7 +409,7 @@ function AgentProfilePage({ agentId }: { agentId: string }) {
   /* 左栏：船员列表（点击切换档案） */
   const left = (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">Agent 成员 · AGENTS</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">Agent 成员</div>
       {roster.map((a) => (
         <button
           key={a.id}
@@ -439,7 +439,7 @@ function AgentProfilePage({ agentId }: { agentId: string }) {
   /* 右栏：运行约束 + 写回声明（P8E1 档案字段） */
   const right = p && (
     <>
-      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">运行约束 · RUNTIME</div>
+      <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">运行约束</div>
       <div className="space-y-2">
         <div className="rounded-lg border border-line bg-card p-3 text-micro leading-relaxed text-ink2">
           <div>· {p.agent.nightShift ? `夜班窗口 ${p.nightWindow.range} 自动上线（M4）` : "非夜班 preset"}</div>
