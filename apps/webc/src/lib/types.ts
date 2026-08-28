@@ -66,8 +66,6 @@ export interface Order {
   quantity?: number;
   /** 物流状态摘要 */
   logistics?: string;
-  checkIn?: string;
-  roomType?: string;
   amount?: number;
 }
 

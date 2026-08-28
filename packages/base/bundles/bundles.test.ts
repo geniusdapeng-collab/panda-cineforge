@@ -115,8 +115,8 @@ describe.runIf(RUN_DB)("行业装配 PG 集成（F2.10 铁律）", async () => {
     const root = mkdtempSync(join(tmpdir(), "wl-bundles-h15-"));
     // 五要素填充 = 复制 ecommerce 实物资产作为第三行业草稿内容（演示口径：资产由行业方提供，非底座代码）
     // #25 修复：用 import.meta.url 定位仓库根（原 process.cwd() 相对路径仅在包目录下跑测试才成立）
-    const hotelDir = new URL("../../../bundles/ecommerce", import.meta.url).pathname;
-    cpSync(hotelDir, join(root, "copycat"), { recursive: true });
+    const ecomDir = new URL("../../../bundles/ecommerce", import.meta.url).pathname;
+    cpSync(ecomDir, join(root, "copycat"), { recursive: true });
     const bjPath = join(root, "copycat", "bundle.json");
     const bj = JSON.parse(readFileSync(bjPath, "utf-8"));
     bj.name = "@workloom/copycat"; bj.workloom.industry = "copycat"; bj.workloom.status = "draft";

@@ -1,7 +1,9 @@
 /**
  * @workloom/connectors · 核心类型
  * 平台枚举 / 店铺引用 / 分页 / 六族领域 DTO。
- * 说明：任务口径为"13 平台"，但平台清单实列 14 个（国内 8 + 跨境 6），
+ * 叙事口径为「14 家店铺 × 13 个电商平台 + 1 个独立站」；平台清单实列 16 个（国内 8 + 跨境 8）——
+ * 13 平台口径：天猫/京东/拼多多/抖音/快手/小红书/视频号/天猫国际/亚马逊/Temu/TikTokShop/Shopee/速卖通，
+ * Lazada 归入 Shopee 店（同店两平台）、SHEIN 归入速卖通店（同店两渠道）、Shopify 为独立站。
  * 此处以清单为准全部纳入联合类型，缺哪个平台由 registry 运行时把关。
  */
 
@@ -22,14 +24,16 @@ export const CROSSBORDER_PLATFORM_IDS = [
   "amazon", // 亚马逊
   "temu", // Temu
   "tiktok-shop", // TikTok Shop
-  "shopee", // Shopee
-  "aliexpress", // 速卖通
-  "shopify", // Shopify 独立站
+  "shopee", // Shopee（PandaSelect 同店运营 Lazada，13 平台口径按 Shopee 计）
+  "lazada", // Lazada（归入 Shopee 店，不占 13 平台口径）
+  "aliexpress", // 速卖通（PandaGlobal 同店供货 SHEIN，13 平台口径按速卖通计）
+  "shein", // SHEIN 供货（归入速卖通店，不占 13 平台口径）
+  "shopify", // Shopify 独立站（口径中的「+1 独立站」）
 ] as const;
 
 export const PLATFORM_IDS = [...DOMESTIC_PLATFORM_IDS, ...CROSSBORDER_PLATFORM_IDS] as const;
 
-/** 13+1 平台联合类型（清单 14 个，见文件头说明） */
+/** 平台联合类型（清单 16 个 = 国内 8 + 跨境 8；叙事口径 13 平台 + 1 独立站，见文件头说明） */
 export type PlatformId = (typeof PLATFORM_IDS)[number];
 
 export type PlatformRegion = "domestic" | "crossborder";
@@ -49,7 +53,7 @@ export interface ShopRef {
   shopName?: string;
   /** IANA 时区，如 Asia/Shanghai、America/Los_Angeles */
   timezone: string;
-  /** ISO 4217 币种，如 CNY / USD */
+  /** ISO 4217 币种（集团月结口径五币种：CNY/USD/EUR/JPY/GBP；店铺级另见平台本地币如 SGD） */
   currency: string;
 }
 

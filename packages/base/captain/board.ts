@@ -97,7 +97,7 @@ export async function scanOrgHealth(app: pg.Pool, scope: Scope): Promise<OrgHeal
     );
     await c.query("COMMIT");
     const DOMAIN_PRESET: Record<string, string> = {
-      "price.": "pricing-agent", "review.": "customer-service", "order.": "ota-operations",
+      "price.": "pricing-agent", "review.": "customer-service", "order.": "channel-operations",
       "inventory.": "inventory-procurement", "night.": "night-shift", "content.": "content-marketing",
     };
     const uncovered = new Set<string>();

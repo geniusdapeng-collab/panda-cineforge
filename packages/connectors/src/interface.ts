@@ -1,6 +1,6 @@
 /**
  * @workloom/connectors · PlatformConnector 接口
- * 六族方法统一抽象 14 个电商平台的读写面（详见 types.ts 平台清单）。
+ * 六族方法统一抽象 16 个电商平台的读写面（详见 types.ts 平台清单；叙事口径 13 平台 + 1 独立站）。
  * 每个方法标注 read/write 与执行面级别 L1-L5（落地策略见 README）；
  * 所有方法返回 Receipt<T>：含 verified 与 raw 证据快照，
  * 对齐底座纪律——无回执 = 未核实，未核实不得转完成（L3.6/E3.7）。

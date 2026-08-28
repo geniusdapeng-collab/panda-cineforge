@@ -81,7 +81,7 @@ async function qApp<T = Record<string, unknown>>(sql: string, params: unknown[] 
 const draftOf = (action: string, whoId = "pricing-agent", extra: Record<string, unknown> = {}) => ({
   who: { type: "agent" as const, id: whoId, version: "v2.3" },
   context: { tenant_id: scope.tenantId, workspace_id: scope.workspaceId, time: new Date().toISOString() },
-  object: { type: "room_price", id: `obj-${SFX}` },
+  object: { type: "price", id: `obj-${SFX}` },
   decision: { action, ...extra },
   rule_impact: [],
 });
@@ -184,7 +184,7 @@ const b = C("B");
 for (const action of ["price.adjust", "order.refund", "review.reply", "content.draft", "content.publish", "refund.apply", "desktop.gui", "trigger.create"]) {
   b(`写动作前缀「${action}」识别`, () => assert(isWriteAction(action), `${action} 应为写类`));
 }
-for (const action of ["order.list", "review.list", "pms.price.read", "inspection.scan", "competitor.fetch"]) {
+for (const action of ["order.list", "review.list", "erp.price.read", "inspection.scan", "competitor.fetch"]) {
   b(`读动作「${action}」识别`, () => assert(!isWriteAction(action), `${action} 应为读类`));
 }
 b("registerWriteActions 注册新写动作生效", async () => {
@@ -342,7 +342,7 @@ c("when 求值异常按 block 且留痕", () => {
 });
 c("rule_impact 含版本号（附录 E）", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "room_price" }, action: "price.adjust", before: { price: 458 }, after: { price: 350 }, context: {} }, rules, "review");
+  const v = judge({ object: { type: "price" }, action: "price.adjust", before: { price: 458 }, after: { price: 350 }, context: {} }, rules, "review");
   assert(v.impacts.every((i) => i.rule_id && i.version), "impact 五元完整");
 });
 c("子调用同瀑布无后门（judgeSubCall ≡ judge）", async () => {
@@ -397,16 +397,16 @@ c("基线 R2 与 R1 并集：降幅 8% 但破毛利红线 → block", async () =
   eq(v.level, "block", "毛利红线优先");
 });
 c("多对象类型规则不匹配对象跳过", () => {
-  const v = judge({ object: { type: "channel" }, action: "price.adjust" }, [{ rule_id: "X", version: "v1", name: "x", level: "block", is_baseline: false, objectTypes: ["room_price"], actions: ["price.adjust"], when: "true" }], "auto");
+  const v = judge({ object: { type: "channel" }, action: "price.adjust" }, [{ rule_id: "X", version: "v1", name: "x", level: "block", is_baseline: false, objectTypes: ["price"], actions: ["price.adjust"], when: "true" }], "auto");
   eq(v.level, "auto", "对象不匹配不命中");
 });
 c("动作不匹配跳过", () => {
-  const v = judge({ object: { type: "room_price" }, action: "order.refund" }, [{ rule_id: "X", version: "v1", name: "x", level: "block", is_baseline: false, objectTypes: ["room_price"], actions: ["price.adjust"], when: "true" }], "auto");
+  const v = judge({ object: { type: "price" }, action: "order.refund" }, [{ rule_id: "X", version: "v1", name: "x", level: "block", is_baseline: false, objectTypes: ["price"], actions: ["price.adjust"], when: "true" }], "auto");
   eq(v.level, "auto", "动作不匹配不命中");
 });
 c("触发名带规则名（triggeredBy 展示口径）", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "room_price" }, action: "price.adjust", before: { price: 458 }, after: { price: 300 }, context: {} }, rules, "review");
+  const v = judge({ object: { type: "price" }, action: "price.adjust", before: { price: 458 }, after: { price: 300 }, context: {} }, rules, "review");
   assert(v.triggeredBy.length > 0, "触发留名");
 });
 c("写类无命中 triggeredBy 含 default 说明", () => {
@@ -1229,7 +1229,7 @@ h("D15-③ 注入评估：诱导绕过围栏即拒", async () => {
 });
 h("D15-③ 注入评估：干净正文不误伤", async () => {
   const { scanSkillForInjection } = await import("@workloom/base/skills");
-  eq(scanSkillForInjection("巡检 OTA 渠道差评，起草安抚回复，提交店长审批").length, 0, "正常技能描述不误伤");
+  eq(scanSkillForInjection("巡检电商平台差评，起草安抚回复，提交店长审批").length, 0, "正常技能描述不误伤");
 });
 h("D15-② 流水线：扫描不过连提案都进不了", async () => {
   const { proposePublish } = await import("@workloom/base/skills");
@@ -1427,7 +1427,7 @@ j("巡检扫描正常快照 → ok", async () => {
 });
 j("探针失败重试后写 inspect.run.failed（不静默）", async () => {
   const boom = (() => { throw new Error("探针爆炸"); }) as never;
-  const r = await runInspectionScan(app, gw, scope, { snapshot: { channels: [], rooms: [], reviews: [] }, retries: 1, probes: { channel_price: boom, room_state: boom, review: boom, violation: boom } });
+  const r = await runInspectionScan(app, gw, scope, { snapshot: { channels: [], rooms: [], reviews: [] }, retries: 1, probes: { channel_price: boom, stock_sync: boom, review: boom, violation: boom } });
   eq(r.ok, false, "失败上报");
   assert(r.failedEventId?.match(/^E-\d+$/), "告警事件");
 });
@@ -1817,7 +1817,7 @@ o("IM 下指令：钉钉文本进事件库且可路由为任务", async () => {
   eq(ruleBasedRoute(text).mode, "quest", "指令路由为任务");
 });
 o("访客咨询：未映射 openid 按外部访客留痕", async () => {
-  const r = await ingestInbound(app, gw, scope, { channel: "wecom", channelMsgId: `m-${SFX}-visitor-daily`, conversationId: `cv-${SFX}`, kind: "direct", senderOpenId: `ou_guest_${SFX}`, text: "请问今晚还有房吗" });
+  const r = await ingestInbound(app, gw, scope, { channel: "wecom", channelMsgId: `m-${SFX}-visitor-daily`, conversationId: `cv-${SFX}`, kind: "direct", senderOpenId: `ou_buyer_${SFX}`, text: "请问这款还有现货吗" });
   eq(r.identity, "visitor", "访客口径");
 });
 o("自然语言查账：店长口语检索被驳回的调价", async () => {
@@ -2090,7 +2090,7 @@ q("围栏判定压测：1000 次混合判定 < 2s", async () => {
   const rules = await activeRules();
   const t0 = Date.now();
   for (let idx = 0; idx < 1000; idx++) {
-    judge({ object: { type: idx % 2 ? "order" : "room_price" }, action: idx % 3 ? "price.adjust" : "order.refund", params: { amount: idx } }, rules, "review");
+    judge({ object: { type: idx % 2 ? "order" : "price" }, action: idx % 3 ? "price.adjust" : "order.refund", params: { amount: idx } }, rules, "review");
   }
   assert(Date.now() - t0 < 2000, `耗时 ${Date.now() - t0}ms`);
 });
@@ -2573,8 +2573,8 @@ h2("onboarding 经营主体写入 + 启用真实模式（横幅熄灭）→ 复�
       await setCharter(chActive);
       await qApp(`INSERT INTO threads (id, tenant_id, workspace_id, title, mode, status, created_by) VALUES ($1,$2,$3,$4,'quest','running','MEM-001') ON CONFLICT (id) DO NOTHING`, [tid, scope.tenantId, scope.workspaceId, "R11 调价 quest"]);
       const plan510 = async () => JSON.stringify([
-        { action: "pms.price.read", objectType: "price", tool: "pms.price.read", params: { sku: "SKU-3C-1001" }, label: "读取当前售价" },
-        { action: "price.adjust", objectType: "price", tool: "pms.price.write", params: { sku: "SKU-3C-1001", price: 510, cost: 420, channel_price: 510, other_platform_min: 520 }, label: "LLM 规划：调价至 ¥510" },
+        { action: "erp.price.read", objectType: "price", tool: "erp.price.read", params: { sku: "SKU-3C-1001" }, label: "读取当前售价" },
+        { action: "price.adjust", objectType: "price", tool: "erp.price.write", params: { sku: "SKU-3C-1001", price: 510, cost: 420, channel_price: 510, other_platform_min: 520 }, label: "LLM 规划：调价至 ¥510" },
       ]);
       const r1 = await runQuest(app, gw, scope, { threadId: tid, goal: "把磁吸充电宝调价到 510", presetKey: "tmall-head", llmCall: plan510 });
       eq(r1.status, "pending_review", "超 R1 自动带挂起（11.35%>10%）");
@@ -2914,12 +2914,12 @@ h2("onboarding 经营主体写入 + 启用真实模式（横幅熄灭）→ 复�
       for (let i = 0; i < 12; i++) await qApp(`DELETE FROM approvals WHERE approval_id=$1`, [`apr-r27-${i}-${SFX}`]);
       await qApp(`DELETE FROM approvals WHERE workspace_id=$1 AND snapshot->>'kind'='org.hiring'`, [scope.workspaceId]);
       // 健康态前置：临时补齐六域覆盖员工（隔离用例环境差，防交叉污染）
-      for (const pk of ["pricing-agent", "customer-service", "ota-operations", "inventory-procurement", "night-shift", "content-marketing"]) {
+      for (const pk of ["pricing-agent", "customer-service", "channel-operations", "inventory-procurement", "night-shift", "content-marketing"]) {
         await qApp(`INSERT INTO agents (id, workspace_id, preset_key, name, version, kind, readonly, fence_bindings, skills, status) VALUES ($1,$2,$3,$4,'v1','specialist',false,'[]','[]','ready') ON CONFLICT (id) DO NOTHING`, [`agt-cov-${pk}-${SFX}`, scope.workspaceId, pk, pk]);
       }
       const r2 = await runOrgScanBeat(app, scope);
       eq(r2.proposal, false, "健康态不出提案");
-      for (const pk of ["pricing-agent", "customer-service", "ota-operations", "inventory-procurement", "night-shift", "content-marketing"]) {
+      for (const pk of ["pricing-agent", "customer-service", "channel-operations", "inventory-procurement", "night-shift", "content-marketing"]) {
         await qApp(`DELETE FROM agents WHERE id=$1`, [`agt-cov-${pk}-${SFX}`]);
       }
     } finally { await restoreArchive(arc); }

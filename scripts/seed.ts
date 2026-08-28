@@ -292,6 +292,48 @@ function pandaArchive(): Record<string, unknown> {
       digital_army_size: 82, structure: "1+2+N：指挥层 4 / 共享中台 28（含巡检哨兵）/ 国内军 26 / 跨境军 24",
       human_members: ["MEM-001 董事长", "MEM-002 运营总监", "MEM-003 财务总监"],
       night_shift: "夜班班组主攻跨时区（美东/欧洲白天 = 北京 22:00-08:30）",
+      // A7 数字CEO两级化（数据级落地）：店铺CEO(店长 preset) → 事业部负责人 → 集团CEO(group-ceo) 三级汇报线，与五级审批路由对齐
+      reporting_lines: {
+        schema: "shop_ceo → division_lead → group_ceo（三级汇报线；captain 引擎未改，纯数据口径）",
+        shop_ceo: {
+          role: "店铺CEO（店长 preset，对店铺 GMV 负责）",
+          presets: ["tmall-head", "jd-head", "pdd-head", "douyin-head", "kuaishou-head", "xhs-head", "channels-head", "tmallg-head", "amz-us-head", "amz-eu-head", "amz-jp-head", "temu-head", "tts-us-head", "tts-sea-head", "shopee-head", "ae-head", "dtc-webmaster"],
+          approval_scope: "L2 发起层：店内调价/采购/广告动作按围栏级别自治或请示",
+        },
+        division_lead: {
+          role: "事业部负责人（国内军/跨境军，数据级角色：由 group-ceo 分权代理，跨店资源调度与两军协调）",
+          approval_scope: "L3 复核层：跨店协同、预算池内调度、军内升级收口",
+        },
+        group_ceo: {
+          preset: "group-ceo",
+          approval_scope: "L4-L5 收口：六步深度决策管线、向董事长（MEM-001）晨报与请示",
+        },
+        note: "与数字CEO五级审批路由对齐：店长层 L2 发起 → 事业部 L3 复核 → 集团CEO L4 → 董事长 L5；中台/职能岗按专业线虚线汇报",
+      },
+    },
+    // A3 模型路由电商任务分级表（演示级落地：工作区级配置口径；路由核心 classify() 未改，F6.7 机制位）
+    model_routing: {
+      note: "电商任务分级映射（A3）：底座 model-router 仅 standard/flagship 两档确定性分类，本表为工作区一档配置口径，供策略覆盖与演示引用",
+      tiers: {
+        light: {
+          desc: "客服秒级应答 → 轻模型（standard 链）",
+          tasks: ["cs.reply", "cs.multimodal.answer", "faq.answer", "order.note"],
+          sla: "售前首响 ≤30s（国内）/ ≤120s（跨境），与 cs_sla 同源",
+        },
+        mid: {
+          desc: "翻译/本地化/详情页文案 → 中模型（standard 链高位）",
+          tasks: ["listing.translate", "localization.edit", "detail.copy", "keyword.seo"],
+        },
+        heavy: {
+          desc: "选品算账/六步决策/经营归因 → 重模型（flagship 链）",
+          tasks: ["selection.ledger", "ceo.six_step_decision", "biz.attribution", "cash.sandbox"],
+        },
+        off_peak_batch: {
+          desc: "对账/报表等批量任务 → 谷时窗口 22:00-08:00（旗舰费率 ≤ 标准 20%，G9；queueable 等谷时）",
+          tasks: ["settlement.reconcile", "report.weekly", "sku.pl.batch", "inventory.age.report"],
+          window: "22:00-08:00", queueable: true,
+        },
+      },
     },
     fx_settlement: {
       currencies: ["CNY", "USD", "EUR", "JPY", "GBP"], // 5 币种月结对账
@@ -381,10 +423,10 @@ function pandaArchive(): Record<string, unknown> {
         { channel: "京东", price: 89, parity: true, status: "online" },
         { channel: "拼多多", price: 75, parity: false, status: "online" },
       ],
-      roomStates: [
-        { roomType: "SKU-3C-1001 东莞一仓", synced: true },
-        { roomType: "SKU-HM-2001 义乌二仓", synced: true },
-        { roomType: "SKU-3C-1001 FBA 美西", synced: false },
+      stockUnits: [
+        { sku: "SKU-3C-1001 东莞一仓", synced: true },
+        { sku: "SKU-HM-2001 义乌二仓", synced: true },
+        { sku: "SKU-3C-1001 FBA 美西", synced: false },
       ],
       reviews: [
         { id: "rv-douyin-9901", channel: "抖音电商", score: 5 },
@@ -853,15 +895,18 @@ function makeEvent(i: number, time: Date, presets: Preset[]): SeedEvent {
       const gmv = int(80, 120) * 10000;
       const hasDiff = i % 24 === 6;
       const diff = hasDiff ? Math.round(gmv * 0.003) : 0;
+      // A2 多币种口径：结算事件带币种（国内 CNY；跨境按 5 币种月结口径 USD/EUR/JPY/GBP）
+      const plat = pick(PLATFORMS);
+      const currency = PLATFORMS.indexOf(plat) >= 8 ? pick(["USD", "EUR", "JPY", "GBP"] as const) : "CNY";
       return {
         event_id: id,
         who: agentWho("multi-reconciler"),
         context: { ...baseCtx, channel: "夜班" },
-        object: { type: "settlement", id: `STL-${pick(PLATFORMS)}-${int(100, 999)}` },
+        object: { type: "settlement", id: `STL-${plat}-${int(100, 999)}` },
         decision: {
           action: "settlement.reconcile",
           after: {
-            gmv_sample: gmv, diff, diff_rate: Math.round((diff / gmv) * 10000) / 10000, rounds: 3,
+            gmv_sample: gmv, currency, diff, diff_rate: Math.round((diff / gmv) * 10000) / 10000, rounds: 3,
             ...(hasDiff ? { note: "三方差异 ≈0.3%，已立项追查（对账Agent 演示发现点）" } : {}),
           },
           basis: ["订单流水 × 平台账单 × 广告/售后扣款三方比对（账单与订单/广告/售后可对平）"],
@@ -1049,6 +1094,23 @@ async function main(): Promise<void> {
         startTime: "22:00",
         packageTime: "08:30",
         timezone: "Asia/Shanghai",
+        // A5 大促模式（系统级状态，演示级落地：数据+文档口径，未写新引擎逻辑）
+        promo_mode: {
+          state: "normal", // normal | war_room；作战周期间为 war_room（全员战备）
+          current: null,
+          last_campaign: {
+            name: "黑五跨时区作战",
+            window: "30 天轴第 20–22 天（黑五+网一，跨境店订单 ×4 脉冲）",
+            state: "war_room",
+            approval_fast_track: {
+              whitelist: ["R4", "R26"], // R4 广告日预算上调 / R26 客服退换承诺超政策
+              temp_level: "auto",
+              note: "审批提速通道：白名单围栏作战周期间临时 auto 放行，作战周结束自动回落 review（基线只紧不松的预设例外，全程留痕）",
+            },
+            roster: "全员战备排班：夜班班组主场（欧美白天 = 北京 22:00-08:00）",
+            fuse_list: "熔断清单：毛利红线 R2 / 违规动作 R11 / 安全禁区 R23 大促期间照常 block，不提速",
+          },
+        },
       }),
     ],
   );

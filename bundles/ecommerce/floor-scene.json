@@ -49,7 +49,7 @@
     {
       "key": "middle-platform",
       "name": "共享中台",
-      "headcount": 27,
+      "headcount": 28,
       "zone": {
         "x": 0.7,
         "y": 11.9,
@@ -635,6 +635,13 @@
       "presetKey": "cs-apac",
       "x": 11.6,
       "y": 12.9,
+      "kind": "counter"
+    },
+    {
+      "id": "st-inspection-agent",
+      "presetKey": "inspection-agent",
+      "x": 12.7,
+      "y": 13.2,
       "kind": "counter"
     }
   ],

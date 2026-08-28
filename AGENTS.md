@@ -102,7 +102,7 @@ pnpm dev                         # server :8787（tRPC /trpc/*）+ web :5173
 | `apps/server` | tRPC 服务端（:8787） |
 | `apps/web` / `apps/webc` | B 端 PC 工作台 / C 端 H5（:5173） |
 | `packages/base` | 底座包：workdata（事件/RLS）、fence-engine（围栏 DSL）、captain（数字CEO）、computer-use（生产级电脑/浏览器自动操作，见 docs/computer-use-production.md）等 |
-| `bundles/` | 行业 Bundle：`ecommerce/`（电商垂直包：81 presets / 160 skills / 围栏 R1–R30） |
+| `bundles/` | 行业 Bundle：`ecommerce/`（电商垂直包：82 presets / 160 skills / 围栏 R1–R30） |
 | `skills/official/` | 自带技能：release-gate / industry-entry / product-feedback |
 | `scripts/` | `suite*.ts` 测试套件、`seed*.ts` 种子、`release-gate.ts` 发布门禁、`agent-tour.sh` 能力巡游、`preview-all.sh` 三端预览、`simulate-twin.ts` 数字孪生（demo:twin 系列） |
 | `docs/` | 设计规范、方案、测试目录、**capability-map.md**、**agent-computer-guide.md** |

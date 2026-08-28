@@ -355,7 +355,7 @@ export const industryAssets = pgTable("industry_assets", {
 export const credentials = pgTable("credentials", {
   id: text("id").primaryKey(),
   workspaceId: text("workspace_id").notNull().references(() => workspaces.id),
-  /** ota-meituan / ota-ctrip / im-dingtalk / ... */
+  /** platform-taobao / platform-jd / im-dingtalk / ... */
   provider: text("provider").notNull(),
   refKey: text("ref_key").notNull(),
   /** AES-256-GCM 密文（本地 master key，阶段二实现加解密） */

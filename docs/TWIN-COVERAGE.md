@@ -22,7 +22,7 @@
 | threads | ✅ | ×3（ACoS 处置 completed / 差评危机 pending_review / 刊登冲刺 running） | P2 线程页 |
 | workspaces | ✅ | ×3（熊猫优选集团 14 店 + 云鹿家居托管 5 店 + 鲸落户外托管 3 店） | owner-cockpit 多客户驾驶舱数据基础 |
 | profiles（一档） | ✅ | ×3；集团一档含 14 店铺档案（价格带/毛利红线/广告红线/客服SLA/forbidden 字段组全量） | FAQ 候选带回源归因 |
-| agents | ✅ | ×81 preset 实例（1+2+N 编制，含只读/夜班/高危分布） | 班组名册/经营剧场工位 |
+| agents | ✅ | ×82 preset 实例（1+2+N 编制：81 业务编制 + 1 只读巡检员，含只读/夜班/高危分布） | 班组名册/经营剧场工位 |
 | members / tenants | ✅ | 3 人类成员（董事长 owner/运营总监 manager/财务总监 readonly） | 权限态演示 |
 | industry_assets | ✅ | 行业共享资产（脱敏待装） | D15 上架流水线演示 |
 | credentials | ✅ | 占位密文 ×2（只记引用 ID） | 凭据边界演示 |
@@ -76,7 +76,7 @@
 | P5 围栏 | R1–R30 规则卡 / dry-run ×3 / rolled_back 旧版 / 三客群 patch | ✅ | Genie 现场发起 dry-run |
 | P6 技能市场 | 160 技能 / 采纳率看板 / 待装行业技能 / 客群清单 | ✅ | — |
 | P7 组织记忆 | 8 条记忆 + 归因 + confidence | ✅ | Genie 周频沉淀新记忆 |
-| P8 班组 | 81 preset / 只读·夜班·高危徽标 / 协作拓扑 | ✅ | — |
+| P8 班组 | 82 preset / 只读·夜班·高危徽标 / 协作拓扑 | ✅ | — |
 | P9 夜班驾驶舱 | 30 晚班次 / 决策包三栏 / 黑五 escalate 样本 / 快照 v1 | ✅ | Genie live tick 推进「今晚」 |
 | 大促作战室 | 战备切换请示 + 第 20–22 天作战日报 + 脉冲曲线 | ✅ | Genie 按需注入大促事件 |
 | 广告驾驶舱 | ACoS 曲线 / 保险丝熔断留痕 / 计划级流水 | ✅ | Genie 按需制造爆表 |

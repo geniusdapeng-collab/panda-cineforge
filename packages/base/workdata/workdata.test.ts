@@ -19,7 +19,7 @@ import { canonicalJson, eventHash, GENESIS_HASH, isReplayEventId } from "./event
 const draft = (action: string, whoId = "pricing-agent") => ({
   who: { type: "agent" as const, id: whoId, version: "v2.3" },
   context: { tenant_id: "tenant-demo", workspace_id: "ws-demo", time: "2026-08-16T22:10:00+08:00" },
-  object: { type: "room_price", id: "RT-DLX-KING" },
+  object: { type: "price", id: "SKU-1001" },
   decision: { action },
   rule_impact: [],
 });
@@ -139,7 +139,7 @@ describe("高风险授权段③（L3.5 + P1-8 验真）", () => {
     ).rejects.toThrow(/不符/);
     await expect(
       checkHighRiskAuthorization(
-        stubDb([{ status: "approved", snapshot: { object_type: "room_price", action: "desktop.gui" } }]),
+        stubDb([{ status: "approved", snapshot: { object_type: "price", action: "desktop.gui" } }]),
         scope, desktop, d(), "apr-1",
       ),
     ).resolves.toBeUndefined();
@@ -287,7 +287,7 @@ d("PG 集成（H-2/L1.4：幂等丢弃、哈希链序）", async () => {
     const ddraft = (objId: string) => ({
       who: { type: "agent" as const, id: "desktop-agent" },
       context: { tenant_id: scope.tenantId, workspace_id: scope.workspaceId, time: new Date().toISOString(), channel: "inapp" },
-      object: { type: "room_price", id: objId },
+      object: { type: "price", id: objId },
       decision: { action: "desktop.gui" },
       rule_impact: [],
     });
@@ -334,7 +334,7 @@ d("PG 集成（H-2/L1.4：幂等丢弃、哈希链序）", async () => {
       ).rejects.toThrow(/不符/);
       // 真实 approved 且绑定相符、未过期 → 放行
       await insApr(`apr-p18-ok-${tag}`, "approved", {
-        object_type: "room_price",
+        object_type: "price",
         action: "desktop.gui",
         expires_at: new Date(Date.now() + 3_600_000).toISOString(),
       });

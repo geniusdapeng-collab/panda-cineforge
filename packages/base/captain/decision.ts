@@ -18,8 +18,8 @@ const IRREVERSIBLE = [/delete/i, /publish/i, /fence\./i, /charter/i, /refund/i, 
 
 /** 对象域归组（影响多域即重大） */
 const DOMAIN_OF: Record<string, string> = {
-  price: "收益", room_price: "收益", price_calendar: "收益",
-  review: "口碑", alert: "口碑", guest: "口碑",
+  price: "收益", price_calendar: "收益",
+  review: "口碑", alert: "口碑", member: "口碑",
   order: "订单", channel: "渠道", inventory: "采购", supplier: "采购",
   staff: "人事", shift: "人事", task: "运营", facility: "运营",
 };

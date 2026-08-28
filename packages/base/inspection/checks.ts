@@ -8,7 +8,7 @@
 /** 异常分级（F9.2）：高/中/低三级 → 推送策略 P0/P1/P2 */
 export type Severity = "high" | "medium" | "low";
 
-export type CheckKind = "channel_price" | "room_state" | "review" | "violation";
+export type CheckKind = "channel_price" | "stock_sync" | "review" | "violation";
 
 export interface CheckDef {
   id: string;
@@ -19,7 +19,7 @@ export interface CheckDef {
 /** 默认巡检项清单（F9.1；US9.5：新行业只配置检项清单即获得完整巡检能力） */
 export const DEFAULT_CHECKS: CheckDef[] = [
   { id: "chk-channel-price", kind: "channel_price", name: "多渠道价格一致性" },
-  { id: "chk-room-state", kind: "room_state", name: "库存同步" },
+  { id: "chk-stock-sync", kind: "stock_sync", name: "库存同步" },
   { id: "chk-review", kind: "review", name: "新评价扫描" },
   { id: "chk-violation", kind: "violation", name: "违规巡检" },
 ];
@@ -41,8 +41,8 @@ export interface Finding {
 export interface InspectionSnapshot {
   /** 渠道价格采样：archive.inspection.channels = [{ channel, price, parity }] */
   channels?: Array<{ channel: string; price?: number; parity?: boolean; status?: string }>;
-  /** 库存采样：archive.inspection.roomStates = [{ roomType, synced }]（字段名为兼容保留，语义=库存单元） */
-  roomStates?: Array<{ roomType: string; synced: boolean }>;
+  /** 库存采样：archive.inspection.stockUnits = [{ sku, synced }] */
+  stockUnits?: Array<{ sku: string; synced: boolean }>;
   /** 新评价采样：archive.inspection.reviews = [{ id, channel, score }]（≤3 分为差评） */
   reviews?: Array<{ id: string; channel: string; score: number }>;
   /** 违规采样：archive.inspection.violations = [{ id, kind, detail }] */
@@ -77,14 +77,14 @@ const channelPriceProbe: Probe = (check, s) => {
   });
 };
 
-const roomStateProbe: Probe = (check, s) => {
-  if (!s.roomStates || s.roomStates.length === 0) {
-    return [{ checkId: check.id, status: "nodata", summary: "无库存快照", objectType: "stock", source: "room_state" }];
+const stockSyncProbe: Probe = (check, s) => {
+  if (!s.stockUnits || s.stockUnits.length === 0) {
+    return [{ checkId: check.id, status: "nodata", summary: "无库存快照", objectType: "stock", source: "stock_sync" }];
   }
-  return s.roomStates.map((r): Finding =>
+  return s.stockUnits.map((r): Finding =>
     r.synced
-      ? { checkId: check.id, status: "ok", summary: `库存单元「${r.roomType}」库存已同步`, objectType: "stock", objectId: r.roomType, source: "room_state" }
-      : { checkId: check.id, status: "anomaly", severity: "medium", summary: `库存单元「${r.roomType}」库存未同步`, objectType: "stock", objectId: r.roomType, source: "room_state" },
+      ? { checkId: check.id, status: "ok", summary: `库存单元「${r.sku}」库存已同步`, objectType: "stock", objectId: r.sku, source: "stock_sync" }
+      : { checkId: check.id, status: "anomaly", severity: "medium", summary: `库存单元「${r.sku}」库存未同步`, objectType: "stock", objectId: r.sku, source: "stock_sync" },
   );
 };
 
@@ -117,7 +117,7 @@ const violationProbe: Probe = (check, s) => {
 
 export const DEFAULT_PROBES: Record<CheckKind, Probe> = {
   channel_price: channelPriceProbe,
-  room_state: roomStateProbe,
+  stock_sync: stockSyncProbe,
   review: reviewProbe,
   violation: violationProbe,
 };

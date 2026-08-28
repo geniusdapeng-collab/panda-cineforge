@@ -84,7 +84,7 @@ export const TRIGGER_KINDS = ["cron", "event"] as const;
 export type TriggerKind = (typeof TRIGGER_KINDS)[number];
 
 /** 电商版 7 个 Agent 职业（游戏规则手册 §3.2） */
-export const HOTEL_AGENT_KINDS = [
+export const AGENT_KINDS = [
   "pricing",
   "review",
   "reconcile",
@@ -93,7 +93,7 @@ export const HOTEL_AGENT_KINDS = [
   "competitor",
   "desktop",
 ] as const;
-export type HotelAgentKind = (typeof HOTEL_AGENT_KINDS)[number];
+export type AgentKind = (typeof AGENT_KINDS)[number];
 
 /** 审批渠道（F5.4；首版仅 inapp 本地回环，其余进停车场——总纲 D7） */
 export const APPROVAL_CHANNELS = ["inapp", "dingtalk", "wecom", "feishu", "slack"] as const;

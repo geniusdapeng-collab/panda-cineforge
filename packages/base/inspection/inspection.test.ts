@@ -24,9 +24,9 @@ const snapshot: InspectionSnapshot = {
     { channel: `京东-${RUN}`, price: 480, parity: false, status: "online" },
     { channel: `拼多多-${RUN}`, status: "offline" },
   ],
-  roomStates: [
-    { roomType: `SKU-3C-${RUN}`, synced: true },
-    { roomType: `SKU-HM-${RUN}`, synced: false },
+  stockUnits: [
+    { sku: `SKU-3C-${RUN}`, synced: true },
+    { sku: `SKU-HM-${RUN}`, synced: false },
   ],
   reviews: [{ id: `rv-${RUN}`, channel: "天猫", score: 2 }],
   violations: [],
@@ -133,7 +133,7 @@ describe.runIf(RUN_DB)("巡检 PG 集成（M9 铁律）", async () => {
     const report = await runInspectionScan(app, gw, scope, {
       snapshot,
       retries: 1,
-      probes: { channel_price: boom, room_state: boom, review: boom, violation: boom },
+      probes: { channel_price: boom, stock_sync: boom, review: boom, violation: boom },
     });
     expect(report.ok).toBe(false);
     expect(report.attempts).toBe(2);

@@ -111,8 +111,8 @@ describe.runIf(RUN_DB)("安全审计 PG 集成（附录 H）", async () => {
     const r = await gatewayAppend(gw, { ...scope, actor: { id: "MEM-001", type: "human" } }, {
       who: { type: "human", id: "MEM-001" },
       context: { tenant_id: scope.tenantId, workspace_id: scope.workspaceId, time: new Date().toISOString(), channel: "inapp" },
-      object: { type: "guest", id: `h13-pii-${Date.now().toString(36)}` },
-      decision: { action: "audit.pii_probe", after: { contact: `客人电话 ${phone}` } },
+      object: { type: "member", id: `h13-pii-${Date.now().toString(36)}` },
+      decision: { action: "audit.pii_probe", after: { contact: `买家电话 ${phone}` } },
       rule_impact: [],
     });
     expect(r.piiHits).toBeGreaterThan(0);

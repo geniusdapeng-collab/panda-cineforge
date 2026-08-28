@@ -2,7 +2,7 @@
  * runtime · 工具执行面（F3.9 五级分层：首版走 L3 确定性剧本——生产主路径）
  * 每个工具产出 { result, receipt }；receipt 是「回执位」（L3.6/E3.7）：
  * 关键数字必须来自工具回执，无回执标「未核实」不得宣称完成。
- * 首版工具为确定性演示剧本（真实 PMS/OTA 适配器进 L1/L2 层，触发条件见总纲 §7）。
+ * 首版工具为确定性演示剧本（真实 ERP/平台渠道适配器进 L1/L2 层，触发条件见总纲 §7）。
  */
 
 export interface ToolReceipt {
@@ -39,9 +39,9 @@ function maybeUnverified(result: Record<string, unknown>): ToolResult {
 
 /** 确定性剧本工具表（熊猫优选集团演示口径；数字与种子剧本一致） */
 export const DEMO_TOOLS: Record<string, ToolFn> = {
-  "pms.price.read": async (p) => maybeUnverified({ room_type: p.room_type ?? "RT-DLX-KING", current: 458, occ_7d: 0.78 }),
-  "pms.price.write": async (p) => maybeUnverified({ room_type: p.room_type, price: p.price, applied: true }),
-  "ota.price.write": async (p) => maybeUnverified({ channel: p.channel ?? "美团", price: p.price, applied: true }),
+  "erp.price.read": async (p) => maybeUnverified({ sku: p.sku ?? "SKU-3C-1001", current: 458, sold_7d: 126 }),
+  "erp.price.write": async (p) => maybeUnverified({ sku: p.sku, price: p.price, applied: true }),
+  "channel.price.write": async (p) => maybeUnverified({ channel: p.channel ?? "美团", price: p.price, applied: true }),
   "competitor.fetch": async () => maybeUnverified({ card: "竞品旗舰店", price: 472, ts: new Date().toISOString() }),
   "review.list": async () => maybeUnverified({ fresh: [{ id: "RV-66413", rating: 2, channel: "天猫", text: "风扇异响影响使用" }] }),
   "review.reply": async (p) => maybeUnverified({ review_id: p.review_id, published: true }),

@@ -285,7 +285,7 @@ export function latencyText(ms: number | null | undefined): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-// —— 行动者/员工代号 → 中文名（F-CN1：界面不出现 reconcile-agent/guest-success 这类原始 ID）——
+// —— 行动者/员工代号 → 中文名（F-CN1：界面不出现 reconcile-agent/channel-operations 这类原始 ID）——
 /** preset_key / actor id → 中文名。成员编号（MEM-xxx）与事件编号（E-xxx）属代号，原样保留 */
 export const ACTOR_TEXT: Record<string, string> = {
   // —— 集团指挥层（4）——
@@ -413,7 +413,7 @@ export const ACTION_OPS_TEXT: Record<string, string> = {
   "coupon.promote": "券推广",
   "funnel.weekly": "漏斗周报",
   "geo.publish": "GEO 发布",
-  "guest.care.send": "买家关怀",
+  "buyer.care.send": "买家关怀",
   "inspection.scan": "巡检扫描",
   "intent.radar.report": "意图雷达播报",
   "lead.assign": "线索分派",

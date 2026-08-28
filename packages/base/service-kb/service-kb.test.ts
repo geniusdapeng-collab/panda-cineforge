@@ -123,17 +123,17 @@ async function seedCollection(db: FakeDb): Promise<string> {
 describe("Markdown 语义切块", () => {
   it("按标题层级切分并保留标题路径", () => {
     const md = [
-      "# 前台政策", "", "## 退房时间", "", "标准退房时间为中午 12:00，可延迟到 14:00。", "",
-      "## 早餐", "", "早餐供应 7:00-10:00，地点在一楼全日制餐厅。", "",
-      "# 设施", "", "## 健身房", "", "健身房 24 小时开放，凭房卡进入。",
+      "# 售后政策", "", "## 退货时效", "", "签收次日起 7 天内支持无理由退货，退款 12:00 前审核当日打款。", "",
+      "## 运费险", "", "退货运费险赔付首重，跨境店 30 天无理由。", "",
+      "# 物流", "", "## 发货时效", "", "工作日 16:00 前付款当日发货，顺丰 48 小时送达。",
     ].join("\n");
     const chunks = chunkMarkdown(md);
     const headings = chunks.map((c) => c.heading);
-    expect(headings).toContain("前台政策 / 退房时间");
-    expect(headings).toContain("前台政策 / 早餐");
-    expect(headings).toContain("设施 / 健身房");
-    const checkout = chunks.find((c) => c.heading.includes("退房时间"))!;
-    expect(checkout.content).toContain("12:00");
+    expect(headings).toContain("售后政策 / 退货时效");
+    expect(headings).toContain("售后政策 / 运费险");
+    expect(headings).toContain("物流 / 发货时效");
+    const aftersale = chunks.find((c) => c.heading.includes("退货时效"))!;
+    expect(aftersale.content).toContain("12:00");
     // chunkIndex 连续
     expect(chunks.map((c) => c.chunkIndex)).toEqual(chunks.map((_, i) => i));
   });
@@ -160,14 +160,14 @@ describe("upsertDocument 版本链 + hash 幂等", () => {
   it("同标题新版本 version+1 并存；同 hash 幂等返回不建版", async () => {
     const db = wireKbDb(new FakeDb());
     const collId = await seedCollection(db);
-    const base = { workspaceId: WS, collectionId: collId, title: "退房政策", sourceKind: "manual" as const };
+    const base = { workspaceId: WS, collectionId: collId, title: "退货政策", sourceKind: "manual" as const };
 
-    const v1 = await upsertDocument(db, { ...base, contentMd: "## 退房\n\n12:00 退房。" });
+    const v1 = await upsertDocument(db, { ...base, contentMd: "## 退货\n\n签收后 7 天内可退。" });
     expect(v1.document.version).toBe(1);
     expect(v1.firstVersion).toBe(true);
     expect(v1.chunks.length).toBeGreaterThan(0);
 
-    const v2 = await upsertDocument(db, { ...base, contentMd: "## 退房\n\n14:00 退房（新政策）。" });
+    const v2 = await upsertDocument(db, { ...base, contentMd: "## 退货\n\n签收后 7 天内可退（新规：跨境 30 天）。" });
     expect(v2.document.version).toBe(2);
     expect(v2.firstVersion).toBe(false);
 
@@ -177,7 +177,7 @@ describe("upsertDocument 版本链 + hash 幂等", () => {
     expect(v2.document.status).toBe("active");
 
     // 同内容再 upsert → 幂等
-    const dup = await upsertDocument(db, { ...base, contentMd: "## 退房\n\n14:00 退房（新政策）。" });
+    const dup = await upsertDocument(db, { ...base, contentMd: "## 退货\n\n签收后 7 天内可退（新规：跨境 30 天）。" });
     expect(dup.deduped).toBe(true);
     expect(dup.document.id).toBe(v2.document.id);
 
@@ -202,16 +202,16 @@ describe("upsertDocument 版本链 + hash 幂等", () => {
 
 /* ================= 抓取结构化与 diffScan ================= */
 
-const PAGE_V1 = "<html><body><h1>熊猫优选集团</h1><p>早餐 7:00-10:00 一楼餐厅。</p><p>退房时间中午 12:00。</p></body></html>";
+const PAGE_V1 = "<html><body><h1>熊猫优选集团</h1><p>国内店 7 天无理由退货。</p><p>16:00 前付款当日发货。</p></body></html>";
 const PAGE_V2 = PAGE_V2_HTML();
 function PAGE_V2_HTML(): string {
-  return "<html><body><h1>熊猫优选集团</h1><p>早餐 6:30-10:30 一楼餐厅。</p><p>退房时间中午 12:00。</p><p>新增：健身房 24 小时开放。</p></body></html>";
+  return "<html><body><h1>熊猫优选集团</h1><p>国内店 7 天无理由退货。</p><p>16:00 前付款当日发货。</p><p>新增：跨境店 30 天无理由退货。</p></body></html>";
 }
 
 describe("crawlAndStructure / diffScan", () => {
   it("htmlToText 清洗标签", () => {
-    const text = htmlToText("<p>早餐 <b>7:00</b></p><script>var x=1;</script>");
-    expect(text).toContain("早餐 7:00");
+    const text = htmlToText("<p>发货 <b>16:00</b></p><script>var x=1;</script>");
+    expect(text).toContain("发货 16:00");
     expect(text).not.toContain("script");
   });
 
@@ -233,14 +233,14 @@ describe("crawlAndStructure / diffScan", () => {
     const src = await registerSiteSource(db, { workspaceId: WS, url: "https://demo.panda-ecom.local/faq" });
     const llm: StructuringLlm = {
       async extractKnowledge() {
-        return [{ title: "早餐时间", content: "7:00-10:00 一楼餐厅" }, { title: "退房时间", content: "中午 12:00" }];
+        return [{ title: "退货时效", content: "签收后 7 天" }, { title: "发货时效", content: "16:00 前当日发" }];
       },
     };
     const r = await crawlAndStructure(db, { workspaceId: WS, sourceId: src.id, collectionId: collId },
       llm, async () => PAGE_V1);
     expect(r.degraded).toBe(false);
     expect(r.items).toBe(2);
-    expect(r.document.content_md).toContain("## 早餐时间");
+    expect(r.document.content_md).toContain("## 退货时效");
   });
 
   it("diffScan：指纹未变不建版；变化生成 pending_review 新版本 + diff 摘要", async () => {
@@ -270,23 +270,23 @@ describe("searchKB 混合检索（无 embedder 走关键词兜底）", () => {
     const db = wireKbDb(new FakeDb());
     const collId = await seedCollection(db);
     await upsertDocument(db, {
-      workspaceId: WS, collectionId: collId, title: "前台政策", sourceKind: "manual",
-      contentMd: "## 退房时间\n\n标准退房时间为中午 12:00，延迟退房可到 14:00。\n\n## 早餐\n\n早餐供应 7:00-10:00。",
+      workspaceId: WS, collectionId: collId, title: "售后政策", sourceKind: "manual",
+      contentMd: "## 退货时效\n\n签收次日起 7 天内支持无理由退货，跨境店 30 天。\n\n## 运费险\n\n退货运费险赔付首重。",
     });
-    const r = await searchKB(db, "退房时间几点", { workspaceId: WS, limit: 5 });
+    const r = await searchKB(db, "退货时效几天", { workspaceId: WS, limit: 5 });
     expect(r.degraded).toBe(true);
     expect(r.hits.length).toBeGreaterThan(0);
-    expect(r.hits[0]!.heading).toContain("退房时间");
-    expect(r.hits[0]!.documentTitle).toBe("前台政策");
+    expect(r.hits[0]!.heading).toContain("退货时效");
+    expect(r.hits[0]!.documentTitle).toBe("售后政策");
     expect(r.hits[0]!.score).toBeGreaterThanOrEqual(r.hits[r.hits.length - 1]!.score);
     expect(r.hits[0]!.score).toBeLessThanOrEqual(1);
   });
 
   it("scoreChunkFallback：标题命中加权 > 仅内容命中 > 不命中", () => {
-    const q = "退房时间";
-    const inHeading = scoreChunkFallback(q, { heading: "前台政策 / 退房时间", content: "详见正文说明。" });
-    const inContent = scoreChunkFallback(q, { heading: "前台政策", content: "本店退房时间为中午十二点。" });
-    const miss = scoreChunkFallback(q, { heading: "健身房", content: "24 小时开放。" });
+    const q = "退货时效";
+    const inHeading = scoreChunkFallback(q, { heading: "售后政策 / 退货时效", content: "详见正文说明。" });
+    const inContent = scoreChunkFallback(q, { heading: "售后政策", content: "本店退货时效为签收后七天。" });
+    const miss = scoreChunkFallback(q, { heading: "运费模板", content: "首重 8 元。" });
     expect(inHeading).toBeGreaterThan(inContent);
     expect(inContent).toBeGreaterThan(0);
     expect(miss).toBe(0);

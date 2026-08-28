@@ -60,7 +60,7 @@ describe("审批卡片组装（M5/F5.1 同源投影）", () => {
       approval_id: "apr-e-1", event_id: "E-1",
       payload: {
         decision: { action: "price.adjust", before: { price: 400 }, after: { price: 432 } },
-        object: { type: "room_price", id: "rt-1", label: "大床房" },
+        object: { type: "price", id: "sku-1", label: "爆款连衣裙" },
         rule_impact: [{ rule_id: "R1", version: "v1", result: "review" }],
       },
       snapshot: { expires_at: "2026-08-18T08:30:00+08:00" },
@@ -163,7 +163,7 @@ d("PG 集成（G8/L1.4/L5.3/E5.2/L5.1）", async () => {
   it("入站消息落五元事件可检索（G8）；重复投递幂等丢弃（L1.4 同口径）", async () => {
     const msg: InboundMessage = {
       channel: "dingtalk", channelMsgId: `m-${sfx}-1`, conversationId: `conv-${sfx}`,
-      kind: "group", senderOpenId: openId, text: "今晚大床房最低价多少？联系我 13812345678",
+      kind: "group", senderOpenId: openId, text: "今晚这款连衣裙最低价多少？联系我 13812345678",
     };
     const r1 = await ingestInbound(app, gateway, scope, msg);
     expect(r1.deduped).toBe(false);

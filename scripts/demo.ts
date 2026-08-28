@@ -352,7 +352,7 @@ async function main(): Promise<void> {
   scene("PF.5 围栏规则演进流", "业主/集团管理员 · 策略变化时 · 自然语言 → DSL 草稿 → dry-run → 审批 → 激活");
   const rule = {
     ruleId: "R7", name: "飞猪大床房底价 420", level: "block" as const,
-    objectTypes: ["room_price"], actions: ["price.adjust"], when: "after.price < 420",
+    objectTypes: ["price"], actions: ["price.adjust"], when: "after.price < 420",
   };
   step("自然语言输入：「飞猪大床房周末不能低于 420」（F2.8）→ 转写 DSL 草稿 + 结构化预览");
   const dr = await trpc<{ dryRunId: string; report: { replayed: number; impact: string; wouldBlock: string[] } }>(

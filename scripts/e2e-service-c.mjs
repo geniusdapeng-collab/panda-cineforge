@@ -68,7 +68,7 @@ try {
   check("session 签发 token", s.status === 200 && typeof s.json.token === "string");
   const token = s.json.token;
   // KB 问答
-  const q1 = await c("/chat", { method: "POST", body: { text: "退房时间是几点？" }, token });
+  const q1 = await c("/chat", { method: "POST", body: { text: "退货期限是几天？" }, token });
   check("KB 问答命中带引用", q1.json.intent === "kb_qa" && q1.json.citations.length > 0);
   // 未绑定引导
   const q2 = await c("/chat", { method: "POST", body: { text: "查一下我的订单" }, token });

@@ -16,7 +16,7 @@ const VALID_EVENT = {
     channel: "meituan",
     stage: "stable",
   },
-  object: { type: "room_price", id: "meituan:deluxe-king:2026-08-21" },
+  object: { type: "price", id: "meituan:sku-1001:2026-08-21" },
   decision: {
     action: "price.adjust",
     before: { price: 398 },

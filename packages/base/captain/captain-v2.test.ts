@@ -78,7 +78,7 @@ describe("招聘提案（扩编不设上限，每单必批）", () => {
     expect(proposeHiring(health({ overworked: [{ agentId: "agt-x", outputs: 60 }] }))?.reason).toContain("单点过载");
     expect(proposeHiring(health())).toBeNull();
     // 缺口优先于积压
-    expect(proposeHiring(health({ uncovered: ["ota-operations"], backlog: 20 }))?.role).toBe("ota-operations");
+    expect(proposeHiring(health({ uncovered: ["channel-operations"], backlog: 20 }))?.role).toBe("channel-operations");
   });
 });
 

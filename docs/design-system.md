@@ -172,7 +172,7 @@ hud 组件辉光/阴影 rgba 旧深空色值已全部按糖果令牌色相替换
 ### 7.2 文案中文化（面向中国大陆商家）
 
 1. **界面不出现大段英文**：动作码、员工代号、状态、副标题一律经 `lib/display.ts` 字典层映射
-   （`actionText` / `actorText` / `payloadText`），禁止裸渲 `reconcile / guest-success / {"diff":0}` 这类原始值。
+   （`actionText` / `actorText` / `payloadText`），禁止裸渲 `reconcile / channel-operations / {"diff":0}` 这类原始值。
 2. **例外保留**：专有称呼与编号——AI、CEO、Agent、RevPAR/OCC、MEM-001/E-8802 等代号可保留英文/原文。
 3. **新增动作码纪律**：后端新增 `domain.verb` 动作码时，必须同步登记 `ACTION_OPS_TEXT`，否则界面会退化为词根直译。
 

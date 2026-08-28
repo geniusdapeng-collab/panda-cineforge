@@ -4,7 +4,7 @@
 
 ## v1.0.0-panda（2026-08-27）
 
-- **WorkLoom 熊猫电商运营系统首次发布**——以 workloom-hotel 为蓝本全量行业改造：bundles/ecommerce（81 presets / 160 skills / 围栏 R1–R30）、熊猫优选集团运行态（14 店铺 / 13 平台）、C 端多模态买家服务前台、packages/connectors 平台连接器层。
+- **WorkLoom 熊猫电商运营系统首次发布**——以 workloom-hotel 为蓝本全量行业改造：bundles/ecommerce（82 presets / 160 skills / 围栏 R1–R30）、熊猫优选集团运行态（14 店铺 / 13 平台）、C 端多模态买家服务前台、packages/connectors 平台连接器层。
 
 ## [1.9.2] - 2026-08-23 · 数字职场（D25-α）：等距 2.5D 办公区
 

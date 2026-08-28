@@ -147,9 +147,9 @@ describe("A1 切块 · 标题层级与段落语义", () => {
   it("多级标题生成「 / 」连接的标题路径", () => {
     const md = `# 售后政策\n\n总述内容一段，长度需要超过六十个字符才能独立成块不被合并，继续补充一些文字。\n\n## 退货时间\n\n退货为签收后七天内。\n`;
     const chunks = chunkMarkdown(md);
-    const checkout = chunks.find((c) => c.heading === "售后政策 / 退货时间");
-    expect(checkout).toBeDefined();
-    expect(checkout!.content).toContain("退货为签收后七天内");
+    const aftersale = chunks.find((c) => c.heading === "售后政策 / 退货时间");
+    expect(aftersale).toBeDefined();
+    expect(aftersale!.content).toContain("退货为签收后七天内");
   });
 
   it("同级标题重置路径（不串层级）", () => {
@@ -561,9 +561,9 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const embedder = { async embed() { return [0.1, 0.2, 0.3]; } };
     await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "向量文档", sourceKind: "manual",
-      contentMd: `## 健身房\n\n健身房二十四小时开放，位于园区三楼，刷工卡进入，正文需要足够长度。\n`,
+      contentMd: `## 发货时效\n\n工作日十六点前付款当日发货，顺丰四十八小时送达，正文需要足够长度。\n`,
     }, embedder);
-    const r = await searchKB(db, "健身房开放吗", { workspaceId: WS }, { embedder });
+    const r = await searchKB(db, "发货时效多久", { workspaceId: WS }, { embedder });
     expect(r.degraded).toBe(false);
     expect(r.hits.length).toBeGreaterThan(0);
     expect(r.hits[0]!.score).toBeGreaterThan(0);

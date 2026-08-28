@@ -1,8 +1,10 @@
 # @workloom/connectors —— 电商平台连接器层
 
-统一抽象国内 8 平台（天猫/京东/拼多多/抖音/快手/小红书/视频号/天猫国际）与跨境 6 平台
-（亚马逊/Temu/TikTokShop/Shopee/速卖通/Shopify）的读写接口，供 `bundles/ecommerce`
-的 Agent preset 调用。任务口径称"13 平台"，清单实列 14 个，本层以清单为准全部覆盖。
+统一抽象国内 8 平台（天猫/京东/拼多多/抖音/快手/小红书/视频号/天猫国际）与跨境 8 平台
+（亚马逊/Temu/TikTokShop/Shopee/Lazada/速卖通/SHEIN/Shopify）的读写接口，供 `bundles/ecommerce`
+的 Agent preset 调用。叙事口径为「14 家店铺 × 13 个电商平台 + 1 个独立站」：
+Lazada 归入 Shopee 店（同店两平台）、SHEIN 归入速卖通店（同店两渠道）、Shopify 为独立站；
+清单实列 16 个，本层以清单为准全部覆盖。
 
 ## 六族接口（src/interface.ts）
 

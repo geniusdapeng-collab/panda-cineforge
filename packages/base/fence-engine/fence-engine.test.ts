@@ -172,10 +172,10 @@ d("PG 集成（dry-run / 激活门禁 / 对象写锁）", async () => {
 
   it("对象写锁：持锁期间他人超时转「需介入」（E2.5）", async () => {
     await expect(
-      withObjectLock(gwPool, "room_price:RT-DLX-KING", async (hold) => {
+      withObjectLock(gwPool, "price:SKU-1001", async (hold) => {
         // 持锁期间，另一个连接尝试同对象 → 500ms 超时
         await expect(
-          withObjectLock(gwPool, "room_price:RT-DLX-KING", async () => "never", 500),
+          withObjectLock(gwPool, "price:SKU-1001", async () => "never", 500),
         ).rejects.toThrow(ObjectLockTimeout);
         // 不真正写库，仅验证锁语义
         await hold.query("SELECT 1");

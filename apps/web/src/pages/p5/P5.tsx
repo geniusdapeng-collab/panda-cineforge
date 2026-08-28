@@ -71,7 +71,7 @@ export default function P5() {
       ruleId: `R${maxId + 1}`,
       name: text.length > 24 ? `${text.slice(0, 24)}…` : text,
       level: "review", // 新规默认必审（只可加严纪律 L2.1：不从 auto 起步）
-      objectTypes: ["room_price"],
+      objectTypes: ["price"],
       actions: ["price.adjust"],
       when: "true",
     });

@@ -85,7 +85,7 @@
 - **B-08** 写动作前缀「trigger.create」识别
 - **B-09** 读动作「order.list」识别
 - **B-10** 读动作「review.list」识别
-- **B-11** 读动作「pms.price.read」识别
+- **B-11** 读动作「erp.price.read」识别
 - **B-12** 读动作「inspection.scan」识别
 - **B-13** 读动作「competitor.fetch」识别
 - **B-14** registerWriteActions 注册新写动作生效
