@@ -48,6 +48,23 @@ description: 快速体检（快照快扫）。售前/接入当场见效模式：
 - **时间纪律**：30 分钟硬上限；某数据源超时→该线标注"未覆盖"并降级出部分报告，不阻塞整体。
 - 不做什么：不做趋势预测（需观察期数据）、不做响应时长实测（需在线观察）、不做任何处置动作（只出建议）。
 
+## 四点五、引擎实现锚点
+
+本技能的方法论由 `packages/audit-engine`（`@workloom/audit-engine`）确定性实现；公式与阈值以本文件为事实源，引擎逐条对齐。CLI 入口：`pnpm audit:scan`（`scripts/audit-scan.ts`）。
+
+| 方法论（第三节步骤） | 引擎锚点 | 关键口径 |
+| --- | --- | --- |
+| 2. 价格健康线 | `src/analyzers/price.ts` | 倒挂 >15%（>20% 升 P0）；毛利红线 成本×1.15；价保=现价<近30天最低成交价 |
+| 3. 库存健康线 | `src/analyzers/inventory.ts` | 周转 >60 天；可售 <7 天且在途=0；海外仓库龄 >90 天；仓间失衡 |
+| 4. 广告健康线 | `src/analyzers/ads.ts` | 盈亏平衡 ACoS=1−成本率−佣金率−物流费率−退货损耗率，连续 ≥3 天越线；烧钱词；14:00 前耗尽 ≥90%；7 天消耗 <10% |
+| 5. 口碑（前半） | `src/analyzers/reputation.ts` | 差评 >48h 未回（>72h 升 P0）；均分 <4.0 且评论 ≥20；7 天差评 ≥3 聚集 |
+| 5. 合规（后半） | `src/analyzers/compliance.ts` | 内置 ≥50 词违禁词库 ∪ 店铺词库扫在售 Listing；ODR>1%/迟发率>4%/IPI<400 |
+| 6. 对账复核线 | `src/analyzers/recon.ts` | 佣金 |实提−应提|>0.5pp；退款未冲抵；广告费/物流相对差异 >1%；账单差异率红线 0.3% |
+| 1. 快照口径 + 7. 汇总成报告 | `src/types.ts` / `src/engine.ts` | `AuditSnapshot` 数据集；`runFastScan`：30 分钟软预算、缺源降级 not-covered/partial、一店一份+集团总览+Top10 |
+| 估算口径透明（第四节） | `Finding.estimatedImpact` | 每条金额强制带 confidence（exact/baseline/estimate）与计算口径 basis |
+
+验收锚点：`packages/audit-engine/test/planted-issues.test.ts`（埋点考卷：倒挂 18%/ACoS 连续 3 天越线/库龄 95 天/「全网最低价」/佣金多提 0.8pp/差评 72h 未回，必须全检出）。
+
 ## 五、与其他技能的协作
 
 - 产出 → `inspection-suite`（持续巡检接管，验证快扫发现并监测时变问题）

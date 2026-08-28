@@ -8,8 +8,10 @@
     "node": ">=24.0.0"
   },
   "dependencies": {
+    "@workloom/audit-engine": "workspace:*",
     "@workloom/base": "workspace:*",
     "@workloom/connectors": "workspace:*",
+    "@workloom/db": "workspace:*",
     "@workloom/runtime": "workspace:*",
     "@workloom/shared": "workspace:*",
     "pg": "8.23.0",
@@ -26,6 +28,7 @@
     "db:verify-chain": "tsx --env-file=.env scripts/verify-chain.ts",
     "suite": "TOOL_UNVERIFIED_RATE=0 tsx --env-file=.env scripts/suite.ts",
     "demo:twin": "tsx --env-file=.env scripts/simulate-twin.ts",
+    "audit:scan": "tsx --env-file=.env scripts/audit-scan.ts",
     "demo:twin:snapshot": "bash scripts/snapshot-twin.sh",
     "demo:twin:restore": "bash scripts/restore-twin.sh",
     "demo:twin:live": "tsx --env-file=.env scripts/twin-genie.ts",
