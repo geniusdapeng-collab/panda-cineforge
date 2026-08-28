@@ -1,7 +1,7 @@
 # panda-ecom · 能力导览（人类版）
 
 > WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）
-> 本文件由 `node scripts/generate-capabilities.mjs` 从代码事实**自动生成**（2026-08-27），
+> 本文件由 `node scripts/generate-capabilities.mjs` 从代码事实**自动生成**（2026-08-28），
 > 请勿手改——能力变更后重跑生成器即可。Agent 版机器清单见 docs/capability-map.md。
 
 ## 🚀 5 分钟体验路径
@@ -28,11 +28,11 @@ pnpm install && pnpm preview:all
 | **移动端 · B 端高保真** | 6 页高保真演示页 + 手机壳容器 | `pnpm preview:all` → http://localhost:3001 |
 | **移动端 · C 端 AI 服务前台** | 小程序入口 H5 模拟：对话/服务/工单/消息/我的，演示直登 | `pnpm preview:all` → http://localhost:3002 |
 
-### 🏨 行业 Bundle（垂直能力包）
+### 🐼 行业 Bundle（垂直能力包）
 
 | 能力 | 一句话 | 怎么体验 |
 |---|---|---|
-| **bundles/ecommerce/** | 围栏/技能/员工/对象/管线一键装配 | 见 bundles/ecommerce/ 目录 |
+| **bundles/ecommerce/** | 82 数字员工 presets · 161 个官方技能 · 4 客群装配（audit_only/waist_single/cn_multi/global_group） · 含 fast-scan 快照快扫（15–30 分钟当场出体检报告） | 见 bundles/ecommerce/ 目录 |
 
 ### 🖐 操作电脑能力（本仓自带 · 可装生产工作站）
 

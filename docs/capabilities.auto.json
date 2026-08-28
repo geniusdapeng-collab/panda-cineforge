@@ -1,14 +1,14 @@
 {
  "repo": "panda-ecom",
  "description": "WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）",
- "generatedAt": "2026-08-27T01:23:55.141Z",
+ "generatedAt": "2026-08-28T19:13:46.686Z",
  "demoPages": [
-  "service-front-b-mobile.html",
-  "service-front-b-pc.html",
-  "service-front-c.html",
   "panda-ecom-demo-c.html",
   "panda-ecom-demo-mobile.html",
-  "panda-ecom-demo-pc.html"
+  "panda-ecom-demo-pc.html",
+  "service-front-b-mobile.html",
+  "service-front-b-pc.html",
+  "service-front-c.html"
  ],
  "shots": [],
  "groups": [
@@ -34,13 +34,13 @@
    ]
   },
   {
-   "icon": "🏨",
+   "icon": "🐼",
    "title": "行业 Bundle（垂直能力包）",
    "items": [
     {
      "name": "bundles/ecommerce/",
      "how": "见 bundles/ecommerce/ 目录",
-     "desc": "围栏/技能/员工/对象/管线一键装配"
+     "desc": "82 数字员工 presets · 161 个官方技能 · 4 客群装配（audit_only/waist_single/cn_multi/global_group） · 含 fast-scan 快照快扫（15–30 分钟当场出体检报告）"
     }
    ]
   },
