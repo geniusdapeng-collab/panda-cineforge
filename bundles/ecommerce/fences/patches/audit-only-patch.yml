@@ -1,0 +1,63 @@
+# 客群级 Patch：质检模式（Audit-Only · 只读体检期）
+# 定位：新客户接入的「第 0 阶段」——系统只读扫描、只出报告与建议，不写回任何平台。
+# 叠加于 ecom-baseline/v1 之上，只可收紧不可放宽（F2.3 单调守卫）。
+# 纪律：本 patch 生效期间，一切写类动作物理阻断（block）；客户确认整改项时由人类在平台侧执行，
+#   系统只跟踪闭环。体检期结束（通常 1–2 周）后，客户切换为影子模式 → 正式托管客群（waist/cn_multi/global_group）。
+version: ecommerce-patch-audit-only/v1
+applies_to: audit_only
+base: ecom-baseline/v1
+default_level: block          # 写类动作无任何规则命中 → 按 block（默认即拒，宁可错杀）
+patches:
+  - rule_id: R1
+    tighten: { level: block }
+    note: 调价一律阻断（质检期系统不建议直接改价，只产出《价格健康报告》）
+
+  - rule_id: R2
+    tighten: { level: block }
+    note: 维持毛利红线 block（与基线一致，不得放宽）
+
+  - rule_id: R3
+    tighten: { level: block }
+    note: 广告降预算动作阻断——ACoS 越线只记录进《广告健康清单》（含估算可省金额），由客户人工处置
+
+  - rule_id: R4
+    tighten: { level: block }
+    note: 广告预算调整一律阻断
+
+  - rule_id: R5
+    tighten: { level: block }
+    note: 退款/售后处置一律阻断（只统计 SLA 与口碑风险，不代客操作）
+
+  - rule_id: R7
+    tighten: { level: block }
+    note: 采购单/补货单一律阻断（只产出补货建议单）
+
+  - rule_id: R9
+    tighten: { level: block }
+    note: 差评回复一律阻断（只生成候选草稿进报告，客户人工决定是否发出）
+
+  - rule_id: R18
+    tighten: { level: block }
+    note: 价格倒挂只告警不处置
+
+  - rule_id: R19
+    tighten: { level: block }
+    note: 跟卖驱赶函只起草不发送（取证材料归档）
+
+  - rule_id: R23
+    tighten: { level: block }
+    note: 安全禁区维持 block（基线纪律，不得放宽）
+
+  - rule_id: R26
+    tighten: { level: block }
+    note: 客服承诺类应答一律阻断（质检期客服线只读监控：响应时长/升级关键词/满意度信号）
+
+  - rule_id: R30
+    tighten: { level: block }
+    note: 高危审批维持 block（基线纪律）
+
+# 体检期允许的唯一"写"：向系统自身事件库写入巡检发现/报告/建议（五元事件，不落任何平台）。
+# 巡检五线检项（inspection 域，只读工具集裁剪保证）：
+#   价格健康（倒挂/毛利破防/促销失误）· 库存健康（断货/库龄/海外仓失衡）· 广告健康（ACoS越线/烧钱词/预算浪费）
+#   客服与口碑（响应超时/差评未处理/SLA违约）· 合规风险（侵权词/极限词/绩效越限/跟卖）
+# 产出物：一店一份《店铺体检报告》+ 集团总览 + 整改建议单（按 P0/P1/P2 分级，估算挽回金额）。

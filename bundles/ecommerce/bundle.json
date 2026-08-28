@@ -4,7 +4,7 @@
   "workloom": {
     "industry": "ecommerce",
     "displayName": "WorkLoom 熊猫电商运营系统",
-    "description": "电商行业版差异资产包 v1.0：82 个 Agent preset（集团指挥层+共享中台+国内八平台战队+跨境六战队与多语言客服中心）+ 基线围栏包 R1–R30（毛利红线/广告保险丝/夜班白名单/安全禁区等，客群 patch 只紧不松）+ 28 类经营对象 / 8 个经营阶段 + 店铺档案与集团一档 30+ 字段组 + 160 个官方技能（含 48 个盈利门道固化技能），覆盖「商品-流量-转化-履约-售后-财务-合规-组织」全经营面（三客群：单平台多店腰部卖家 / 国内多平台大卖 / 跨境多平台超级大卖集团，segment-defaults 默认装配清单）",
+    "description": "电商行业版差异资产包 v1.0：82 个 Agent preset（集团指挥层+共享中台+国内八平台战队+跨境六战队与多语言客服中心）+ 基线围栏包 R1–R30（毛利红线/广告保险丝/夜班白名单/安全禁区等，客群 patch 只紧不松）+ 28 类经营对象 / 8 个经营阶段 + 店铺档案与集团一档 30+ 字段组 + 160 个官方技能（含 48 个盈利门道固化技能），覆盖「商品-流量-转化-履约-售后-财务-合规-组织」全经营面（四客群（含 audit_only 质检模式）：单平台多店腰部卖家 / 国内多平台大卖 / 跨境多平台超级大卖集团，segment-defaults 默认装配清单）",
     "provides": {
       "presets": [
         "presets/account-guardian.yml",
@@ -94,7 +94,8 @@
         "fences/ecom-baseline.yml",
         "fences/patches/waist-seller-patch.yml",
         "fences/patches/cn-multi-patch.yml",
-        "fences/patches/global-group-patch.yml"
+        "fences/patches/global-group-patch.yml",
+        "fences/patches/audit-only-patch.yml"
       ],
       "skills": [
         "skills/a-plus-content/SKILL.md",
