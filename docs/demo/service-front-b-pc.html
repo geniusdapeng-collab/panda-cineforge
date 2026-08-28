@@ -145,7 +145,7 @@ tr:hover td{background:rgba(255,228,236,.7)}
   <!-- 顶栏（apps/web/src/shell/Bridge.tsx 镜像） -->
   <header class="abar">
     <div class="logo"><span class="diamond"></span><span class="name">WorkLoom</span></div>
-    <span style="font-size:12px;color:var(--ink3)">企业 Agent IM · <b style="color:var(--ink2)">熊猫优选集团</b></span>
+    <span style="font-size:12px;color:var(--ink3)">企业数字员工 IM · <b style="color:var(--ink2)">熊猫优选集团</b></span>
     <span style="flex:1"></span>
     <a class="navlink" style="border-color:var(--gline);color:var(--gold)">🛎 买家服务前台</a>
     <a class="navlink gold">董事长视图</a>
@@ -157,7 +157,7 @@ tr:hover td{background:rgba(255,228,236,.7)}
   <div class="cols">
     <!-- 左栏（P22 left 镜像） -->
     <aside class="col-left">
-      <div class="col-label">买家服务前台 · SERVICE DESK</div>
+      <div class="col-label">买家服务前台 · 服务台</div>
       <button class="lnav" data-v="kb" onclick="location.hash='kb'"><div class="t">📚 知识中台</div><div class="m" id="mKb">集合 2 · 待审 1</div></button>
       <button class="lnav" data-v="tickets" onclick="location.hash='tickets'"><div class="t">🎫 工单台</div><div class="m" id="mTk">在列 3</div></button>
       <button class="lnav" data-v="stats" onclick="location.hash='stats'"><div class="t">📊 服务报表</div><div class="m">会话 2 · 问答 4</div></button>
@@ -216,7 +216,7 @@ tr:hover td{background:rgba(255,228,236,.7)}
           </table>
         </div>
 
-        <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--ink2)">待审区（pending_review · <span id="pendN">1</span>）</div>
+        <div style="margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--ink2)">待审区（待审核 · <span id="pendN">1</span>）</div>
         <div id="pendBox" style="margin-bottom:20px">
           <div class="card" style="border-color:rgba(255,170,51,.35);display:flex;align-items:center;gap:12px;padding:10px 14px" id="pendRow">
             <span style="font-size:16px">📝</span>
@@ -315,9 +315,9 @@ tr:hover td{background:rgba(255,228,236,.7)}
 
     <!-- 右栏（P22 right 镜像） -->
     <aside class="col-right">
-      <div class="col-label">数据口径 · GOVERNANCE</div>
+      <div class="col-label">数据口径 · 治理</div>
       <div class="gov-card">全部数据来自 <span class="mono" style="font-size:10px;color:var(--holo)">trpc.service.*</span>；写操作落五元事件，批准生效联动 approvals 审批台（发布知识文档，D16）。</div>
-      <div class="gov-card"><div class="h">待审知识</div><b class="orb" style="font-size:16px;color:var(--warn)" id="govPend">1</b> 篇（pending_review）</div>
+      <div class="gov-card"><div class="h">待审知识</div><b class="orb" style="font-size:16px;color:var(--warn)" id="govPend">1</b> 篇（待审核）</div>
       <div class="gov-card"><div class="h">SLA 超时</div><b class="orb" style="font-size:16px;color:var(--go)">0</b> 单</div>
       <div class="gov-card"><div class="h">工单状态机</div>新建 → 已分派 → 处理中 → 已办结/已关闭；非法跃迁 409 拒绝（H1/H3）。</div>
     </aside>
@@ -386,7 +386,7 @@ function renderDocs(){
   document.getElementById("docTitle").textContent=`文档${activeCol?` · ${DOCS.find(d=>d.col===activeCol).colName}`:"（全部集合）"}（${list.length}）`;
   document.getElementById("docRows").innerHTML=list.map(d=>`
     <tr><td>${d.title}</td><td style="color:var(--ink3)">${d.src}</td><td class="mono" style="color:var(--ink3)">v${d.ver}</td>
-    <td><span class="chip ${d.status==='active'?'chip-go':'chip-warn'}">${d.status}</span></td>
+    <td><span class="chip ${d.status==='active'?'chip-go':'chip-warn'}">${d.status==='active'?'生效中':'已停用'}</span></td>
     <td class="orb" style="color:var(--holo)">${d.chunks}</td>
     <td style="text-align:right"><button class="btn" onclick="openDoc('${d.id}')">详情</button></td></tr>`).join("");
 }
@@ -406,8 +406,8 @@ function approve(){
 function regSite(){ banner("info","已登记抓取源 kbs-official-site——可「立即抓取」入库"); }
 function crawl(){
   const r=document.getElementById("siteResult"); r.style.display="block";
-  r.textContent="抓取完成：结构化 12 条入知识库（文档 kbd-site-crawl-001；LLM 结构化正常）——已进入待审区 pending_review";
-  banner("info","官网抓取完成，新文档已进入待审区（pending_review）");
+  r.textContent="抓取完成：结构化 12 条入知识库（文档 kbd-site-crawl-001；LLM 结构化正常）——已进入待审区（待审核）";
+  banner("info","官网抓取完成，新文档已进入待审区（待审核）");
 }
 /* 试检索（检索知识库 投影：命中块来自 seed kb_chunks） */
 function doSearch(){
@@ -437,7 +437,7 @@ function openDoc(id){
     </div>
     <h3 style="font-size:13.5px;font-weight:700">${d.title}</h3>
     <div style="margin-top:6px;display:flex;gap:8px;align-items:center;font-size:10px;color:var(--ink3)">
-      <span class="chip chip-go">${d.status}</span><span class="mono">v${d.ver}</span><span>${d.src}</span><span class="mono">${d.id}</span>
+      <span class="chip chip-go">${d.status==='active'?'生效中':'已停用'}</span><span class="mono">v${d.ver}</span><span>${d.src}</span><span class="mono">${d.id}</span>
     </div>
     <div class="card" style="margin-top:12px;padding:12px">
       <div style="margin-bottom:6px;font-size:10px;font-weight:700;color:var(--ink2)">内容预览（检索索引投影）</div>
@@ -448,7 +448,7 @@ function openDoc(id){
       </div>
     </div>
     <div style="margin-top:12px;display:flex;gap:8px">
-      <button class="btn" onclick="closeDoc();banner('warn','「${d.title}」已置为 disabled（即时退出检索索引）')">■ 停用（disabled）</button>
+      <button class="btn" onclick="closeDoc();banner('warn','「${d.title}」已停用（即时退出检索索引）')">■ 停用</button>
     </div>`;
 }
 function closeDoc(){ document.getElementById("docMask").style.display="none"; document.getElementById("docDrawer").style.display="none"; }
@@ -456,14 +456,14 @@ function closeDoc(){ document.getElementById("docMask").style.display="none"; do
 /* ===== 工单台（P22 ticketsSection 镜像；seed c_tickets×3 + 状态机） ===== */
 const KIND={repair:"退换/保修",delivery:"补发/催发",complaint:"投诉",service_request:"服务请求",consult:"咨询",other:"其他"};
 const TICKETS=[
-  {id:"···001",kind:"delivery",title:"订单 OD-20260824-7781 超 48 小时未发货",status:"processing",priority:"high",dept:"售后组",assignee:"阿May",sla:"8/25 14:42",rating:null,created:"8/25 10:42"},
+  {id:"···001",kind:"delivery",title:"订单 OD-20260824-7781 超 48 小时未发货",status:"processing",priority:"high",dept:"售后组",assignee:"阿梅",sla:"8/25 14:42",rating:null,created:"8/25 10:42"},
   {id:"···002",kind:"repair",title:"收纳箱换 80L 加大号",status:"assigned",priority:"normal",dept:"售后组",assignee:null,sla:"8/25 14:42",rating:null,created:"8/25 09:32"},
-  {id:"···003",kind:"other",title:"价保申请：快充头 7 天内降价 ¥10",status:"done",priority:"high",dept:"客服专家组",assignee:"价保专员-阿May",sla:"8/22 14:05",rating:5,created:"8/21 14:05"}
+  {id:"···003",kind:"other",title:"价保申请：快充头 7 天内降价 ¥10",status:"done",priority:"high",dept:"客服专家组",assignee:"价保专员-阿梅",sla:"8/22 14:05",rating:5,created:"8/21 14:05"}
 ];
 const TL={
-  "···001":[["create","c_user · cu-xiaoli",'{"note":"用户发订单截图对话中建单（截图识别）"}',"2026/8/25 10:42:00"],["assign","agent · agt-service-desk",'{"note":"智能分派 → 售后组"}',"2026/8/25 10:43:00"],["start","staff · 阿May",'{"note":"已联系仓库，承诺今日 16:00 前出库"}',"2026/8/25 11:57:00"]],
-  "···002":[["create","c_user · cu-zhangwei",'{"note":"服务台自助提交"}',"2026/8/25 09:32:00"],["assign","agent · agt-service-desk",'{"note":"智能分派 → 售后组"}',"2026/8/25 09:33:00"]],
-  "···003":[["create","c_user · cu-xiaoli",'{"note":"价保自助申请转人工复核"}',"2026/8/21 14:05:00"],["assign","agent · agt-service-desk",'{"note":"智能分派 → 客服专家组"}',"2026/8/21 14:06:00"],["start","staff · 价保专员-阿May",'{"note":"系统比对差价 ¥10"}',"2026/8/21 15:12:00"],["complete","staff · 价保专员-阿May",'{"note":"差价 ¥10 已原路退回"}',"2026/8/21 15:28:00"],["rate","c_user · cu-xiaoli",'{"note":"满意度 5 星"}',"2026/8/21 16:02:00"]]
+  "···001":[["create","c_user · cu-xiaoli",'{"note":"用户发订单截图对话中建单（截图识别）"}',"2026/8/25 10:42:00"],["assign","数字员工 · 服务台",'{"note":"智能分派 → 售后组"}',"2026/8/25 10:43:00"],["start","staff · 阿梅",'{"note":"已联系仓库，承诺今日 16:00 前出库"}',"2026/8/25 11:57:00"]],
+  "···002":[["create","c_user · cu-zhangwei",'{"note":"服务台自助提交"}',"2026/8/25 09:32:00"],["assign","数字员工 · 服务台",'{"note":"智能分派 → 售后组"}',"2026/8/25 09:33:00"]],
+  "···003":[["create","c_user · cu-xiaoli",'{"note":"价保自助申请转人工复核"}',"2026/8/21 14:05:00"],["assign","数字员工 · 服务台",'{"note":"智能分派 → 客服专家组"}',"2026/8/21 14:06:00"],["start","staff · 价保专员-阿梅",'{"note":"系统比对差价 ¥10"}',"2026/8/21 15:12:00"],["complete","staff · 价保专员-阿梅",'{"note":"差价 ¥10 已原路退回"}',"2026/8/21 15:28:00"],["rate","c_user · cu-xiaoli",'{"note":"满意度 5 星"}',"2026/8/21 16:02:00"]]
 };
 let fStatus="",fDept="",assignFor=null,completeFor=null;
 const S_LABEL={created:"新建",assigned:"已分派",processing:"处理中",done:"已办结",closed:"已关闭"};
@@ -515,7 +515,7 @@ function doAssign(id){
   t.dept=document.getElementById("asDept").value;
   const w=document.getElementById("asWho").value.trim(); if(w)t.assignee=w;
   t.status="assigned";
-  TL[id].push(["assign","agent · agt-service-desk",`{"note":"分派 → ${t.dept}${t.assignee?" / "+t.assignee:""}"}`,"2026/8/24 08:24:00"]);
+  TL[id].push(["assign","数字员工 · 服务台",`{"note":"分派 → ${t.dept}${t.assignee?" / "+t.assignee:""}"}`,"2026/8/24 08:24:00"]);
   assignFor=null; renderTk();
   banner("info",`工单 ${id} 已分派 ${t.dept}${t.assignee?" / "+t.assignee:""}`);
 }

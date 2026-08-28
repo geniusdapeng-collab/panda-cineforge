@@ -107,9 +107,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <!-- 服务预警（SLA 超时；P22 insights alert 范式） -->
       <div class="card" style="border-color:rgba(255,77,109,.5);background:rgba(255,77,109,.06)">
         <div style="margin-bottom:4px;font-size:13.5px;font-weight:700;color:var(--alert)">▲ 服务预警 · SLA 超时风险</div>
-        <div style="font-size:11px;line-height:1.7;color:var(--ink2)">工单 <span class="mono" style="color:var(--holo)">···001</span>「订单 OD-20260824-7781 超 48 小时未发货」高优先级处理中已 3 小时，距 SLA 截止（08/25 14:42）不足 12 小时未办结将升级——请催办售后专员阿May。</div>
+        <div style="font-size:11px;line-height:1.7;color:var(--ink2)">工单 <span class="mono" style="color:var(--holo)">···001</span>「订单 OD-20260824-7781 超 48 小时未发货」高优先级处理中已 3 小时，距 SLA 截止（08/25 14:42）不足 12 小时未办结将升级——请催办售后专员阿梅。</div>
         <div style="margin-top:8px;display:flex;gap:8px">
-          <button class="act-btn pressable" style="flex:1;border-color:rgba(255,77,109,.55);color:var(--alert)" onclick="toast('已催办 售后专员-阿May（pushMessage mock:true）')">催办处理人</button>
+          <button class="act-btn pressable" style="flex:1;border-color:rgba(255,77,109,.55);color:var(--alert)" onclick="toast('已催办 售后专员-阿梅（pushMessage mock:true）')">催办处理人</button>
           <button class="act-btn pressable" style="flex:1;border-color:var(--gline);color:var(--goldhi)" onclick="location.hash='tickets'">去工单台 →</button>
         </div>
       </div>
@@ -221,7 +221,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <span style="color:var(--ink3)">›</span>
       </button>
       <div class="card" style="text-align:center;padding:18px">
-        <div style="font-size:11px;color:var(--ink3)">WorkLoom · 熊猫优选集团<br>企业 Agent IM · AI 买家服务前台</div>
+        <div style="font-size:11px;color:var(--ink3)">WorkLoom · 熊猫优选集团<br>企业数字员工 IM · AI 买家服务前台</div>
       </div>
     </section>
   </div>
@@ -269,7 +269,7 @@ window.addEventListener("hashchange",route);
 
 /* ===== 待办工单（seed ···001/002，状态机可点翻转） ===== */
 const TICKETS=[
-  {id:"···001",kind:"催发货",title:"订单 OD-20260824-7781 超 48 小时未发货",status:"processing",priority:"high",dept:"售后组",assignee:"阿May",meta:"对话中建单（截图识别）· 智能分派 → 售后组 · 阿May已接单"},
+  {id:"···001",kind:"催发货",title:"订单 OD-20260824-7781 超 48 小时未发货",status:"processing",priority:"high",dept:"售后组",assignee:"阿梅",meta:"对话中建单（截图识别）· 智能分派 → 售后组 · 阿梅已接单"},
   {id:"···002",kind:"退换",title:"收纳箱换 80L 加大号",status:"assigned",priority:"normal",dept:"售后组",assignee:null,meta:"服务台自助提交 · 智能分派 → 售后组"}
 ];
 const S_LABEL={created:"新建",assigned:"已分派",processing:"处理中",done:"已办结"};

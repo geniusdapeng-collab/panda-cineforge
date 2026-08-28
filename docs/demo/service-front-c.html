@@ -161,10 +161,10 @@ input,textarea,select{font-family:inherit}
         <div>
           <h1 style="font-size:17px;font-weight:600">熊猫优选集团 <span style="color:var(--gold)">· AI 买家服务前台</span></h1>
           <p style="margin-top:4px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink2)">
-            <span style="width:6px;height:6px;border-radius:99px;background:var(--go);display:inline-block"></span>小栖在线 · 支持截图/图片/视频识别
+            <span style="width:6px;height:6px;border-radius:99px;background:var(--go);display:inline-block"></span>小优在线 · 支持截图/图片/视频识别
           </p>
         </div>
-        <div class="avatar orb" style="width:40px;height:40px;font-size:15px;margin:0">栖</div>
+        <div class="avatar orb" style="width:40px;height:40px;font-size:15px;margin:0">优</div>
       </div>
       <div style="margin-top:12px;display:flex;gap:8px;overflow-x:auto" class="scroll-x">
         <button class="qchip pressable" onclick="chipSend('帮我查一下我的订单')">查订单</button>
@@ -300,7 +300,7 @@ input,textarea,select{font-family:inherit}
         <span class="chip chip-go" style="padding:4px 10px;font-size:11px">已绑定</span>
       </div>
       <button class="row-card pressable" onclick="location.hash='chat'">
-        <div><p style="font-size:13px">历史会话</p><p style="margin-top:2px;font-size:11px;color:var(--ink3)">继续与 AI 前台小栖的对话</p></div>
+        <div><p style="font-size:13px">历史会话</p><p style="margin-top:2px;font-size:11px;color:var(--ink3)">继续与 AI 前台小优的对话</p></div>
         <span style="color:var(--ink3)">›</span>
       </button>
       <div class="row-card">
@@ -378,7 +378,7 @@ function typewriter(el, text, done){
 }
 function addAi(text, extras){
   const id = "ai"+Math.random().toString(36).slice(2,8);
-  flow.insertAdjacentHTML("beforeend", `<div class="fadein" style="display:flex;gap:8px;margin-bottom:12px"><div class="avatar">栖</div><div style="max-width:82%"><div class="msg-ai" id="${id}"></div><div class="extras"></div></div></div>`);
+  flow.insertAdjacentHTML("beforeend", `<div class="fadein" style="display:flex;gap:8px;margin-bottom:12px"><div class="avatar">优</div><div style="max-width:82%"><div class="msg-ai" id="${id}"></div><div class="extras"></div></div></div>`);
   const el = document.getElementById(id);
   const box = el.parentElement.querySelector(".extras");
   typewriter(el, text, ()=>{ if(extras) extras(box); scrollBottom(); });
@@ -397,7 +397,7 @@ function orderCard(){
 }
 function thinking(cb){
   const id = "th"+Math.random().toString(36).slice(2,8);
-  flow.insertAdjacentHTML("beforeend", `<div class="typing" id="${id}" style="margin-bottom:12px"><span><i></i> <i style="animation-delay:.2s"></i> <i style="animation-delay:.4s"></i></span>小栖正在思考…</div>`);
+  flow.insertAdjacentHTML("beforeend", `<div class="typing" id="${id}" style="margin-bottom:12px"><span><i></i> <i style="animation-delay:.2s"></i> <i style="animation-delay:.4s"></i></span>小优正在思考…</div>`);
   scrollBottom();
   setTimeout(()=>{ document.getElementById(id).remove(); cb(); }, 900);
 }
@@ -477,11 +477,11 @@ function svcSubmit(){
 /* ================= 工单页（TicketsPage 镜像；seed 工单×3 + 时间线） ================= */
 const TICKETS = [
   { id:"···001", kind:"退换/保修", title:"收纳箱换 80L 加大号", status:"处理中", chip:"chip-gold", time:"8/25 10:42", sla:"预计响应：8/25 14:42 前",
-    tl:[["售后单已提交，AI 买家服务前台已受理","我 · 8/25 10:42"],["智能分派 → 售后组","agt-service-desk · 8/25 10:43"],["换货商品已安排质检","售后专员-阿May · 8/25 11:57"]] },
+    tl:[["售后单已提交，AI 买家服务前台已受理","我 · 8/25 10:42"],["智能分派 → 售后组","服务台数字员工 · 8/25 10:43"],["换货商品已安排质检","售后专员-阿梅 · 8/25 11:57"]] },
   { id:"···002", kind:"补发/催发货", title:"订单 OD-20260824-7781 超 48 小时未发货", status:"已受理", chip:"chip-holo", time:"8/25 09:32", sla:"预计响应：8/26 09:32 前",
-    tl:[["服务台自助提交","我 · 8/25 09:32"],["智能分派 → 售后组","agt-service-desk · 8/25 09:33"]] },
+    tl:[["服务台自助提交","我 · 8/25 09:32"],["智能分派 → 售后组","服务台数字员工 · 8/25 09:33"]] },
   { id:"···003", kind:"其他需求", title:"价保申请：快充头 7 天内降价 ¥10", status:"已完成", chip:"chip-go", time:"8/21 14:05", sla:"", rated:true,
-    tl:[["价保自助申请","我 · 8/21 14:05"],["智能分派 → 客服专家组","agt-service-desk · 8/21 14:06"],["系统比对差价 ¥10","价保专员-阿May · 8/21 15:12"],["差价已原路退回","价保专员-阿May · 8/21 15:28"],["满意度 5 星","我 · 8/21 16:02"]] }
+    tl:[["价保自助申请","我 · 8/21 14:05"],["智能分派 → 客服专家组","服务台数字员工 · 8/21 14:06"],["系统比对差价 ¥10","价保专员-阿梅 · 8/21 15:12"],["差价已原路退回","价保专员-阿梅 · 8/21 15:28"],["满意度 5 星","我 · 8/21 16:02"]] }
 ];
 function tkList(){
   document.getElementById("tkTitle").textContent="我的工单";

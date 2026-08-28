@@ -238,12 +238,12 @@ input.inp::placeholder,textarea.inp::placeholder{color:var(--ink3)}
     <button class="pill" id="nightpill" data-toast="夜班班组运行中 · 昨夜 9 项已完成 · 跳转夜班中心频道（/p9）" onclick="location.hash='p9'"><span class="dot"></span>夜班 · 运行中 · 9 完成</button>
     <button class="brk" id="brake">⛔ 紧急制动</button>
   </header>
-  <div class="simbar">⚠ <b>模拟数据</b> · 本 DEMO 镜像生产页面与种子数据（熊猫优选集团 panda-group / MEM-001 / ecom-baseline v3），文本口径经展示字典层统一映射 <span class="route-tag" id="routetag">真实路由 /</span></div>
+  <div class="simbar">⚠ <b>模拟数据</b> · 本演示镜像生产页面与种子数据（熊猫优选集团 panda-group / MEM-001 / ecom-baseline v1），文本口径经展示字典层统一映射 <span class="route-tag" id="routetag">真实路由 /</span></div>
   <div id="view"></div>
 </div>
 
 <div id="ticker"><div class="tk-in" id="tickerin"></div></div>
-<aside id="askrail" aria-label="Ask · AI 助手对话"></aside>
+<aside id="askrail" aria-label="问询 · AI 助手对话"></aside>
 <div id="toast"></div>
 <div id="modal"><div class="box" id="modalbox"></div></div>
 
@@ -274,60 +274,64 @@ const fmtT=t=>t;
 /* ================= 种子数据（镜像 scripts/seed.ts / bundles/ecommerce） ================= */
 const D={
 ws:{name:"熊猫优选集团",slug:"panda-group",city:"杭州",shops:14,seg:"产业带卖家"},
-members:[{id:"MEM-001",name:"王店主",role:"经营者"},{id:"MEM-002",name:"陈经理",role:"经理"},{id:"MEM-003",name:"李运营",role:"只读"}],
+members:[{id:"MEM-001",name:"董事长（创始人）",role:"所有者"},{id:"MEM-002",name:"运营总监",role:"管理"},{id:"MEM-003",name:"财务总监",role:"只读"}],
 agents:[
- {key:"cs-agent",name:"客服Agent",v:"v1.0",grade:"正常",fences:["R5","R9"]},
- {key:"pricing-agent",name:"调价Agent",v:"v3.0",grade:"表扬",fences:["R1","R2","R7","R8"]},
- {key:"review-agent",name:"评价Agent",v:"v2.0",grade:"关注",fences:["R6","R19"]},
- {key:"content-agent",name:"内容Agent",v:"v2.0",grade:"正常",fences:["R15"]},
- {key:"reconcile-agent",name:"对账Agent",v:"v3.0",grade:"正常",fences:["R4"]},
- {key:"competitor-agent",name:"竞对Agent",v:"v2.0",grade:"正常",fences:["R17","R18"],ro:true},
- {key:"inspection-agent",name:"巡检Agent",v:"v2.0",grade:"正常",fences:["R3"],ro:true},
- {key:"warehouse-agent",name:"仓储Agent",v:"v1.0",grade:"正常",fences:["R12","R20"]},
- {key:"phone-agent",name:"语音客服Agent",v:"v1.0",grade:"表扬",fences:["R9","R13"]},
- {key:"desktop-agent",name:"桌面Agent",v:"v1.0",grade:"辅导",fences:["R10","R16"]},
- {key:"shop-cockpit",name:"店铺驾驶舱Agent",v:"v1.0",grade:"正常",fences:[],ro:true}],
+ {key:"tmall-head",name:"天猫店长",v:"v1.0",grade:"表扬",fences:["R1","R2","R8","R16","R17","R29"]},
+ {key:"amz-ppc",name:"亚马逊PPC投手",v:"v1.0",grade:"关注",fences:["R3","R4","R16"]},
+ {key:"douyin-cs",name:"抖音客服",v:"v1.0",grade:"正常",fences:["R5","R10","R12","R26"]},
+ {key:"demand-planner",name:"需求预测师",v:"v1.0",grade:"正常",fences:["R7","R20","R27"]},
+ {key:"multi-reconciler",name:"多平台对账师",v:"v1.0",grade:"正常",fences:["R5","R22","R30"]},
+ {key:"competitor-radar",name:"竞对雷达",v:"v1.0",grade:"正常",fences:["R18","R19","R22"]},
+ {key:"inspection-agent",name:"巡检哨兵",v:"v1.0",grade:"正常",fences:[],ro:true},
+ {key:"ip-shield",name:"知识产权护盾",v:"v1.0",grade:"表扬",fences:["R11","R19","R24"]},
+ {key:"cs-en",name:"英语客服组",v:"v1.0",grade:"正常",fences:["R5","R10","R12","R26"]},
+ {key:"fx-settler",name:"多币种结算师",v:"v1.0",grade:"正常",fences:["R14","R23","R30"]},
+ {key:"listing-factory",name:"刊登工厂长",v:"v1.0",grade:"辅导",fences:["R8","R11","R24"]},
+ {key:"group-ceo",name:"集团数字CEO",v:"v1.0",grade:"正常",fences:["R20","R23","R27","R30"]}],
 threads:[
- {id:"线程 101",title:"周五 3C 调价（快充头/数据线）",mode:"quest",status:"completed",done:6,total:6,agent:"调价Agent"},
- {id:"线程 102",title:"差评应急回复（天猫 2 分评价）",mode:"quest",status:"pending_review",done:3,total:5,agent:"评价Agent"},
- {id:"线程 103",title:"抖音店铺新客首图发布",mode:"agent",status:"running",done:1,total:4,agent:"内容Agent"}],
-night:{done:9,pending:3,need_human:2,credits:96,est:118,fence:"ecom-baseline/v3",pkg:"08:30"},
-briefing:"董事长，早报已备：昨夜班组完成 14 项作业（差评/巡检/对账各线正常），1 件差评处置请您拍板；本周 GMV 与转化率趋势见节拍控制台。试用期边界降一档执行中。",
+ {id:"线程 101",title:"亚马逊 ACoS 爆表处置（保险丝降预算）",mode:"quest",status:"completed",done:6,total:6,agent:"亚马逊PPC投手"},
+ {id:"线程 102",title:"抖音直播间差评危机处置（2h SLA）",mode:"quest",status:"pending_review",done:3,total:5,agent:"抖音客服"},
+ {id:"线程 103",title:"Q4 新品刊登冲刺（天猫/独立站）",mode:"agent",status:"running",done:1,total:4,agent:"刊登工厂长"}],
+night:{done:9,pending:3,need_human:2,credits:96,est:118,fence:"ecom-baseline/v1",pkg:"08:30"},
+briefing:"董事长，早报已备：昨夜班组完成 14 项作业（跨境店托管会话/对账/跟卖巡检各线正常），1 件抖音差评处置请您拍板；本周 GMV、毛利与 ACoS 趋势见节拍控制台；亚马逊保险丝已降预算 30% 待您确认。试用期边界降一档执行中。",
 approvals:[
- {id:"···8871",ev:"E-SEED-8871",action:"回复差评",title:"差评应急回复（天猫 2 分评价）",tier:"l4_chairman",rule:"R9 差评必审",who:"评价Agent",
-  rationale:"建议致歉→核实→说明已采取的质检与补发措施→改进承诺四段式；不承诺档案外补偿（R10 口径）。",
+ {id:"···8871",ev:"E-SEED-8871",action:"回复差评",title:"差评应急回复（抖音直播间 1 星差评）",tier:"l4_chairman",rule:"R9 差评 2 小时 SLA",who:"抖音客服",
+  rationale:"直播间展示与实物色差，当场 2.3 万人在线；建议致歉→核实→说明已复核直播间灯光校色→改进承诺四段式，不承诺档案外补偿（R10 口径）。",
   before:"（未回复）",after:"非常抱歉色差给您带来困扰，我们已复核直播间灯光校色并支持无理由退换+运费险……",status:"pending",risk:false},
- {id:"···9064",ev:"事件 ···9064",action:"订单退款",title:"买家大额退款 ¥1,180（超 ¥1,000 阈值）",tier:"l3_fleet",rule:"R5 大额退款必审",who:"对账Agent",
-  rationale:"买家称跨境包裹清关延误 12 天要求全额退款；按政策可退，建议附赠复购券维护店铺评分。",
-  before:"待退款 ¥1,180",after:"全额退款 + 复购券 ¥50",status:"pending",risk:false},
- {id:"···8820",ev:"E-SEED-8820",action:"调整价格",title:"快充头周五调价 ¥119 → ¥129",tier:"l2_captain",rule:"R18 价格倒挂防护",who:"调价Agent",
-  rationale:"3C 配件周末转化率高，周六 10:00 前提价 5% 转化损失最小（组织记忆「3C 周末规律」）。",
-  before:"¥119",after:"¥129（+8.4%，毛利红线内）",status:"approved",risk:false}],
+ {id:"···9064",ev:"事件 ···9064",action:"广告降预算",title:"ACoS 保险丝：磁吸充电宝广告组降预算 30%",tier:"l3_fleet",rule:"R3 ACoS 连续越限降预算",who:"预算管控官",
+  rationale:"亚马逊 SP 自动组 ACoS 连续 3 天 0.31/0.34/0.38 超盈亏平衡点 0.28，保险丝自动降日预算 $1,500 → $1,050 并请示。",
+  before:"日预算 $1,500",after:"$1,050（-30%，待您确认后生效）",status:"pending",risk:false},
+ {id:"···8820",ev:"E-SEED-8820",action:"汇率重定价",title:"汇率波动 2.3%：跨境军 6 店全线重定价",tier:"l2_captain",rule:"R14 汇率波动触发重定价",who:"多币种结算师",
+  rationale:"USD/CNY 7.12 → 7.28 单日波动 2.3% 超 2% 阈值；US 站全线 +2.5%、EU 站 +1.8%，毛利红线 ×1.15 复核通过。",
+  before:"跨境 3,400 SKU 旧价",after:"US 站 +2.5% · EU 站 +1.8%（已批准）",status:"approved",risk:false}],
 triggers:[
  {id:"tg-inspection-0700",name:"每日 07:00 只读巡检",cron:"0 7 * * *"},
  {id:"tg-night-2200",name:"夜班 22:00 战队出征",cron:"0 22 * * *"},
- {id:"tg-review-sla-30min",name:"差评 SLA 扫描（R19 联动）",cron:"*/30 * * * *"},
- {id:"tg-parity-15min",name:"倒挂超售看门狗（R17/R18 联动）",cron:"*/15 * * * *"},
- {id:"tg-faq-mine-sun",name:"FAQ 知识库周萃取",cron:"0 3 * * 0"},
- {id:"tg-incident-weekly",name:"断点率周报",cron:"0 4 * * 1"},
- {id:"tg-ceo-brief-0830",name:"公司CEO 晨报",cron:"30 8 * * *"},
- {id:"tg-ceo-queue-2h",name:"公司CEO 审批巡检",cron:"7 */2 * * *"},
- {id:"tg-ceo-deviation",name:"公司CEO 目标偏差扫描",cron:"15 */4 * * *"},
- {id:"tg-ceo-breaker",name:"公司CEO 自治熔断巡检",cron:"45 23 * * *"}],
+ {id:"tg-review-sla-30min",name:"差评 SLA 扫描（R9 联动）",cron:"*/30 * * * *"},
+ {id:"tg-parity-15min",name:"价格倒挂看门狗（R18 联动）",cron:"*/15 * * * *"},
+ {id:"tg-faq-mine-sun",name:"知识库周萃取",cron:"0 3 * * 0"},
+ {id:"tg-incident-weekly",name:"库龄与断货周报",cron:"0 4 * * 1"},
+ {id:"tg-ceo-brief-0830",name:"数字CEO 晨报",cron:"30 8 * * *"},
+ {id:"tg-ceo-queue-2h",name:"数字CEO 裁决巡检",cron:"7 */2 * * *"},
+ {id:"tg-ceo-deviation",name:"数字CEO 目标偏差扫描",cron:"15 */4 * * *"},
+ {id:"tg-ceo-breaker",name:"数字CEO 自治熔断巡检",cron:"45 23 * * *"}],
 ticker:[
- {a:"确认订单",w:"客服Agent"},{a:"调整价格",w:"调价Agent"},{a:"回复差评",w:"评价Agent"},
- {a:"同步库存",w:"对账Agent"},{a:"跨境客服应答",w:"语音客服Agent"},{a:"智能补货",w:"仓储Agent"},
- {a:"创建工单",w:"AI 员工"},{a:"夜班记录",w:"夜班班组"},{a:"channel.parity.fixed",w:"竞对Agent"},
- {a:"检索知识库",w:"AI 员工"},{a:"sku.inspect",w:"仓储Agent"},{a:"CEO 晨报",w:"公司CEO"}],
+ {a:"确认订单",w:"天猫客服"},{a:"广告降预算",w:"亚马逊PPC投手"},{a:"回复差评",w:"抖音客服"},
+ {a:"夜间对账",w:"多平台对账师"},{a:"跨境客服应答",w:"英语客服组"},{a:"紧急补货",w:"需求预测师"},
+ {a:"跟卖取证",w:"知识产权护盾"},{a:"夜班记录",w:"夜班班组"},{a:"修复平台倒挂",w:"竞对雷达"},
+ {a:"汇率重定价",w:"多币种结算师"},{a:"出库质检",w:"国内仓网管家"},{a:"数字CEO 晨报",w:"集团数字CEO"}],
 fences:[
- ["R1","商品单日涨幅自动上限","auto"],["R2","毛利率红线熔断","block"],["R3","新店铺首次改价/发布必审","review"],
- ["R4","广告日预算超限必审","review"],["R5","高危承诺一律人审","block"],["R6","差评必审","review"],
- ["R7","夜班窗口调价微调自动上限","auto"],["R8","夜班窗口调价越线必审","review"],["R9","差评响应 SLA 升级","review"],
- ["R10","安全事件禁区","block"],["R11","采购超阈值必审","review"],["R12","纠纷升级关键词转人工","block"],
- ["R13","涉费用客服承诺必审","review"],["R14","赔偿类事项必审","review"],["R15","直播/新平台内容首发必审","review"],
- ["R16","夜班高危动作禁区","block"],["R17","竞品跟卖与盗图巡检","block"],["R18","跨平台价格倒挂防护","block"],
- ["R19","买家触达频率合规","block"],["R20","库存损耗异常","review"]],
-skills:[["morning-briefing","晨会简报技能"],["cs-peak-mode","大促客服洪峰技能"],["pre-sale-convert","售前转化跟单技能"],["refund-flow","退换退款自助流技能"],["cs-multilang","多语种客服技能"],["pricing-matrix","价格日历技能"],["review-crisis","差评危机公关"],["review-asset-mining","评价资产化技能"],["incident-postmortem","断点根因闭环技能"],["inspection-suite","全域巡检技能"],["logistics-query","物流查询技能"],["order-follow","订单跟单技能"],["overseas-warehouse","海外仓调度技能"],["channel-reconciler","平台对账师"],["content-marketing","内容营销技能"],["customer-service","客服技能"],["finance-reporting","经营报表技能"],["buyer-profile-crm","买家画像技能"],["handover-manager","交接班技能"],["inventory-procurement","库存采购技能"],["retention-manager","复购召回技能"],["gmv-manager","GMV 经营专家"],["safety-compliance","安全合规技能"],["staff-scheduler","排班技能"],["ai-live-assistant","AI 直播助手技能"]],
+ ["R1","单品单日降价自动上限","auto"],["R2","毛利红线熔断","block"],["R3","广告 ACoS 连续越限降预算","review"],
+ ["R4","广告日预算大幅上调必审","review"],["R5","大额退款必审","review"],["R6","库存周转超标清仓请示","review"],
+ ["R7","断货风险紧急补货请示","review"],["R8","新店/新平台首发必审","review"],["R9","差评 2 小时响应 SLA","review"],
+ ["R10","对外承诺赔偿必审","review"],["R11","违规动作物理阻断","block"],["R12","客服升级关键词自动转人工","review"],
+ ["R13","大促价保期改价熔断","block"],["R14","汇率波动触发重定价","review"],["R15","VAT/关税变更触发售价重算","review"],
+ ["R16","夜班自治白名单","review"],["R17","夜班调价微调自动上限","auto"],["R18","多平台价格倒挂告警","review"],
+ ["R19","跟卖预警处置请示","review"],["R20","大额采购分级人审","review"],["R21","直播涉费承诺必审","review"],
+ ["R22","PII 数据导出脱敏必审","review"],["R23","安全禁区物理熔断","block"],["R24","侵权词/侵权图上新阻断","block"],
+ ["R25","新品首单采购量上限","review"],["R26","客服退换承诺超政策必审","review"],["R27","大促战备模式切换必审","review"],
+ ["R28","评价回复涉质量缺陷承认必审","review"],["R29","账号绩效越限整改请示","review"],["R30","高危审批超时升级","block"]],
+skills:[["acos-fuse","ACoS 利润保险丝"],["review-defense-window","差评防御窗口"],["stockout-guard","断货防御"],["hijack-watch","跟卖监测驱赶"],["fx-reprice","汇率联动重定价"],["cs-multilang","多语言客服 8 语种"],["cs-night-shift","跨境夜班客服"],["competitor-product-track","竞品新品追踪"],["clearance-pricing","清仓定价"],["budget-watch","预算预警看板"],["logistics-query","物流查询"],["review-asset-mining","评价资产挖掘"]],
 channels:[
  {name:"天猫",kind:"货架",price:129,parity:true,status:"online",isNew:false},
  {name:"京东",kind:"货架",price:129,parity:true,status:"online",isNew:false},
@@ -338,39 +342,39 @@ kbSite:{url:"https://www.panda-group.example",fp:"fp-a91c",cron:"0 3 * * *"},
 orders:[
  {id:"OD-20260824-7781",buyer:"张伟 · 金卡会员",product:"65W 氮化镓快充头 ×1",amount:"¥129",st:"待发货",steps:[
   ["下单","买家 · 天猫","2 分钟前","自动放行","天猫直连下单，支付宝支付成功"],
-  ["确认订单","客服Agent","8 秒","自动放行","库存校验通过，确认号 T8821 回传平台"],
-  ["智能拣货","仓储Agent","12 秒","自动放行","杭州仓现货命中 → 波次 W-441"],
-  ["出库","仓储Agent","进行中","自动放行","买家发截图催单（截图识别）→ 已触发优先出库"],
+  ["确认订单","天猫客服","8 秒","自动放行","库存校验通过，确认号 T8821 回传平台"],
+  ["智能拣货","国内仓网管家","12 秒","自动放行","杭州仓现货命中 → 波次 W-441"],
+  ["出库","国内仓网管家","进行中","自动放行","买家发截图催单（截图识别）→ 已触发优先出库"],
   ["物流","—","待发生","—","顺丰揽收后自动推送单号"],
   ["签收","—","待发生","—","预计 8/27 送达"],
   ["发票","—","待发生","—","买家未申请"]]},
  {id:"OD-20260818-3356",buyer:"买家小李",product:"折叠收纳箱 55L ×2",amount:"¥158",st:"运输中",steps:[
   ["下单","买家 · 京东","昨天 21:12","自动放行","京东直连下单"],
-  ["确认订单","客服Agent","9 秒","自动放行","确认号 J3356 回传平台"],
-  ["智能拣货","仓储Agent","11 秒","自动放行","江浙沪皖次日达线路命中"],
-  ["出库","仓储Agent","昨天 22:03","自动放行","复核打包完成"],
+  ["确认订单","天猫客服","9 秒","自动放行","确认号 J3356 回传平台"],
+  ["智能拣货","国内仓网管家","11 秒","自动放行","江浙沪皖次日达线路命中"],
+  ["出库","国内仓网管家","昨天 22:03","自动放行","复核打包完成"],
   ["物流","顺丰","进行中","自动放行","已到达杭州转运中心 · 退换工单 ···002 处理中"],
   ["签收","—","待发生","—","预计明日送达"],
   ["发票","—","待发生","—","买家未申请"]]},
  {id:"OD-20260802-1190",buyer:"王女士 · 复购",product:"原木置物架三层 ×1",amount:"¥199",st:"已签收",steps:[
   ["下单","买家 · 拼多多","3 天前","自动放行","拼多多直连下单"],
-  ["确认订单","客服Agent","7 秒","自动放行","确认号 P1190 回传平台"],
-  ["智能拣货","仓储Agent","10 秒","自动放行","大件送装一体线路 → 200 城覆盖"],
-  ["出库","仓储Agent","周五 15:20","自动放行","附安装工具包与视频教程卡"],
+  ["确认订单","天猫客服","7 秒","自动放行","确认号 P1190 回传平台"],
+  ["智能拣货","国内仓网管家","10 秒","自动放行","大件送装一体线路 → 200 城覆盖"],
+  ["出库","国内仓网管家","周五 15:20","自动放行","附安装工具包与视频教程卡"],
   ["物流","顺丰","已完成","自动放行","送装一体 · 安装 15 分钟完成"],
   ["签收","王女士（本人）","昨日 11:48","自动放行","开箱验货无破损"],
-  ["发票","对账Agent","已完成","自动放行","电子普票已开具并推送"]]}],
+  ["发票","多平台对账师","已完成","自动放行","电子普票已开具并推送"]]}],
 stores:[
- {name:"熊猫优选·天猫旗舰店",skus:"3,214",goal:0.78,aov:96,gmv:41200,night:{done:9,pending:3,escalate:2}},
- {name:"熊猫优选·京东店",skus:"1,866",goal:0.83,aov:102,gmv:36800,night:{done:11,pending:2,escalate:1}},
- {name:"熊猫优选·拼多多店",skus:"2,410",goal:0.71,aov:78,gmv:28900,night:{done:8,pending:4,escalate:2}}],
+ {name:"熊猫优选·天猫旗舰店",skus:"3,214",goal:0.78,aov:96,gmv:912000,night:{done:9,pending:3,escalate:2}},
+ {name:"熊猫优选·京东店",skus:"1,866",goal:0.83,aov:102,gmv:736000,night:{done:11,pending:2,escalate:1}},
+ {name:"熊猫优选·亚马逊美区店",skus:"1,120",goal:0.71,aov:186,gmv:688000,night:{done:8,pending:4,escalate:2}}],
 incidents:[
  {ev:"E-SEED-8912",bp:"拼多多 API 限流致改价失败",fb:"适配器降级重试（二级兜底）",rc:"能力边界",fix:"限流退避策略上线，改价队列已追平"},
  {ev:"E-SEED-8930",bp:"ERP 库存同步超时（收纳箱）",fb:"人工接管录单（三级兜底）",rc:"数据缺失",fix:"网关重启恢复，补登离线时段审计"},
  {ev:"E-SEED-8941",bp:"跨境清关状态回传中断",fb:"AI 首轮处置（一级兜底）",rc:"规则未覆盖",fix:"新增清关回传重试规则草案，待审"},
  {ev:"E-SEED-8955",bp:"广告 API 夜间断连误报",fb:"仅联动告警（安全禁区）",rc:"真随机",fix:"误报复位，巡检规则关闭"}],
 reviews:[
- {id:"rv-tmall-2048",ch:"天猫",score:2,age:"26 小时",st:"处置中",rule:"R9 差评必审 · SLA 已升级店主",txt:"收纳箱有色差，客服半天没回复。"},
+ {id:"rv-dy-77520",ch:"抖音",score:1,age:"1.8 小时",st:"处置中",rule:"R9 差评 2 小时 SLA · 倒计时中",txt:"直播间展示与实物有色差。"},
  {id:"rv-jd-3310",ch:"京东",score:4,age:"3 天",st:"已回复",rule:"自动放行",txt:"快充头不错，就是物流比预期慢了一天。"},
  {id:"rv-tmall-9901",ch:"天猫",score:5,age:"5 天",st:"已回复",rule:"好评挖矿 → 素材库",txt:"客服响应很快，发了安装视频一步步教，很贴心。"}],
 calls:{total:126,intents:[["知识问答",52],["服务请求",24],["业务查询",18],["投诉",9],["闲聊",14],["转人工",9]],
@@ -380,9 +384,9 @@ wh:{pending_out:86,transit:214,signed:168,qc:23,
  waves:[["W-441","65W 快充头","出库中","张伟 · 金卡"],["W-438","折叠收纳箱 55L","已出库","买家小李"],["W-435","原木置物架","质检中","—"],["W-446","快充数据线 2m","待出库","陈先生 · 今日 16:00"],["W-450","保温杯 500ml","已签收","—"],["W-452","收纳箱 80L","待出库","刘女士 · 今日 16:00"]],
  stock:[["快充头（珍珠白）",1200,86,12],["收纳箱 55L",860,64,9],["收纳箱 80L",420,31,4],["快充数据线",2300,142,21],["保温杯 500ml",680,28,6]]},
 reports:{
-  channel_revenue:[["天猫","¥41,040","38%","486 单"],["京东","¥36,720","34%","352 单"],["拼多多","¥17,280","16%","291 单"],["抖音","¥12,960","12%","154 单"]],
-  gmv_trend:[["2026-06","¥89,200","2.9%","¥96"],["2026-07","¥102,500","3.2%","¥99"],["2026-08","¥108,000","3.4%","¥101"]],
-  price_attribution:[["调价Agent","快充头周五调价 ¥119→¥129","竞对同档 ¥139 · 组织记忆「3C 周末规律」","+8.4%"],["竞对Agent","拼多多倒挂修复 ¥99→¥129","R18 倒挂防护 · 检出价差 23%","已修复"],["调价Agent","夜班微调 ¥129→¥131","R7 夜班微调自动上限 ≤2%","+1.6%"]]},
+  channel_revenue:[["天猫","¥2.94 亿","32%","30.6 万单"],["京东","¥1.84 亿","20%","18.0 万单"],["亚马逊","¥1.47 亿","16%","7.9 万单"],["拼多多","¥1.20 亿","13%","15.4 万单"],["抖音","¥0.92 亿","10%","11.2 万单"],["其他 8 平台+独立站","¥0.83 亿","9%","12.9 万单"]],
+  gmv_trend:[["2026-06","¥7.9 亿","13.9%","0.21"],["2026-07","¥8.6 亿","14.4%","0.22"],["2026-08","¥9.2 亿","14.8%","0.24"]],
+  price_attribution:[["亚马逊PPC投手","ACoS 保险丝降预算 $1,500→$1,050","ACoS 连续 3 天 0.31/0.34/0.38 超盈亏线 0.28","-30%"],["竞对雷达","拼多多倒挂修复 ¥99→¥129","R18 倒挂告警 · 检出价差 23%","已修复"],["多币种结算师","跨境军 6 店汇率重定价","USD/CNY 单日 2.3% > 2% 阈值（R14）","US +2.5%"],["天猫店长","夜班微调 ¥139→¥141","R17 夜班微调自动上限 ≤3%","+1.4%"]]},
 };
 
 /* ================= 工具 ================= */
@@ -405,20 +409,20 @@ function threadCard(t){return `<a href="#p2" class="card hov" style="display:blo
  <div class="row" style="justify-content:space-between"><span class="mono">${t.id}</span><span class="tag ${t.status==="completed"?"ok":t.status==="pending_review"?"amber":"holo"}">${dictText(COMMON_STATUS_TEXT,t.status)}</span></div>
  <div style="margin-top:5px;color:var(--ink2)">${t.title}</div>
  <div class="mono" style="margin-top:4px">${dictText(THREAD_MODE_TEXT,t.mode)} · ${t.agent} · 进度 ${t.done}/${t.total}</div></a>`}
-const PAGENAV=[["经营主页·首页","p0","/"],["工作台·晨报","p1","/p1"],["多店驾驶舱","p18","/p18"],["经营分析","p19","/p19"],["掌上日报·交接","p3","/p3"],["订单穿透","p13","/p13"],["平台运营","p14","/p14"],["价格健康","p11","/p11"],["口碑与差评","p15","/p15"],["语音客服","p16","/p16"],["仓储·出库·库存","p17","/p17"],["夜班中心频道","p9","/p9"],["断点看板","p10","/p10"],["董事长视图","p21","/p21"],["审批中心","p4","/p4"],["规则中心","p5","/p5"],["技能中心","p6","/p6"],["团队成员","p8","/p8"],["店铺档案","p20","/p20"],["买家服务前台","p22","/p22"]];
-function navLeft(cur){return `<div class="glabel">页面导航 · NAV</div>`+PAGENAV.map(([l,h,r])=>`<a href="#${h}" class="card hov" style="display:flex;justify-content:space-between;margin-bottom:6px;padding:8px 12px;${h===cur?"border-color:var(--gline);color:var(--gold)":""}"><span>${l}</span><span class="mono">${r}</span></a>`).join("")}
+const PAGENAV=[["经营主页·首页","p0","/"],["工作台·晨报","p1","/p1"],["多店驾驶舱","p18","/p18"],["经营分析","p19","/p19"],["掌上日报·交接","p3","/p3"],["订单穿透","p13","/p13"],["平台运营","p14","/p14"],["价格健康","p11","/p11"],["口碑与差评","p15","/p15"],["多语种客服","p16","/p16"],["仓储·出库·库存","p17","/p17"],["夜班中心频道","p9","/p9"],["断点看板","p10","/p10"],["董事长视图","p21","/p21"],["审批中心","p4","/p4"],["规则中心","p5","/p5"],["技能中心","p6","/p6"],["团队成员","p8","/p8"],["店铺档案","p20","/p20"],["买家服务前台","p22","/p22"]];
+function navLeft(cur){return `<div class="glabel">页面导航 · 真实路由</div>`+PAGENAV.map(([l,h,r])=>`<a href="#${h}" class="card hov" style="display:flex;justify-content:space-between;margin-bottom:6px;padding:8px 12px;${h===cur?"border-color:var(--gline);color:var(--gold)":""}"><span>${l}</span><span class="mono">${r}</span></a>`).join("")}
 function gauge(pct,label){const r=44,c=2*Math.PI*r;return `<div class="gauge"><svg width="110" height="110"><circle cx="55" cy="55" r="${r}" fill="none" stroke="#ffe4ec" stroke-width="8"/><circle cx="55" cy="55" r="${r}" fill="none" stroke="url(#gg)" stroke-width="8" stroke-dasharray="${c*pct} ${c}" stroke-linecap="round"/><defs><linearGradient id="gg"><stop offset="0" stop-color="#ff7a9e"/><stop offset="1" stop-color="#ff2442"/></linearGradient></defs></svg><div class="gv"><b>${Math.round(pct*100)}%</b><span>${label}</span></div></div>`}
 
 /* ================= 视图 ================= */
 const VIEWS={};
-const ROUTES={p0:"/",floor:"/ （办公区视图）",ask:"#ask（AskRail · 全局AI 助手对话）",p1:"/p1",p2:"/p2/线程 102",p3:"/p3",p4:"/p4",p5:"/p5",p6:"/p6",p8:"/p8",p9:"/p9",p10:"/p10",p11:"/p11",p13:"/p13",p14:"/p14",p15:"/p15",p16:"/p16",p17:"/p17",p18:"/p18",p19:"/p19",p20:"/p20",p21:"/p21",p22:"/p22"};
+const ROUTES={p0:"/",floor:"/ （办公区视图）",ask:"#ask（问询通栏 · 全局AI 助手对话）",p1:"/p1",p2:"/p2/线程 102",p3:"/p3",p4:"/p4",p5:"/p5",p6:"/p6",p8:"/p8",p9:"/p9",p10:"/p10",p11:"/p11",p13:"/p13",p14:"/p14",p15:"/p15",p16:"/p16",p17:"/p17",p18:"/p18",p19:"/p19",p20:"/p20",p21:"/p21",p22:"/p22"};
 
 /* ---- P0 经营主页 ---- */
 VIEWS.p0=()=>`
 <div style="padding:0">
  <div class="row" style="padding:10px 18px 0">
   <span class="logo" style="font-size:13px"><span class="d" style="width:12px;height:12px"></span><span class="t">WorkLoom</span></span>
-  <span class="ws" style="font-size:12px;color:var(--ink3)">经营主页 · 公司CEO</span>
+  <span class="ws" style="font-size:12px;color:var(--ink3)">经营主页 · 数字CEO</span>
   <span class="sp" style="flex:1"></span>
   <span style="display:flex;overflow:hidden;border:1px solid var(--line);border-radius:6px;font-size:11px">
     <button class="hbtn" style="border:0;border-radius:0" onclick="location.hash='floor'">办公区</button>
@@ -448,11 +452,11 @@ VIEWS.p0=()=>`
   <div class="bubble" id="speech"><span id="speechtxt"></span><span style="color:var(--gold);animation:pl 1s infinite">▌</span></div>
   <div style="max-width:640px;width:100%;margin-top:10px" id="askzone">
    <div class="askcard">
-    <div style="font-size:11px;letter-spacing:.2em;color:var(--amberdk);margin-bottom:8px">请您决策 · ${D.approvals.filter(a=>a.status==="pending").length} 件（L4 董事长级）</div>
+    <div style="font-size:11px;letter-spacing:.2em;color:var(--amberdk);margin-bottom:8px">请您决策 · ${D.approvals.filter(a=>a.status==="pending").length} 件（L5 董事长级 / L4 数字CEO级）</div>
     ${D.approvals.filter(a=>a.status==="pending").slice(0,2).map(q=>`
     <div class="card" data-apr="${q.id}" style="border-color:rgba(255,170,51,.3);margin-bottom:8px">
      <div style="font-size:12px;color:var(--ink2)"><b>${q.title}</b> <span class="mono">事件 ${shortId(q.ev)} · 审批 ${shortId(q.id)}</span></div>
-     <div style="font-size:11px;color:var(--holo);margin-top:4px">CEO 意见：${q.rationale}</div>
+     <div style="font-size:11px;color:var(--holo);margin-top:4px">数字CEO 意见：${q.rationale}</div>
      <div class="row" style="margin-top:8px">
       <button class="btn ok sm" onclick="decide('${q.id}','approve')">✓ 批准</button>
       <button class="btn warn sm" onclick="decide('${q.id}','reject')">✕ 驳回</button>
@@ -468,7 +472,7 @@ VIEWS.p0=()=>`
    <button class="kbd-chip" data-flip="已派发 ✓|已立项执行（线程 线程 104），进展我会主动汇报">今日怎么样</button>
    <button class="kbd-chip" data-flip="已派发 ✓|已为您打开审批中心（/p4）" onclick="setTimeout(()=>location.hash='p4',600)">批一下请示</button>
    <button class="kbd-chip" data-flip="已派发 ✓|昨夜 9 完成 / 3 待审 / 2 需介入，详见掌上日报（/p3）" onclick="setTimeout(()=>location.hash='p3',600)">昨夜夜班汇报</button>
-   <input class="inp" id="chatin" placeholder="像跟 公司CEO 说话一样输入……（问询 / 安排任务 / 逐步商量）" onkeydown="if(event.key==='Enter')sendChat()">
+   <input class="inp" id="chatin" placeholder="像跟 数字CEO 说话一样输入……（问询 / 安排任务 / 逐步商量）" onkeydown="if(event.key==='Enter')sendChat()">
    <button class="btn g" onclick="sendChat()">发送</button>
   </div>
  </div>
@@ -479,7 +483,7 @@ VIEWS.p0=()=>`
 function sendChat(){const i=$("#chatin");if(!i.value.trim())return;toast(`收到。「${i.value.slice(0,18)}」已立项执行，每一步先请您确认再动手`);i.value=""}
 function agentCard(key){const a=D.agents.find(x=>x.key===key);modal(`
  <div style="font-size:14px;font-weight:700;color:var(--ink)">${a.name}</div>
- <div style="font-size:12px;color:var(--ink3);margin-top:2px">岗位：${a.key} · ${a.v}</div>
+ <div style="font-size:12px;color:var(--ink3);margin-top:2px">数字员工 · ${a.v}</div>
  <div style="font-size:12px;margin-top:8px">绩效态：<b style="color:${a.grade==="表扬"?"var(--go)":a.grade==="辅导"?"var(--warn)":a.grade==="关注"?"var(--amber)":"var(--ink2)"}">${a.grade}</b></div>
  <div style="margin-top:6px">${a.fences.map(f=>`<span class="tag" style="margin-right:4px">围栏 ${f}</span>`).join("")||'<span class="tag">只读 · 无写工具</span>'}</div>
  <button class="btn" style="width:100%;margin-top:12px" onclick="$('#modal').classList.remove('open');location.hash='p8'">去团队看全部（/p8）</button>
@@ -508,17 +512,17 @@ VIEWS.floor=()=>`
  </div>
 </div>`;
 const FLOOR_AGENTS=[
- {key:"cs-agent",name:"客服Agent",st:"工作中",x:2,y:2},
- {key:"pricing-agent",name:"调价Agent",st:"工作中",x:4,y:2},
- {key:"review-agent",name:"评价Agent",st:"asking",x:4.8,y:4.5,apr:"···8871",line:"差评应急回复请您拍板（R9 差评必审）"},
- {key:"reconcile-agent",name:"对账Agent",st:"asking",x:6.7,y:4.9,apr:"···9064",line:"大额退款 ¥1,180 请您审批（R5）"},
- {key:"content-agent",name:"内容Agent",st:"工作中",x:6.5,y:2},
- {key:"warehouse-agent",name:"仓储Agent",st:"工作中",x:8,y:2.4},
- {key:"phone-agent",name:"语音客服Agent",st:"庆功",x:2.4,y:5},
- {key:"inspection-agent",name:"巡检Agent",st:"工作中",x:8.2,y:5},
- {key:"competitor-agent",name:"竞对Agent",st:"工作中",x:4,y:6},
- {key:"desktop-agent",name:"桌面Agent",st:"待命",x:1.2,y:6.4},
- {key:"shop-cockpit",name:"店铺驾驶舱Agent",st:"待命",x:2,y:6.8}];
+ {key:"douyin-cs",name:"抖音客服",st:"工作中",x:2,y:2},
+ {key:"tmall-head",name:"天猫店长",st:"工作中",x:4,y:2},
+ {key:"douyin-cs",name:"抖音客服",st:"asking",x:4.8,y:4.5,apr:"···8871",line:"差评应急回复请您拍板（R9 差评 2 小时 SLA）"},
+ {key:"amz-ppc",name:"亚马逊PPC投手",st:"asking",x:6.7,y:4.9,apr:"···9064",line:"ACoS 保险丝降预算 30% 请您审批（R3）"},
+ {key:"listing-factory",name:"刊登工厂长",st:"工作中",x:6.5,y:2},
+ {key:"demand-planner",name:"需求预测师",st:"工作中",x:8,y:2.4},
+ {key:"cs-en",name:"英语客服组",st:"庆功",x:2.4,y:5},
+ {key:"inspection-agent",name:"巡检哨兵",st:"工作中",x:8.2,y:5},
+ {key:"competitor-radar",name:"竞对雷达",st:"工作中",x:4,y:6},
+ {key:"fx-settler",name:"多币种结算师",st:"待命",x:1.2,y:6.4},
+ {key:"ip-shield",name:"知识产权护盾",st:"待命",x:2,y:6.8}];
 function drawFloor(){const cv=$("#floorcv");if(!cv)return;const ctx=cv.getContext("2d");
  const W=cv.width=cv.offsetWidth*2,H=cv.height=cv.offsetHeight*2;ctx.scale(2,2);
  const w=cv.offsetWidth,h=cv.offsetHeight,gw=10,gh=8;
@@ -531,13 +535,13 @@ function drawFloor(){const cv=$("#floorcv");if(!cv)return;const ctx=cv.getContex
  for(let i=1;i<gw;i++){const a=iso(i,0),b=iso(i,gh);ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke()}
  for(let j=1;j<gh;j++){const a=iso(0,j),b=iso(gw,j);ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke()}
  // 工位
- const stations=[[2,2,"客服台"],[4,2,"调价台"],[6.5,2,"内容台"],[8,2.4,"仓储台"],[5.5,3.4,"指挥台"],[1.6,6.6,"休息角"],[8.2,5,"巡检台"],[4,6,"竞对台"]];
+ const stations=[[2,2,"客服台"],[4,2,"店长台"],[6.5,2,"刊登台"],[8,2.4,"补货台"],[5.5,3.4,"指挥台"],[1.6,6.6,"休息角"],[8.2,5,"巡检台"],[4,6,"竞对台"]];
  for(const [x,y,lb] of stations){const s=iso(x,y);ctx.fillStyle="#f0d9c8";ctx.fillRect(s.sx-20,s.sy-10,40,12);ctx.fillStyle="#e3c3ac";ctx.fillRect(s.sx-20,s.sy-12,40,4);
   ctx.fillStyle="#4d96ff";ctx.globalAlpha=.5;ctx.fillRect(s.sx-6,s.sy-18,12,2);ctx.globalAlpha=1;
   ctx.fillStyle="#8a757d";ctx.font="9px sans-serif";ctx.textAlign="center";ctx.fillText(lb,s.sx,s.sy+16)}
  // CEO 桌
  const cd=iso(5.5,3.4);ctx.fillStyle="#ffd9e4";ctx.beginPath();ctx.ellipse(cd.sx,cd.sy-4,26,10,0,0,7);ctx.fill();
- ctx.fillStyle="#d4002a";ctx.font="9px sans-serif";ctx.fillText("公司CEO",cd.sx,cd.sy+22);
+ ctx.fillStyle="#d4002a";ctx.font="9px sans-serif";ctx.fillText("数字CEO",cd.sx,cd.sy+22);
  // 员工
  const t=performance.now()/1000;window._hits=[];
  for(const a of FLOOR_AGENTS){const s=iso(a.x,a.y);
@@ -555,7 +559,7 @@ function drawFloor(){const cv=$("#floorcv");if(!cv)return;const ctx=cv.getContex
  cv.onclick=e=>{const r=cv.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;
   const hit=window._hits.find(h=>Math.hypot(h.sx-mx,h.sy-my)<16);if(!hit)return;const a=hit.a;
   if(a.st==="asking"){const q=D.approvals.find(x=>x.id===a.apr);modal(`
-   <div style="font-size:11px;letter-spacing:.2em;color:var(--amberdk)">请您决策 · ${q.tier==="l4_chairman"?"董事长级":"集团CEO级"}</div>
+   <div style="font-size:11px;letter-spacing:.2em;color:var(--amberdk)">请您决策 · ${q.tier==="l4_chairman"?"董事长级":"数字CEO级"}</div>
    <div style="font-size:14px;font-weight:700;margin-top:4px">${a.name}</div>
    <div style="font-size:12px;color:var(--ink2);margin-top:4px">${a.line}</div>
    <div class="mono" style="margin-top:4px">审批 ${shortId(q.id)} · ${q.rule}</div>
@@ -568,7 +572,7 @@ function decide2(id,g){toast(`已${g==="approve"?"批准":"驳回"}，全链留�
 
 /* ---- P1 工作台 ---- */
 VIEWS.p1=()=>shell(
- `<div class="glabel">会话 · THREADS</div>
+ `<div class="glabel">会话 · 线程</div>
   <div class="card" style="margin-bottom:8px;border-color:var(--gline)"><div class="row" style="justify-content:space-between"><span style="color:var(--gold)">📌 夜班中心频道</span><a class="mono" href="#p9">/p9</a></div>
   <div style="font-size:11px;color:var(--ink3);margin-top:4px">昨夜 9 完成 · 3 待审 · 2 需介入</div></div>
   <div class="card hov" style="margin-bottom:8px;padding:10px" onclick="location.hash='p3'"><div class="row" style="justify-content:space-between"><span style="color:var(--ink2)">📌 昨夜日报</span><span class="tag amber">3 待办</span></div>
@@ -582,30 +586,30 @@ VIEWS.p1=()=>shell(
    <div class="row" style="margin-top:10px"><button class="btn g sm" data-flip="已采纳 ✓|批量采纳仅低风险项，已写回事件库">批量采纳（低风险）</button>
    <button class="btn sm" onclick="location.hash='p3'">去掌上日报逐条审（/p3）</button></div>
   </div>
-  <div class="card panel tint-blue"><div class="ptitle">KPI 投影 · 门店档案 history_curve（2026-08）</div>
-   <div class="row" style="justify-content:space-around">${gauge(.82,"GMV ¥10.8万")}${gauge(.62,"转化率 3.4%")}${gauge(.48,"客单价 ¥101")}</div></div>
+  <div class="card panel tint-blue"><div class="ptitle">KPI 投影 · 集团一档 history_curve（2026-08）</div>
+   <div class="row" style="justify-content:space-around">${gauge(.82,"月 GMV ¥9.2 亿")}${gauge(.62,"毛利率 14.8%")}${gauge(.48,"ACoS 0.24")}</div></div>
   <div class="card panel tint-amber" style="border-color:rgba(255,77,109,.4)"><div class="ptitle" style="color:var(--warn)">巡检雷达推送 · 07:00 检出</div>
-   <div class="card" style="margin-bottom:8px;border-color:rgba(255,77,109,.35)"><b style="color:var(--warn)">高危</b> · 天猫 2 分差评已 26 小时未回复（R9 SLA 升级）
-    <div class="row" style="margin-top:6px"><button class="btn warn sm" data-flip="已派单 ✓|差评处置已派单 → 评价Agent，SLA 计时中">一键派单</button></div></div>
-   <div class="card" style="border-color:rgba(255,170,51,.35)"><b style="color:var(--amberdk)">中危</b> · 拼多多价格倒挂 23%（R18）· 收纳箱库存未同步（R20）
+   <div class="card" style="margin-bottom:8px;border-color:rgba(255,77,109,.35)"><b style="color:var(--warn)">高危</b> · 抖音直播间 1 星差评已 1.8 小时未回复（R9 差评 2 小时 SLA 倒计时）
+    <div class="row" style="margin-top:6px"><button class="btn warn sm" data-flip="已派单 ✓|差评处置已派单 → 抖音客服，SLA 计时中">一键派单</button></div></div>
+   <div class="card" style="border-color:rgba(255,170,51,.35)"><b style="color:var(--amberdk)">中危</b> · 拼多多价格倒挂 23%（R18）· 磁吸充电宝可售 5.2 天（R7 断货预警）
     <div class="row" style="margin-top:6px"><button class="btn sm" onclick="location.hash='p11'">看价格健康（/p11）</button></div></div></div>
   <div class="card"><div class="ptitle">航线设定台</div>
    <div class="row"><input class="inp" id="goalin" placeholder="设定今日经营目标，Enter 启航（含糊目标会反问，不直接建任务）" onkeydown="if(event.key==='Enter'){toast('收到目标，已建主线任务线程 线程 105');this.value=''}"><button class="btn g" data-toast="已启航：主线任务线程 线程 105 已立项">启航</button></div>
-   <div class="row" style="margin-top:8px;flex-wrap:wrap">${["本周 GMV 冲 ¥12 万","差评清零行动","抖音首图上线","双11 价格策略预审","库存损耗复盘","会员召回 50 人"].map(g=>`<button class="kbd-chip" data-toast="快捷目标已写入航线：${g}">${g}</button>`).join("")}</div></div>`,
- `<div class="glabel">上下文 · CONTEXT</div>
-  <div class="card" style="margin-bottom:10px"><div class="ptitle">档案</div>${["杭州 · 14 店铺 · 产业带卖家","毛利红线 32%","目标 GMV ¥120 万/月","品牌：真诚克制"].map(c=>`<span class="tag" style="margin:0 4px 6px 0">${c}</span>`).join("")}</div>
+   <div class="row" style="margin-top:8px;flex-wrap:wrap">${["本周 GMV 冲 ¥2.4 亿","差评 2h 闭环","黑五备货冲刺","ACoS 压回 0.22","断货清零行动","会员召回 5 万人"].map(g=>`<button class="kbd-chip" data-toast="快捷目标已写入航线：${g}">${g}</button>`).join("")}</div></div>`,
+ `<div class="glabel">上下文 · 档案与班组</div>
+  <div class="card" style="margin-bottom:10px"><div class="ptitle">档案</div>${["杭州 · 14 店铺 · 13 平台+独立站","8,600 SKU · 日均 9.6 万单","毛利红线 成本 ×1.15","月 GMV ¥9.2 亿（8 月）","品牌：真诚克制"].map(c=>`<span class="tag" style="margin:0 4px 6px 0">${c}</span>`).join("")}</div>
   <div class="card" style="margin-bottom:10px"><div class="ptitle">夜班班组</div>
-   ${["巡检Agent","评价Agent","对账Agent","竞对Agent","语音客服Agent","内容Agent","客服Agent"].map(n=>`<div class="row" style="margin:5px 0"><span style="width:7px;height:7px;border-radius:50%;background:var(--holo);box-shadow:0 0 6px var(--holo)"></span><span style="color:var(--ink2)">${n}</span><span class="mono" style="margin-left:auto">在线</span></div>`).join("")}</div>
+   ${["竞对雷达","亚马逊PPC投手","抖音客服","多平台对账师","英语客服组","知识产权护盾","多币种结算师"].map(n=>`<div class="row" style="margin:5px 0"><span style="width:7px;height:7px;border-radius:50%;background:var(--holo);box-shadow:0 0 6px var(--holo)"></span><span style="color:var(--ink2)">${n}</span><span class="mono" style="margin-left:auto">在线</span></div>`).join("")}</div>
   <div class="card"><div class="ptitle">渠道巡检状态</div>
    ${D.channels.map(c=>`<div class="row" style="margin:5px 0"><span style="color:var(--ink2)">${c.name}</span>${c.isNew?'<span class="tag holo">新渠道</span>':""}<span class="mono" style="margin-left:auto">${c.price?`¥${c.price}`:"—"} ${c.parity===false?'<span style="color:var(--warn)">倒挂</span>':c.parity?'<span style="color:var(--go)">平价</span>':""}</span></div>`).join("")}</div>`);
 
 /* ---- P2 任务中心线程 ---- */
 VIEWS.p2=()=>shell(navLeft("p2"),
- `${pageHead("/p2/线程 102","任务中心 · 差评应急回复（天猫 2 分评价）","主线任务 · 评价Agent · 进度 3/5 · 状态：待审查")}
+ `${pageHead("/p2/线程 102","任务中心 · 抖音直播间差评危机处置（2h SLA）","主线任务 · 抖音客服 · 进度 3/5 · 状态：待审查")}
   <div class="flow">
-   <div class="step"><div class="ic">系</div><div class="bd"><span class="mono">E-SEED-8846 · 系统</span><div style="margin-top:4px;color:var(--ink2)">巡检检出：天猫新增 2 分差评「收纳箱有色差，客服半天没回复」（事件 ${shortId("E-SEED-8846")}）</div></div></div>
-   <div class="step"><div class="ic">评</div><div class="bd"><span class="mono">E-SEED-8852 · 评价Agent</span><div style="margin-top:4px;color:var(--ink2)">已调取订单 OD-20260818-3356 与退换工单 ···002，核实：色差属实，已复核直播间灯光校色并安排补发。</div></div></div>
-   <div class="step"><div class="ic">围</div><div class="bd"><span class="mono">围栏判定</span><div style="margin-top:4px"><span class="tag amber">R9 差评必审 → 人工复核</span> <span class="tag amber">差评响应 SLA 升级（已 26 小时）</span></div></div></div>
+   <div class="step"><div class="ic">系</div><div class="bd"><span class="mono">E-SEED-8846 · 系统</span><div style="margin-top:4px;color:var(--ink2)">巡检检出：抖音直播间新增 1 星差评「直播间展示与实物色差」，当场 2.3 万人在线（事件 ${shortId("E-SEED-8846")}）</div></div></div>
+   <div class="step"><div class="ic">抖</div><div class="bd"><span class="mono">E-SEED-8852 · 抖音客服</span><div style="margin-top:4px;color:var(--ink2)">已调取订单与售后记录，核实：色差属实，已复核直播间灯光校色并安排补发；2 小时 SLA 防御窗口开启。</div></div></div>
+   <div class="step"><div class="ic">围</div><div class="bd"><span class="mono">围栏判定</span><div style="margin-top:4px"><span class="tag amber">R9 差评 2 小时 SLA → 人工复核</span> <span class="tag amber">R28 涉质量缺陷承认必审</span></div></div></div>
    <div class="step"><div class="ic">草</div><div class="bd tint-amber"><span class="mono">E-SEED-8871 · 回复草稿（待您审批）</span>
     <div style="margin-top:6px;font-size:12px;line-height:1.8">
      <div class="diff-del">（旧草稿）深表歉意，我们赠送您三倍赔偿……</div>
@@ -613,12 +617,12 @@ VIEWS.p2=()=>shell(navLeft("p2"),
     </div>
     <div style="font-size:11px;color:var(--ink3);margin-top:6px">依据：品牌口径「真诚克制，不承诺档案外补偿（R10）」· 组织记忆「差评回复 SOP」（致歉→核实→措施→承诺）</div>
     <div class="row" style="margin-top:10px" data-apr="···8871"><button class="btn ok sm" onclick="decide('···8871','approve')">✓ 采纳（权重 1）</button>
-    <button class="btn sm" data-flip="已改派 ✓|编辑后采纳已写回（权重 2），评价Agent 重新生成">✎ 编辑后采纳</button>
+    <button class="btn sm" data-flip="已改派 ✓|编辑后采纳已写回（权重 2），抖音客服 重新生成">✎ 编辑后采纳</button>
     <button class="btn warn sm" onclick="decide('···8871','reject')">✕ 驳回（权重 3）</button><span class="apr-st tag amber" style="margin-left:auto">待审批</span></div></div></div>
   </div>`,
  `<div class="glabel">线程上下文</div>
   <div class="card" style="margin-bottom:10px"><div class="ptitle">三要素</div>
-   <div style="font-size:12px;color:var(--ink2);line-height:2">档案：熊猫优选集团 · 产业带卖家<br>阶段：双11 备战冲刺<br>目标：差评率 ≤ 2%</div></div>
+   <div style="font-size:12px;color:var(--ink2);line-height:2">档案：熊猫优选集团 · 14 店铺 13 平台+独立站<br>阶段：黑五备货冲刺<br>目标：差评 2h 闭环率 100%</div></div>
   <div class="card"><div class="ptitle">关联对象</div>
    <div style="font-size:12px;line-height:2.2">
    <div>订单 <a class="holo-tag" href="#p13">OD-20260818-3356（穿透 →/p13）</a></div>
@@ -643,7 +647,7 @@ VIEWS.p3=()=>`<div style="display:flex;justify-content:center;padding:20px">
     <button class="btn warn sm" onclick="decide('${q.id}','reject')">✕ 驳回</button></div>
   </div>`).join("")}
   <div class="card tint-amber" style="border-color:rgba(255,77,109,.4)"><b style="color:var(--warn)">求援卡 · 需介入 2 件</b>
-   <div style="font-size:12px;color:var(--ink2);margin-top:6px">① 跨境买家命中「投诉工商」关键词（R12 硬阻断转人工）　② 大促爆单库存告急复核</div>
+   <div style="font-size:12px;color:var(--ink2);margin-top:6px">① 美区买家命中「律师函」关键词（R12 自动转人工）　② 爆款磁吸充电宝断货预警复核（可售 5.2 天 · R7）</div>
    <div class="row" style="margin-top:8px"><button class="btn warn sm" data-flip="已派单 ✓|已派单 → 客服主管，SLA 计时开始">一键派单</button>
    <button class="btn sm" style="margin-left:auto" id="brake2">⛔ 紧急制动（暂停全部夜班动作）</button></div></div>
  </div></div>`;
@@ -655,37 +659,37 @@ VIEWS.p4=()=>shell(navLeft("p4"),
    <div>${D.approvals.map((q,i)=>`
     <div class="card hov panel tint-amber" onclick="toast('已选中：${q.title}')" style="${i===0?"border-color:var(--gline)":""}">
      <div class="row" style="justify-content:space-between"><b style="font-size:12px">${q.title}</b><span class="tag ${q.status==="approved"?"ok":"amber"}">${dictText(APPROVAL_STATUS_TEXT,q.status)}</span></div>
-     <div class="mono" style="margin-top:4px">${actionText(q.action)} · ${shortId(q.id)} · ${q.tier==="l4_chairman"?"L4 董事长级":q.tier==="l3_fleet"?"L3 集团CEO级":"L2 公司CEO级"}</div></div>`).join("")}
+     <div class="mono" style="margin-top:4px">${actionText(q.action)} · ${shortId(q.id)} · ${q.tier==="l4_chairman"?"L5 董事长级":q.tier==="l3_fleet"?"L4 数字CEO级":"L2 店长级"}</div></div>`).join("")}
     <div class="note">今日已审 6 件：采纳 4 / 编辑后采纳 1 / 驳回 1（驳回原因已进偏好模式）</div></div>
    <div class="card tint-amber">
     <div class="ptitle">审批卡 · ${D.approvals[0].title}</div>
     <table class="dt"><tr><th style="width:70px">变更</th><th>前</th><th>后</th></tr>
      <tr><td>回复文案</td><td class="diff-del">（未回复）</td><td class="diff-add">已复核灯光校色并支持无理由退换+运费险，响应不及时诚恳致歉……</td></tr>
-     <tr><td>平台</td><td>天猫</td><td>天猫（公开回复）</td></tr></table>
-    <div style="margin-top:10px"><span class="tag amber">R9 差评必审</span> <span class="tag amber">SLA 升级</span></div>
-    <div class="note" style="margin-top:10px">为什么这样改：依据事件 ${shortId("E-SEED-8871")} · 引用组织记忆「差评回复 SOP」 · 模型档 mock-ecom-001（标准档）· 积分 1 · 影响面：天猫公开评价</div>
+     <tr><td>平台</td><td>抖音</td><td>抖音（公开回复）</td></tr></table>
+    <div style="margin-top:10px"><span class="tag amber">R9 差评 2 小时 SLA</span> <span class="tag amber">R28 涉缺陷承认必审</span></div>
+    <div class="note" style="margin-top:10px">为什么这样改：依据事件 ${shortId("E-SEED-8871")} · 引用组织记忆「差评回复 SOP」 · 模型档 mock-ecom-001（标准档）· 积分 1 · 影响面：抖音公开评价</div>
     <div class="row" style="margin-top:12px" data-apr="${D.approvals[0].id}">
      <button class="btn ok sm" onclick="decide('${D.approvals[0].id}','approve')">✓ 采纳</button>
      <button class="btn sm" data-flip="已改派 ✓|编辑后采纳（权重 2）已写回">✎ 编辑后采纳</button>
      <button class="btn warn sm" onclick="decide('${D.approvals[0].id}','reject')">✕ 驳回</button>
      <span class="apr-st tag amber" style="margin-left:auto">待审批</span></div>
-    <div style="font-size:11px;color:var(--ink3);margin-top:8px">执行回执位：批准后生成回复事件并同步天猫，回执 ${shortId("E-SEED-8872")} 可溯。</div>
+    <div style="font-size:11px;color:var(--ink3);margin-top:8px">执行回执位：批准后生成回复事件并同步抖音，回执 ${shortId("E-SEED-8872")} 可溯。</div>
    </div></div>`,
  `<div class="glabel">队列口径</div>
   <div class="card" style="font-size:12px;line-height:2;color:var(--ink2)">
-   L4 董事长级 · <b style="color:var(--amberdk)">1</b><br>L3 集团CEO级 · <b style="color:var(--amberdk)">1</b><br>L2 公司CEO级 · <b style="color:var(--go)">1（已批准）</b><hr style="border-color:var(--line);margin:8px 0">
+   L5 董事长级 · <b style="color:var(--amberdk)">1</b><br>L4 数字CEO级 · <b style="color:var(--amberdk)">1</b><br>L2 店长级 · <b style="color:var(--go)">1（已批准）</b><hr style="border-color:var(--line);margin:8px 0">
    快照 24 小时有效（G6）<br>快照过期 → 红条告警 + 刷新再审</div>`);
 
 /* ---- P5 规则中心 ---- */
 VIEWS.p5=()=>shell(navLeft("p5"),
- `${pageHead("/p5","规则中心 · 规则围栏","ecom-baseline/v3 · 单调守卫只可加严 · 基线 🔒 集团强制")}
+ `${pageHead("/p5","规则中心 · 规则围栏","ecom-baseline/v1 · 单调守卫只可加严 · 基线 🔒 集团强制")}
   <div class="row panel" style="align-items:stretch">
    <div class="card" style="width:200px;flex:none"><div class="ptitle">版本历史</div>
-    ${[["v3","active","20 条规则"],["v2","archived","16 条规则"],["v1（出厂基线）","rolled_back","12 条规则 🔒"]].map(v=>`
+    ${[["v1","active","30 条规则（R1–R30）"],["v0.9（草案）","archived","22 条规则"],["出厂基线","rolled_back","12 条规则 🔒"]].map(v=>`
     <div class="card" style="margin-bottom:6px;padding:8px;${v[1]==="active"?"border-color:var(--gline)":""}"><b>ecom-baseline/${v[0]}</b> <span class="tag ${v[1]==="active"?"ok":""}">${dictText(COMMON_STATUS_TEXT,v[1])}</span><div class="mono">${v[2]}</div></div>`).join("")}</div>
    <div class="card" style="flex:1"><div class="ptitle">规则列表 · 生效范围：全工作区</div>
     <table class="dt"><tr><th>规则</th><th>名称</th><th>级别</th><th>来源</th><th>30 天触发</th></tr>
-    ${D.fences.map((r,i)=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td><span class="tag ${r[2]==="auto"?"ok":r[2]==="review"?"amber":"warn"}">${dictText(FENCE_LEVEL_TEXT,r[2])}</span></td><td class="mono">基线 🔒</td><td class="mono">${[34,2,5,7,1,12,41,3,0,0,4,2,6,1,2,0,9,5,3,2][i]}</td></tr>`).join("")}</table></div></div>
+    ${D.fences.map((r,i)=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td><span class="tag ${r[2]==="auto"?"ok":r[2]==="review"?"amber":"warn"}">${dictText(FENCE_LEVEL_TEXT,r[2])}</span></td><td class="mono">基线 🔒</td><td class="mono">${[34,2,5,7,1,12,41,3,9,0,4,2,0,6,1,18,52,5,3,2,1,0,0,7,4,2,1,6,3,1][i]}</td></tr>`).join("")}</table></div></div>
   <div class="card"><div class="ptitle">自然语言新增群规（转写草稿 → 结构化预览 → 模拟航行 → 审批，未确认不生效）</div>
    <div class="row"><input class="inp" id="rulein" placeholder="例如：双11 期间单品单日涨幅不超过 5%" onkeydown="if(event.key==='Enter')toast('已转写草稿，等待模拟航行')"><button class="btn g" data-toast="草稿已生成 → 结构化预览（dry-run 回放最近 10 条）">转写草稿</button>
    <button class="btn" data-toast="模拟航行：回放 10 条 · 将拦截 0 条 · 将复核 1 条 · 不变 9 条（影响面可控）">模拟航行</button></div></div>`,
@@ -705,7 +709,7 @@ VIEWS.p6=()=>shell(navLeft("p6"),
    <div class="row" style="margin-top:8px"><button class="btn g sm" data-flip="已固化 ✓|已生成触发器草稿，待审批后生效">一键固化</button>
    <button class="btn sm" data-flip="已生成 ✓|草稿已进入「打造新技能」向导">生成草稿</button>
    <button class="btn warn sm" data-flip="已驳回 ✓|已降权，30 天内不再建议">驳回</button></div></div>
-  <div class="ptitle">官方技能 · 电商行业包（25 技能 · 绑定围栏可见）</div>
+  <div class="ptitle">官方技能 · 电商行业包（160 技能 · 绑定围栏可见）</div>
   <div class="grid4 panel tint-grape" style="padding:10px">${D.skills.map((s,i)=>`
    <div class="card hov" style="border-color:rgba(255,36,66,.45)" data-toast="技能「${s[1]}」已安装 · 调用 ${ 40+((i*37)%160)} 次/30 天">
     <div style="font-size:12px;color:var(--goldhi)">${s[1]}</div>
@@ -713,32 +717,32 @@ VIEWS.p6=()=>shell(navLeft("p6"),
     <div style="margin-top:4px"><span class="tag" style="font-size:10px">围栏 ${D.fences[i%20][0]}</span></div></div>`).join("")}</div>
   <div class="ptitle">团队技能（银边）</div>
   <div class="grid2 panel">
-   <div class="card tint-grape" style="border-color:rgba(196,205,240,.4)"><b>周一经营复盘</b> <span class="tag">v1.2.0 · 已装给 陈经理</span>
+   <div class="card tint-grape" style="border-color:rgba(196,205,240,.4)"><b>周一经营复盘</b> <span class="tag">v1.2.0 · 已装给 运营总监</span>
     <div style="font-size:11px;color:var(--ink3);margin-top:4px">团队沉淀：每周一 09:00 自动汇总上周 GMV/转化率/差评/断货，输出复盘纪要。</div></div>
   </div>
   <div class="ptitle">行业共享（铜边 · 已脱敏 ✓ · 调用与采纳率公开）</div>
   <div class="grid2">
-   <div class="card" style="border-color:rgba(255,36,66,.5)"><b>大促爆单冲刺包</b> <span class="tag amber">华东电商卖家联盟 · 326 店在用</span>
-    <div style="font-size:11px;color:var(--ink3);margin-top:4px">竞对盯价 + 大促广告保险丝 + 差评快反 SOP；绑定 R1/R2，不破毛利红线。采纳率 78%。</div>
-    <button class="btn g sm" style="margin-top:8px" data-flip="已安装 ✓|已安装到工作区，围栏绑定 R1/R2 生效">安装</button></div>
+   <div class="card" style="border-color:rgba(255,36,66,.5)"><b>黑五大促冲刺包</b> <span class="tag amber">华东跨境大卖联盟 · 326 店在用</span>
+    <div style="font-size:11px;color:var(--ink3);margin-top:4px">竞对盯价 + 广告分时加码（ACoS 越限自动降预算）+ 差评快反 SOP；绑定 R3/R9，不触碰毛利红线 R2。采纳率 78%。</div>
+    <button class="btn g sm" style="margin-top:8px" data-flip="已安装 ✓|已安装到工作区，围栏绑定 R3/R9 生效">安装</button></div>
    <div class="card"><b>打造新技能</b><div style="font-size:11px;color:var(--ink3);margin-top:4px">零代码三要素向导：何时用 / 怎么做 / 什么不做（边界自动转围栏声明）。</div>
     <button class="btn sm" style="margin-top:8px" data-toast="已进入三要素向导（/p6/create）">开始打造 →</button></div>
   </div>`,
  `<div class="glabel">已装给谁</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
-   价格日历技能 → 调价Agent<br>差评危机公关 → 评价Agent<br>跨平台价格倒挂防护技能 → 竞对Agent<br>多语种客服技能 → 语音客服Agent<br>全域巡检技能 → 巡检Agent
+   ACoS 利润保险丝 → 亚马逊PPC投手<br>差评防御窗口 → 抖音客服<br>跟卖监测驱赶 → 知识产权护盾<br>汇率联动重定价 → 多币种结算师<br>多语言客服 8 语种 → 英语客服组
    <hr style="border-color:var(--line);margin:8px 0"><a class="holo-tag" href="#p8">团队对账 →/p8</a></div>`);
 
 /* ---- P8 团队 ---- */
 VIEWS.p8=()=>shell(navLeft("p8"),
- `${pageHead("/p8","团队成员 · 人机混编","Agent 是一等公民：方头像 + 版本角标 + 段位；30 天工时事件库聚合投影")}
+ `${pageHead("/p8","团队成员 · 人机混编","数字员工是一等公民：方头像 + 版本角标 + 段位；30 天工时事件库聚合投影")}
   <div class="ptitle">人类成员</div>
   <div class="grid3 panel tint-grape" style="padding:10px">${D.members.map(m=>`
    <div class="card hov" data-toast="成员 ${m.name}（${m.id}）权限：${m.role} · 三端一致">
     <div class="row"><span style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff7a9e,#ff2442);display:flex;align-items:center;justify-content:center;color:#fff">${m.name[0]}</span>
     <div><b>${m.name}</b><div class="mono">${m.id}</div></div><span class="tag ${m.role==="只读"?"":"g"}" style="margin-left:auto">${m.role}</span></div>
     <div class="mono" style="margin-top:6px">近 24h 有事件留痕 · 在线</div></div>`).join("")}</div>
-  <div class="ptitle">Agent 成员（夜班窗口 22:00–08:00 自动上线 · 青脉冲）</div>
+  <div class="ptitle">数字员工（夜班窗口 22:00–08:00 自动上线 · 青脉冲）</div>
   <div class="grid4 tint-grape" style="padding:10px">${D.agents.map(a=>`
    <div class="card hov" onclick='agentCard(${JSON.stringify(a.key)})'>
     <div class="row"><span style="width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#e3f0ff,#ffffff);border:1px solid rgba(77,150,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;color:#2a6ac8">AI</span>
@@ -755,17 +759,17 @@ VIEWS.p8=()=>shell(navLeft("p8"),
 /* ---- P9 夜班中心 ---- */
 VIEWS.p9=()=>shell(navLeft("p9"),
  `${pageHead("/p9","夜班中心频道 · AI–AI 协作现场","夜班动作 100% 过围栏，无例外通道；越围栏项「未生效·待审批」")}
-  <div class="card panel tint-amber" style="border-color:rgba(255,77,109,.45)"><b style="color:var(--warn)">需介入卡 · 跨境买家纠纷升级（R12 硬阻断）</b>
-   <div style="font-size:12px;color:var(--ink2);margin-top:4px">美国买家包裹清关延误 12 天，命中「投诉工商」关键词；夜间不确定不执行，请您定夺。</div>
+  <div class="card panel tint-amber" style="border-color:rgba(255,77,109,.45)"><b style="color:var(--warn)">需介入卡 · 跨境买家纠纷升级（R12 自动转人工）</b>
+   <div style="font-size:12px;color:var(--ink2);margin-top:4px">美区买家包裹清关延误 12 天，命中「律师函」关键词；夜间不确定不执行，请您定夺。</div>
    <div class="row" style="margin-top:8px"><button class="btn warn sm" data-flip="已派单 ✓|已派单 → 客服主管，G5 计时留痕">一键派单</button>
    <button class="btn sm" data-toast="已转跨境客服专家席（二级兜底）">转专家席</button></div></div>
   <div class="flow">
-   ${[["E-SEED-8901","巡检Agent","巡检快照回写：14 店铺在线，拼多多倒挂检出（转 R18）","receipt"],
-     ["E-SEED-8907","竞对Agent","倒挂防护触发：拼多多 ¥99 低于天猫/京东 ¥129，已自动校准该店铺报价","fence"],
-     ["E-SEED-8915","评价Agent","差评应急回复草稿已生成 → 待审批（未生效）","pending"],
-     ["E-SEED-8922","对账Agent","13 平台夜间对账三轮比对完成，差异 0 笔","receipt"],
-     ["E-SEED-8931","语音客服Agent","跨境店夜间会话 412 通：AI 托管应答 398 · 转人工 14","receipt"],
-     ["E-SEED-8940","内容Agent","抖音店铺首图定时发布已排期 06:00（R15 已审）","receipt"]].map(m=>`
+   ${[["E-SEED-8901","巡检哨兵","巡检快照回写：14 店铺在线，拼多多倒挂检出（转 R18）","receipt"],
+     ["E-SEED-8907","竞对雷达","倒挂告警触发：拼多多 ¥99 低于天猫 ¥129（价差 23%），已转店长确认修复","fence"],
+     ["E-SEED-8915","抖音客服","差评应急回复草稿已生成 → 待审批（R9 未生效）","pending"],
+     ["E-SEED-8922","多平台对账师","13 平台夜间对账三轮比对完成，差异 0 笔","receipt"],
+     ["E-SEED-8931","英语客服组","跨境店夜间会话 412 通：AI 托管应答 398 · 转人工 14","receipt"],
+     ["E-SEED-8940","知识产权护盾","跟卖巡检 14 店：美区站检出跟卖 1 起（Buy Box 丢失），取证完毕请示驱赶（R19）","receipt"]].map(m=>`
    <div class="step"><div class="ic">${m[1][0]}</div><div class="bd tint-mint">
     <div class="row"><span class="mono">${shortId(m[0])} · ${m[1]}</span>
     ${m[3]==="pending"?'<span class="tag amber" style="margin-left:auto">未生效 · 待审批</span>':m[3]==="fence"?'<span class="tag warn" style="margin-left:auto">围栏动作 · 回执已留痕</span>':'<span class="tag ok" style="margin-left:auto">回执 ✓</span>'}</div>
@@ -773,10 +777,10 @@ VIEWS.p9=()=>shell(navLeft("p9"),
   </div>
   <div class="card"><div class="row"><input class="inp" placeholder="给班组留言（五元事件留痕）" onkeydown="if(event.key==='Enter'){toast('留言已写入夜班频道事件流');this.value=''}"><button class="btn warn" id="brake3">⛔ 一键暂停</button></div></div>`,
  `<div class="glabel">班组状态</div>
-  <div class="card" style="margin-bottom:10px"><div class="ptitle">成员 · 7 Agent 在线</div>
-   ${["巡检Agent","评价Agent","对账Agent","竞对Agent","语音客服Agent","内容Agent","客服Agent"].map(n=>`<div class="row" style="margin:5px 0"><span style="width:7px;height:7px;border-radius:50%;background:var(--holo);box-shadow:0 0 6px var(--holo);animation:pl 2s infinite"></span><span style="color:var(--ink2)">${n}</span><span class="mono" style="margin-left:auto">夜班窗口内</span></div>`).join("")}</div>
+  <div class="card" style="margin-bottom:10px"><div class="ptitle">成员 · 7 名员工在线</div>
+   ${["竞对雷达","亚马逊PPC投手","抖音客服","多平台对账师","英语客服组","知识产权护盾","多币种结算师"].map(n=>`<div class="row" style="margin:5px 0"><span style="width:7px;height:7px;border-radius:50%;background:var(--holo);box-shadow:0 0 6px var(--holo);animation:pl 2s infinite"></span><span style="color:var(--ink2)">${n}</span><span class="mono" style="margin-left:auto">夜班窗口内</span></div>`).join("")}</div>
   <div class="card tint-blue" style="margin-bottom:10px"><div class="ptitle">峰谷计量</div>${hbar("积分消耗",81,"96 / 118 估")}${hbar("已完成",64,"9 / 14 项")}</div>
-  <div class="card"><div class="ptitle">围栏快照</div><div style="font-size:12px;color:var(--ink2)">ecom-baseline/v3（当晚版本可回溯）</div>
+  <div class="card"><div class="ptitle">围栏快照</div><div style="font-size:12px;color:var(--ink2)">ecom-baseline/v1（当晚版本可回溯）</div>
   <div class="ptitle" style="margin-top:10px">交接班预告</div><div style="font-size:12px;color:var(--ink2)">每天 08:30 → 掌上日报（/p3）</div></div>`);
 
 /* ---- P10 断点看板 ---- */
@@ -796,29 +800,29 @@ VIEWS.p10=()=>shell(navLeft("p10"),
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    ① AI 首轮处置<br>② 适配器降级重试<br>③ 人工接管 / 应急联系人<br>
    <hr style="border-color:var(--line);margin:8px 0">
-   <span style="color:var(--ink3)">应急联系人：值班客服席 → 远程店主 王店主 → 平台服务商应急群；R10 安全事件禁区不接管。</span></div>`);
+   <span style="color:var(--ink3)">应急联系人：值班客服席 → 值班运营总监 → 平台服务商应急群；R23 安全禁区不接管。</span></div>`);
 
 /* ---- P11 价格健康 ---- */
 VIEWS.p11=()=>shell(navLeft("p11"),
- `${pageHead("/p11","价格健康 · 倒挂熔断与超售防护","检出 → 处置 → 结果三段式修复留痕（R17/R18）")}
+ `${pageHead("/p11","价格健康 · 倒挂告警与夜班微调","检出 → 处置 → 结果三段式修复留痕（R18 倒挂告警 / R17 夜班微调上限）")}
   <div class="grid2 panel">
-   <div class="card tint-amber" style="border-color:rgba(255,77,109,.45)"><div class="ptitle" style="color:var(--warn)">倒挂熔断 · R17</div>
-    <div style="font-size:12px;line-height:2;color:var(--ink2)">检出：拼多多 <b style="color:var(--warn)">¥99</b> 低于天猫/京东 <b>¥129</b>（价差 23%）<br>
-    处置：硬阻断 → 拼多多店铺报价自动下架<br>结果：竞对Agent 修复 <span class="diff-add">¥99 → ¥129</span>，已恢复上架（回执 ${shortId("E-SEED-8908")}）</div>
+   <div class="card tint-amber" style="border-color:rgba(255,77,109,.45)"><div class="ptitle" style="color:var(--warn)">多平台价格倒挂告警 · R18</div>
+    <div style="font-size:12px;line-height:2;color:var(--ink2)">检出：拼多多 <b style="color:var(--warn)">¥99</b> 低于天猫 <b>¥129</b>（价差 23%）<br>
+    处置：倒挂告警 → 转店长确认，拼多多店铺报价临时下架<br>结果：竞对雷达 修复 <span class="diff-add">¥99 → ¥129</span>，已恢复上架（回执 ${shortId("E-SEED-8908")}）</div>
     <div class="row" style="margin-top:8px"><button class="btn sm" data-flip="已恢复 ✓|恢复库存上架：拼多多报价 ¥129 已重新上架">恢复上架</button></div></div>
-   <div class="card tint-amber" style="border-color:rgba(255,170,51,.4)"><div class="ptitle" style="color:var(--amberdk)">超卖·同步失败防护 · R20</div>
-    <div style="font-size:12px;line-height:2;color:var(--ink2)">检出：收纳箱 ERP 库存同步失败，可售数存疑<br>
-    处置：收纳箱全平台临时下架（防超卖）<br>结果：对账Agent 重试同步成功，已自动上架（回执 ${shortId("E-SEED-8911")}）</div>
-    <div class="row" style="margin-top:8px"><button class="btn sm" data-flip="已同步 ✓|同步库存：收纳箱现货 860 件已回写全平台">手动重试同步</button></div></div></div>
-  <div class="card tint-blue"><div class="ptitle">连续调价事件流（白班 R1 / 夜班 R7，含前后值与依据）</div>
+   <div class="card tint-amber" style="border-color:rgba(255,170,51,.4)"><div class="ptitle" style="color:var(--amberdk)">断货预警 · R7</div>
+    <div style="font-size:12px;line-height:2;color:var(--ink2)">检出：磁吸充电宝 10000mAh 可售 5.2 天 < 7 天且补货在途为 0<br>
+    处置：需求预测师 触发断货预警 → 采购执行员 紧急补货 3 万台请示（¥126 万，R20 分级人审）<br>结果：待运营总监批准，东莞锂威电子交期 12 天</div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-flip="已催办 ✓|已催办采购审批：紧急补货 3 万台待批">催办审批</button></div></div></div>
+  <div class="card tint-blue"><div class="ptitle">连续调价事件流（白班 R1 / 夜班 R17，含前后值与依据）</div>
    <table class="dt"><tr><th>时间</th><th>动作</th><th>执行者</th><th>前 → 后</th><th>命中规则</th><th>依据</th></tr>
-   <tr><td class="mono">昨日 16:40</td><td>${actionText("调整价格")}</td><td>调价Agent</td><td>¥119 → <b class="diff-add">¥129</b></td><td><span class="tag ok">R1 自动放行</span></td><td>竞对同档 ¥139 · 组织记忆「3C 周末规律」</td></tr>
-   <tr><td class="mono">昨夜 23:12</td><td>${actionText("调整价格")}</td><td>调价Agent（夜班）</td><td>¥129 → <b class="diff-add">¥131</b></td><td><span class="tag ok">R7 微调上限内</span></td><td>夜班窗口微调 ≤2%</td></tr>
-   <tr><td class="mono">昨夜 02:05</td><td>${actionText("发布价格")}</td><td>竞对Agent</td><td>¥99 → <b class="diff-add">¥129</b></td><td><span class="tag warn">R18 硬阻断后修复</span></td><td>倒挂检出价差 23%</td></tr>
-   <tr><td class="mono">今晨 07:00</td><td>${actionText("同步库存")}</td><td>对账Agent</td><td>收纳箱 下架 → <b class="diff-add">上架</b></td><td><span class="tag amber">R20 复核通过</span></td><td>ERP 同步重试成功</td></tr></table></div>`,
+   <tr><td class="mono">昨日 16:40</td><td>${actionText("调整价格")}</td><td>天猫店长</td><td>¥129 → <b class="diff-add">¥139</b></td><td><span class="tag ok">R1 自动放行</span></td><td>单日降价 ≤10% 自动 · 竞对同档 ¥149</td></tr>
+   <tr><td class="mono">昨夜 23:12</td><td>${actionText("调整价格")}</td><td>天猫店长（夜班）</td><td>¥139 → <b class="diff-add">¥141</b></td><td><span class="tag ok">R17 微调上限内</span></td><td>夜班窗口微调 ≤3%（R17 自动上限）</td></tr>
+   <tr><td class="mono">昨夜 02:05</td><td>${actionText("发布价格")}</td><td>竞对雷达</td><td>¥99 → <b class="diff-add">¥129</b></td><td><span class="tag warn">R18 告警后修复</span></td><td>倒挂检出价差 23%</td></tr>
+   <tr><td class="mono">今晨 06:30</td><td>${actionText("发布价格")}</td><td>多币种结算师</td><td>US 站全线 → <b class="diff-add">+2.5%</b></td><td><span class="tag amber">R14 已批准</span></td><td>USD/CNY 单日波动 2.3% &gt; 2% 阈值</td></tr></table></div>`,
  `<div class="glabel">价格治理</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
-   毛利红线 <b>32%</b>（R2 硬阻断）<br>单日涨幅上限 <b>8%</b>（R1）<br>夜班微调上限 <b>2%</b>（R7）<br>倒挂/超卖看门狗 <b>每 15 分钟</b><hr style="border-color:var(--line);margin:8px 0">
+   毛利红线 <b>售价 ≥ 成本 ×1.15</b>（R2 硬阻断）<br>单日降价上限 <b>≤10%</b>（R1）<br>夜班微调上限 <b>≤3%</b>（R17）<br>倒挂看门狗 <b>每 15 分钟</b>（R18）<hr style="border-color:var(--line);margin:8px 0">
    <a class="holo-tag" href="#p5">规则原文 →/p5</a></div>`);
 
 /* ---- P13 订单穿透 ---- */
@@ -830,7 +834,7 @@ VIEWS.p13=()=>shell(navLeft("p13"),
     <div class="card hov panel tint-blue" onclick="document.querySelectorAll('.ordcard').forEach(c=>c.style.borderColor='');this.style.borderColor='var(--gold)';document.getElementById('trail-${o.id}').scrollIntoView({behavior:'smooth'})" style="${i===0?"border-color:var(--gline)":""}">
      <div class="row" style="justify-content:space-between"><b>${o.buyer}</b><span class="tag ${o.st==="已签收"?"ok":"holo"}">${o.st}</span></div>
      <div class="mono" style="margin-top:4px">订单 ${o.id} · ${o.product} · ${o.amount}</div></div>`).join("")}
-    <div class="note">订单状态再不用打电话问技术——每环含执行者（人/Agent）、耗时、围栏判定与依据。</div></div>
+    <div class="note">订单状态再不用打电话问技术——每环含执行者（人/数字员工）、耗时、围栏判定与依据。</div></div>
    <div class="flow">${D.orders.map(o=>`
     <div id="trail-${o.id}" class="ordcard" style="border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px">
      <div class="row" style="justify-content:space-between;margin-bottom:8px"><b>${o.id} · ${o.buyer}</b><span class="mono">${o.amount}</span></div>
@@ -839,10 +843,10 @@ VIEWS.p13=()=>shell(navLeft("p13"),
       <div style="font-size:11px;color:var(--ink3);margin-top:2px">执行者：${s[1]} · 围栏：${s[3]==="—"?"—":`<span class="tag ok" style="font-size:10px">${s[3]}</span>`}</div>
       <div style="font-size:12px;color:var(--ink2);margin-top:2px">${s[4]}</div></div></div>`).join("")}
     </div>`).join("")}</div></div>`,
- `<div class="glabel">订单穿透 · TRAIL</div>
+ `<div class="glabel">订单穿透 · 全链</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    数据源：确认订单 / 订单对账 / 订单退款 事件 + 单订单正序回放<hr style="border-color:var(--line);margin:8px 0">
-   异常环节一眼定位：<br>· 催发货工单 ${shortId("···001")} 挂订单 OD-20260824-7781 出库环<br>· 大额退款进 R5 必审（${shortId("···9064")}）</div>`);
+   异常环节一眼定位：<br>· 催发货工单 ${shortId("···001")} 挂订单 OD-20260824-7781 出库环<br>· ACoS 保险丝降预算进 R3 请示（${shortId("···9064")}）</div>`);
 
 /* ---- P14 渠道运营 ---- */
 VIEWS.p14=()=>shell(navLeft("p14"),
@@ -850,18 +854,18 @@ VIEWS.p14=()=>shell(navLeft("p14"),
   <div class="grid3 panel tint-blue" style="padding:10px">${D.channels.map(c=>`
    <div class="card" style="${c.parity===false?"border-color:rgba(255,77,109,.45)":""}">
     <div class="row" style="justify-content:space-between"><b>${c.name}</b><span class="tag ${c.parity===false?"warn":"ok"}">${c.parity===false?"倒挂":c.parity?"平价":"内容渠道"}</span></div>
-    <div class="mono" style="margin-top:4px">${c.kind}${c.isNew?" · 新渠道（R3/R15 首发必审）":""}</div>
+    <div class="mono" style="margin-top:4px">${c.kind}${c.isNew?" · 新渠道（R8 新店/新平台首发必审）":""}</div>
     <div style="font-size:20px;font-weight:800;color:${c.parity===false?"var(--warn)":"var(--goldhi)"};margin-top:6px">${c.price?`¥${c.price}`:"—"}</div>
     <div style="font-size:11px;color:var(--ink3)">${c.price?"65W 快充头 · 今日卖价":"不上价 · 内容/直播/跨境引流"}</div>
     <div class="row" style="margin-top:8px"><span class="tag ok">${dictText(COMMON_STATUS_TEXT,c.status)}</span>
     ${c.parity===false?'<button class="btn warn sm" style="margin-left:auto" data-flip="已修复 ✓|修复平台倒挂：拼多多 ¥99 → ¥129 已回写">修复倒挂</button>':""}</div></div>`).join("")}</div>
   <div class="card"><div class="ptitle">内容营销事件流</div>
    <table class="dt"><tr><th>时间</th><th>事件</th><th>渠道</th><th>状态</th><th>规则</th></tr>
-   <tr><td class="mono">今日 06:00</td><td>抖音店铺新客首图发布（线程 线程 103）</td><td>抖音</td><td><span class="tag holo">${dictText(COMMON_STATUS_TEXT,"scheduled")}</span></td><td><span class="tag amber">R15 已审</span></td></tr>
+   <tr><td class="mono">今日 06:00</td><td>独立站 Q4 新品刊登（线程 线程 103）</td><td>独立站</td><td><span class="tag holo">${dictText(COMMON_STATUS_TEXT,"scheduled")}</span></td><td><span class="tag amber">R8 已审</span></td></tr>
    <tr><td class="mono">昨日 19:30</td><td>「秋日收纳好物·折叠收纳箱开箱」笔记</td><td>小红书</td><td><span class="tag ok">${dictText(COMMON_STATUS_TEXT,"published")}</span></td><td><span class="tag ok">自动放行</span></td></tr>
    <tr><td class="mono">昨日 12:00</td><td>竞对卡刷新：倍思 / 绿联 / 品胜</td><td>—</td><td><span class="tag ok">已完成</span></td><td><span class="tag ok">只读</span></td></tr>
-   <tr><td class="mono">周一 10:00</td><td>抖音直播首播（排期双11 档）</td><td>抖音</td><td><span class="tag amber">${dictText(COMMON_STATUS_TEXT,"pending_approval")}</span></td><td><span class="tag amber">R15 首发必审</span></td></tr></table></div>`,
- `<div class="glabel">渠道治理 · OPS</div>
+   <tr><td class="mono">周一 10:00</td><td>抖音直播首播（排期黑五档）</td><td>抖音</td><td><span class="tag amber">${dictText(COMMON_STATUS_TEXT,"pending_approval")}</span></td><td><span class="tag amber">R21 直播涉费承诺必审</span></td></tr></table></div>`,
+ `<div class="glabel">渠道治理 · 运营</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    平台扣点：天猫 5% · 京东 8% · 拼多多 3% · 抖音 5%<br>倒挂/超卖处置 →/p11<br>活动与图评整改由 platform-operations 产出<hr style="border-color:var(--line);margin:8px 0">
    巡检节拍：<b>10:00 / 15:00 / 20:00</b></div>`);
@@ -869,7 +873,7 @@ VIEWS.p14=()=>shell(navLeft("p14"),
 /* ---- P15 口碑与差评 ---- */
 VIEWS.p15=()=>shell(navLeft("p15"),
  `${pageHead("/p15","口碑与差评 · 防线前移","差评防御窗口前移到物流在途与签收 48h；处置案例沉淀组织记忆")}
-  <div class="grid4 panel tint-blue" style="padding:10px">${stat(2,"在途差评")}${stat("26h","最长未回复（SLA 24h）")}${stat(1,"已升级店主")}${stat("96%","30 天回复率")}</div>
+  <div class="grid4 panel tint-blue" style="padding:10px">${stat(2,"在途差评")}${stat("1.8h","最长未回复（SLA 2h）")}${stat(1,"已升级店长")}${stat("96%","30 天回复率")}</div>
   <div class="card panel tint-amber"><div class="ptitle">差评 SLA · 处置留痕</div>
    ${D.reviews.map(r=>`
    <div class="card" style="margin-bottom:8px;${r.score<=2?"border-color:rgba(255,77,109,.45)":""}">
@@ -879,12 +883,12 @@ VIEWS.p15=()=>shell(navLeft("p15"),
     <div class="mono" style="margin-top:4px">已 ${r.age} · ${r.rule}</div>
     ${r.score<=2?`<div class="row" style="margin-top:8px"><button class="btn g sm" onclick="location.hash='p2'">看处置线程（/p2）</button><button class="btn warn sm" data-flip="已升级 ✓|告警升级：已通知店主并计入 SLA 看板">升级店主</button></div>`:""}</div>`).join("")}</div>
   <div class="card"><div class="ptitle">好评挖矿 · 反哺素材库</div>
-   <div style="font-size:12px;color:var(--ink2);line-height:2">「客服响应很快，发了安装视频一步步教」→ 已提取卖点「视频安装指导/响应快」进内容素材库，供内容Agent 复用（好评素材入库事件 ${shortId("E-SEED-8862")}）。</div>
-   ${hbar("响应时效达标",75,"18h / 24h")}${hbar("差评闭环率",88,"22 / 25")}${hbar("好评素材转化",44,"11 条入库","c")}</div>`,
- `<div class="glabel">口碑防线 · REVIEW</div>
+   <div style="font-size:12px;color:var(--ink2);line-height:2">「客服响应很快，发了安装视频一步步教」→ 已提取卖点「视频安装指导/响应快」进内容素材库，供刊登工厂长 复用（好评素材入库事件 ${shortId("E-SEED-8862")}）。</div>
+   ${hbar("响应时效达标",90,"1.8h / 2h")}${hbar("差评闭环率",88,"22 / 25")}${hbar("好评素材转化",44,"11 条入库","c")}</div>`,
+ `<div class="glabel">口碑防线 · 评价</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
-   SOP：差评 24h 内响应<br>结构：致歉→核实→措施→承诺<br>边界：不承诺档案外补偿<hr style="border-color:var(--line);margin:8px 0">
-   <span class="tag amber">R6 差评必审</span> <span class="tag amber">R19 SLA 升级</span></div>`);
+   SOP：差评 2h 内响应<br>结构：致歉→核实→措施→承诺<br>边界：不承诺档案外补偿<hr style="border-color:var(--line);margin:8px 0">
+   <span class="tag amber">R9 差评 2 小时 SLA</span> <span class="tag amber">R28 涉缺陷承认必审</span></div>`);
 
 /* ---- P16 语音前台 ---- */
 VIEWS.p16=()=>shell(navLeft("p16"),
@@ -902,8 +906,8 @@ VIEWS.p16=()=>shell(navLeft("p16"),
    <div class="row" style="flex-wrap:wrap;gap:10px">
     <div class="card" style="flex:1;min-width:150px"><b>一级 · AI 应答</b><div style="font-size:11px;color:var(--ink3);margin-top:4px">知识库高置信直接答（${confidenceText(0.95)}）</div></div>
     <div class="card" style="flex:1;min-width:150px"><b>二级 · 人工客服席</b><div style="font-size:11px;color:var(--ink3);margin-top:4px">低置信/投诉/售后 → 转人工客服席（带上下文摘要）</div></div>
-    <div class="card" style="flex:1;min-width:150px"><b>三级 · 客服主管</b><div style="font-size:11px;color:var(--ink3);margin-top:4px">安全/大额/媒体曝光 → 客服主管 王店主（R10/R16 禁区不接管）</div></div></div></div>`,
- `<div class="glabel">语音客服 · PHONE</div>
+    <div class="card" style="flex:1;min-width:150px"><b>三级 · 客服主管</b><div style="font-size:11px;color:var(--ink3);margin-top:4px">安全/大额/媒体曝光 → 客服主管 运营总监（R23 安全禁区不接管）</div></div></div></div>`,
+ `<div class="glabel">多语种客服 · 在线</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    跨境店旗舰卖点：<b>把夜晚还给店主</b><br>夜班 AI 托管应答，高危承诺一律人审<hr style="border-color:var(--line);margin:8px 0">
    FAQ 萃取触发器：${cronText("0 3 * * 0")} · 动作 ${actionText("跨境客服应答")}</div>`);
@@ -918,12 +922,12 @@ VIEWS.p17=()=>shell(navLeft("p17"),
     <td><span class="tag ${r[2]==="出库中"?"holo":r[2]==="待出库"?"amber":r[2]==="质检中"?"warn":"ok"}">${r[2]}</span></td><td>${r[3]}</td>
     <td>${r[2]==="待出库"?'<button class="btn sm" data-flip="已出库 ✓|智能波次：拣货路径已优化，面单待打印">优先出库</button>':r[2]==="质检中"?'<button class="btn sm" data-flip="已质检 ✓|出库质检：外观/数量/配件/包装/面单 五项通过">出库质检</button>':'<span class="mono">—</span>'}</td></tr>`).join("")}</table>
    <div class="note" style="margin-top:10px">出库 SOP：加急单 &gt; 当日截单 &gt; 跨境集货 &gt; 常规单；16:00 截单当日发。</div></div>
-  <div class="card"><div class="ptitle">库存四态与损耗（基线损耗率 3% · R20 超 1.5 倍必审）</div>
+  <div class="card"><div class="ptitle">库存四态与周转（周转 >60 天触发清仓请示 · R6）</div>
    <table class="dt"><tr><th>SKU</th><th>在库</th><th>在途/锁定</th><th>本月损耗</th><th>损耗率</th><th>判定</th></tr>
    ${D.wh.stock.map(l=>{const rate=l[3]/l[1];const bad=rate>0.03*1.5;return `<tr><td>${l[0]}</td><td>${l[1]}</td><td>${l[2]}</td><td>${l[3]}</td><td>${(rate*100).toFixed(1)}%</td>
     <td>${bad?'<span class="tag warn">超基线 · 已必审</span>':'<span class="tag ok">正常</span>'}</td></tr>`}).join("")}</table>
    <div style="font-size:11px;color:var(--ink3);margin-top:8px">供应商：东莞锂威电子 · 义乌恒洁家居 · 交付容差 2% · 损耗异常已生成复核单（${shortId("···9102")}）</div></div>`,
- `<div class="glabel">仓储发货 · OPS</div>
+ `<div class="glabel">仓储发货 · 运营</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    店主从检查者变教练：质检画像回流波次权重<hr style="border-color:var(--line);margin:8px 0">
    班次：早班 08:00-16:00<br>中班 16:00-24:00<br>夜班 00:00-08:00<hr style="border-color:var(--line);margin:8px 0">
@@ -931,7 +935,7 @@ VIEWS.p17=()=>shell(navLeft("p17"),
 
 /* ---- P18 多店驾驶舱 ---- */
 VIEWS.p18=()=>shell(navLeft("p18"),
- `${pageHead("/p18","多店驾驶舱 · 一屏管多店","shop-cockpit：管理半径 3 → 5–8 个店铺（同租户各工作区 RLS 轮询）")}
+ `${pageHead("/p18","多店驾驶舱 · 一屏管多店","多店驾驶舱：管理半径 3 → 5–8 个店铺（同租户各工作区 RLS 轮询）")}
   <div class="card panel tint-blue"><table class="dt"><tr><th>店铺</th><th>在售 SKU</th><th>目标达成</th><th>客单价</th><th>日 GMV</th><th>昨夜班组</th><th>夜班包</th></tr>
    ${D.stores.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.skus}</td>
     <td><b style="color:${s.goal>=0.8?"var(--go)":s.goal>=0.75?"var(--goldhi)":"var(--amber)"}">${Math.round(s.goal*100)}%</b></td>
@@ -939,13 +943,13 @@ VIEWS.p18=()=>shell(navLeft("p18"),
     <td>${s.night.done} 完成 / ${s.night.pending} 待审 / ${s.night.escalate} 升级</td>
     <td><span class="tag ok">每天 08:30 已送达</span></td></tr>`).join("")}</table></div>
   <div class="card panel"><div class="ptitle">日 GMV 横向对比</div>
-   ${D.stores.map(s=>hbar(s.name,Math.round(s.gmv/45000*100),`¥${s.gmv.toLocaleString()}`)).join("")}</div>
-  <div class="row"><button class="btn g" data-toast="接入新店向导：复制店铺档案模板 → 围栏基线 v3 继承 → 夜班班组自动编排">＋ 接入第 4 个店铺</button>
+   ${D.stores.map(s=>hbar(s.name,Math.round(s.gmv/1000000*100),`¥${s.gmv.toLocaleString()}`)).join("")}</div>
+  <div class="row"><button class="btn g" data-toast="接入新店向导：复制店铺档案模板 → 围栏基线 v1 继承 → 夜班班组自动编排（R8 新店首发必审）">＋ 接入第 15 个店铺</button>
   <button class="btn" onclick="location.hash='p20'">看旗舰店店铺档案（/p20）</button></div>`,
  `<div class="glabel">驾驶舱口径</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    数据源：store.daily.summary + 夜班包投递事件<hr style="border-color:var(--line);margin:8px 0">
-   <span style="color:var(--ink3)">shop-cockpit 为只读 preset（无写工具），数据逐工作区 RLS 隔离。</span></div>`);
+   <span style="color:var(--ink3)">多店驾驶舱 为只读 preset（无写工具），数据逐工作区 RLS 隔离。</span></div>`);
 
 /* ---- P19 收益分析 ---- */
 VIEWS.p19=()=>shell(navLeft("p19"),
@@ -953,46 +957,46 @@ VIEWS.p19=()=>shell(navLeft("p19"),
   <div class="row panel" style="flex-wrap:wrap">
    ${[["channel_revenue","本月各平台收入与订单量"],["gmv_trend","近 3 月 GMV/转化率/客单价走势"],["price_attribution","调价动作与依据归因"]].map((q,i)=>`
    <button class="kbd-chip" style="${i===0?"border-color:var(--gold);color:var(--gold)":""}" onclick="document.querySelectorAll('.rpt').forEach((r,j)=>r.style.display=j===${i}?'block':'none')">${q[1]}</button>`).join("")}</div>
-  <div class="card rpt tint-blue"><div class="ptitle">本月各平台收入与订单量（8 月 · 目标 ¥108,000）</div>
+  <div class="card rpt tint-blue"><div class="ptitle">本月各平台收入与订单量（8 月 · 月 GMV ¥9.2 亿 · 日均 9.6 万单）</div>
    <table class="dt"><tr><th>平台</th><th>收入</th><th>占比</th><th>订单量</th></tr>
    ${D.reports.channel_revenue.map(r=>`<tr><td>${r[0]}</td><td><b style="color:var(--goldhi)">${r[1]}</b></td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</table>
    ${D.reports.channel_revenue.map(r=>hbar(r[0],parseInt(r[2]),r[1])).join("")}</div>
-  <div class="card rpt tint-blue" style="display:none"><div class="ptitle">近 3 月 GMV / 转化率 / 客单价走势</div>
-   <table class="dt"><tr><th>月份</th><th>GMV</th><th>转化率</th><th>客单价</th></tr>
-   ${D.reports.goal_trend.map(r=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><b style="color:var(--goldhi)">${r[3]}</b></td></tr>`).join("")}</table></div>
+  <div class="card rpt tint-blue" style="display:none"><div class="ptitle">近 3 月 GMV / 毛利率 / ACoS 走势</div>
+   <table class="dt"><tr><th>月份</th><th>GMV</th><th>毛利率</th><th>ACoS</th></tr>
+   ${D.reports.gmv_trend.map(r=>`<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><b style="color:var(--goldhi)">${r[3]}</b></td></tr>`).join("")}</table></div>
   <div class="card rpt tint-blue" style="display:none"><div class="ptitle">调价动作与依据归因</div>
    <table class="dt"><tr><th>执行者</th><th>动作</th><th>依据</th><th>结果</th></tr>
    ${D.reports.price_attribution.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><b style="color:var(--go)">${r[3]}</b></td></tr>`).join("")}</table></div>`,
- `<div class="glabel">经营分析 · BI</div>
+ `<div class="glabel">经营分析 · 报表</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    数据已在事件库，报表是提问的即时答案<hr style="border-color:var(--line);margin:8px 0">
-   年度目标：月 GMV ¥120 万 · 转化率 3.5% · 客单价 ¥105 · 差评率 ≤2% · 复购率 28%</div>`);
+   年度目标：月 GMV ¥10 亿 · 毛利率 ≥15% · ACoS ≤0.24 · 差评 2h 闭环 100% · 复购率 28%</div>`);
 
 /* ---- P20 门店档案 ---- */
 VIEWS.p20=()=>shell(navLeft("p20"),
- `${pageHead("/p20","店铺档案全景 · 全景档案","Agent 生成内容前必读三要素之一；forbidden 硬约束独立成列")}
+ `${pageHead("/p20","店铺档案全景 · 全景档案","数字员工生成内容前必读三要素之一；forbidden 硬约束独立成列")}
   <div class="grid2">
    <div class="card tint-blue"><div class="ptitle">基础类</div>
     <table class="dt">
-     <tr><th style="width:90px">店铺</th><td>熊猫优选集团 · 杭州 · 14 店铺 · 产业带卖家 · 示例ERP</td></tr>
+     <tr><th style="width:90px">店铺</th><td>熊猫优选集团 · 杭州 · 14 店铺 · 13 平台+独立站 · 8,600 SKU · 日均 9.6 万单</td></tr>
      <tr><th>品牌口径</th><td>真诚克制，不夸大、不承诺档案外补偿；禁用词「最低价全网保证」「百分百满意」</td></tr>
      <tr><th>图片规则</th><td>首图实拍、无水印、1:1 白底</td></tr></table>
     <div class="ptitle" style="margin-top:12px">治理类</div>
     <table class="dt">
-     <tr><th style="width:90px">SOP</th><td>差评 2h 内响应 / 调价须附竞对依据 / 夜间对账三轮比对</td></tr>
-     <tr><th>硬约束</th><td><span class="tag warn">高危承诺禁止</span> <span class="tag warn">安全事件禁区</span> <span class="tag warn">夜班高危禁区</span></td></tr>
-     <tr><th>审批矩阵</th><td>退款 &gt;¥1,000 必审 · 采购 &gt;¥5,000 必审 · 补偿 &gt;¥500 必审 · 夜班高危阻断</td></tr>
-     <tr><th>赔偿政策</th><td>goodwill 补偿上限 ¥500 · 退款走对账Agent 通道</td></tr></table></div>
+     <tr><th style="width:90px">SOP</th><td>差评 2h 内响应（R9）/ 调价须附竞对依据 / 夜间对账三轮比对</td></tr>
+     <tr><th>硬约束</th><td><span class="tag warn">违规动作阻断 R11</span> <span class="tag warn">安全禁区熔断 R23</span> <span class="tag warn">侵权词图上新阻断 R24</span></td></tr>
+     <tr><th>审批矩阵</th><td>退款 ≥¥1,000 / ≥$200 必审（R5）· 大额采购分级人审（R20）· 补偿 ≥¥500 必审（R10）· 高危审批超时升级（R30）</td></tr>
+     <tr><th>赔偿政策</th><td>goodwill 补偿上限 ¥500 · 退款走多平台对账师 通道</td></tr></table></div>
    <div class="card tint-blue"><div class="ptitle">业务类</div>
     <table class="dt">
-     <tr><th style="width:90px">毛利红线</th><td>32%；价格带：3C 配件 29–199 / 家居收纳 39–299 / 设计家居 199–1,299</td></tr>
+     <tr><th style="width:90px">毛利红线</th><td>售价 ≥ 货品成本 ×1.15（R2 同源）；价格带：3C 配件 29–199 / 家居收纳 39–299 / 设计家居 199–1,299</td></tr>
      <tr><th>平台扣点</th><td>天猫 5% · 京东 8% · 拼多多 3% · 抖音 5% · 亚马逊 15%</td></tr>
      <tr><th>竞对</th><td>倍思（39–299）· 绿联（29–259）· 品胜（25–199）</td></tr>
      <tr><th>客群</th><td>3C 数码 45% · 家居收纳 35% · 跨境买家 20%</td></tr>
-     <tr><th>历史曲线</th><td>06 月 ¥89,200/2.9% → 07 月 ¥102,500/3.2% → 08 月 ¥108,000/3.4%</td></tr>
-     <tr><th>年度目标</th><td>年 GMV ¥14,400,000 · 月 GMV ¥120 万 · 转化率 3.5%</td></tr></table>
+     <tr><th>历史曲线</th><td>06 月 ¥7.9 亿/13.9% → 07 月 ¥8.6 亿/14.4% → 08 月 ¥9.2 亿/14.8%（毛利率）</td></tr>
+     <tr><th>年度目标</th><td>月 GMV ¥10 亿 · 毛利率 ≥15% · ACoS ≤0.24 · 黑五网一跨时区作战</td></tr></table>
     <div class="ptitle" style="margin-top:12px">记忆类</div>
-    <div style="font-size:12px;color:var(--ink2);line-height:2">「3C 周末规律」：3C 配件周末转化率高，周六 10:00 前提价 5% 转化损失最小<br>「差评回复 SOP」：致歉→核实→措施→承诺</div></div></div>
+    <div style="font-size:12px;color:var(--ink2);line-height:2">「黑五跨时区作战」：欧美白天 = 北京 22:00–08:00，夜班班组主场，跨境店订单 ×4 脉冲<br>「差评回复 SOP」：致歉→核实→措施→承诺</div></div></div>
   <div class="card"><div class="ptitle">运营类</div>
    <table class="dt">
     <tr><th style="width:110px">班次/夜窗</th><td>三班倒 · 夜窗 22:00–08:00 · 日报 08:30 · 巡检 10:00/15:00/20:00</td></tr>
@@ -1001,10 +1005,10 @@ VIEWS.p20=()=>shell(navLeft("p20"),
     <tr><th>库存</th><td>快充头 1,200 · 收纳箱 1,280 · 数据线 2,300 · 基线损耗 3%</td></tr>
     <tr><th>断点预案</th><td>平台 API 限流降级 / ERP 断连人工接管；三级应急联系人</td></tr>
     <tr><th>FAQ 库</th><td>退货 / 发货 / 价保 三大高频已确认（8 大类 48 问）</td></tr></table></div>`,
- `<div class="glabel">档案 · ARCHIVE</div>
+ `<div class="glabel">档案 · 全景</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2)">
    数据模式：<b style="color:var(--amberdk)">模拟数据</b>（落地向导接入真实平台店铺后切换）<hr style="border-color:var(--line);margin:8px 0">
-   价格日历：未来 90 天 · 双11（2026-11-11）提前 14 天策略审批</div>`);
+   大促日历：黑五网一（2026-11-27）T1 级 · 跨时区作战，夜班班组主场</div>`);
 
 /* ---- P21 董事长视图 ---- */
 VIEWS.p21=()=>shell(navLeft("p21"),
@@ -1013,16 +1017,16 @@ VIEWS.p21=()=>shell(navLeft("p21"),
    <div class="card tint-mint"><div class="ptitle">治理状态 · 授权宪章 v1</div>
     <div class="row" style="flex-wrap:wrap;gap:6px"><span class="tag amber">模式：试用期（第 2 天 / 共 7 天）</span><span class="tag ok">熔断：未触发</span><span class="tag">披露 risk-v1 已签署</span></div>
     <div style="font-size:12px;color:var(--ink2);line-height:2;margin-top:8px">
-     自治区间：调价带 85%–115% · 广告日预算上限 ¥5,000 · 优惠让利上限 ¥2,000<br>
-     必升级：保底价变更 / 单月让利超限 / 围栏放宽 / 新渠道上线 / 对外承诺 / 宪章变更<br>
-     授予：MEM-001 王店主 · 签署事件 ${shortId("E-SEED-GRANT01")} · 影子期 3 天已满</div>
-    <div class="row" style="margin-top:8px"><button class="btn warn sm" data-toast="一键撤回：公司CEO 已降级为「仅汇报」，全部自治动作冻结并留痕">⛔ 一键撤回授权</button></div></div>
-   <div class="card"><div class="ptitle">简报流 · ${actionText("CEO 晨报")}（每天 08:30）</div>
+     自治区间：单日降价 ≤10% 自动（R1）· 夜班微调 ≤3% 自动（R17）· 广告日预算上调 >30% 必审（R4）<br>
+     必升级：毛利红线变更 / 大额采购（R20）/ 围栏放宽 / 新店首发（R8）/ 对外承诺赔偿（R10）/ 宪章变更<br>
+     授予：MEM-001 董事长（创始人） · 签署事件 ${shortId("E-SEED-GRANT01")} · 影子期 3 天已满</div>
+    <div class="row" style="margin-top:8px"><button class="btn warn sm" data-toast="一键撤回：数字CEO 已降级为「仅汇报」，全部自治动作冻结并留痕">⛔ 一键撤回授权</button></div></div>
+   <div class="card"><div class="ptitle">简报流 · 数字CEO 晨报（每天 08:30）</div>
     <div class="bubble" style="max-width:none">${D.briefing}</div>
-    <div class="mono" style="margin-top:6px">事件 ${shortId("E-SEED-8999")} · 依据：CEO Loop 日频晨报 · 模型 mock-ecom-001</div></div></div>
+    <div class="mono" style="margin-top:6px">事件 ${shortId("E-SEED-8999")} · 依据：数字CEO 日频晨报 · 模型 mock-ecom-001</div></div></div>
   <div class="grid3 panel">
    <div class="card tint-amber"><div class="ptitle">待审分层</div>
-    ${hbar("L2 公司CEO级",30,"1 件（已批准）")}${hbar("L3 集团CEO级",60,"1 件")}${hbar("L4 董事长级",90,"1 件","c")}
+    ${hbar("L2 店长级",30,"1 件（已批准）")}${hbar("L4 数字CEO级",60,"1 件")}${hbar("L5 董事长级",90,"1 件","c")}
     <button class="btn g sm" style="margin-top:6px" onclick="location.hash='p4'">去审批中心（/p4）</button></div>
    <div class="card tint-blue"><div class="ptitle">成绩单 · 试用期</div>
     ${hbar("审批采纳率",86,"31 / 36")}${hbar("边界守规率",100,"0 越线")}${hbar("晨报准点率",100,"9 / 9","c")}</div>
@@ -1046,34 +1050,34 @@ const P22_DOCS=[
  ["买家服务目录","手工录入",1,4,"cat"],["配送与增值服务目录","手工录入",1,5,"cat"]];
 /* 工单 ×8（含 SLA 超时样例 ···007；状态经 TICKET_STATUS_TEXT 中文化） */
 const P22_TK=[
- {id:"···001",st:"处理中",kind:"催发货",pri:"加急",title:"订单 OD-20260824-7781 超 48 小时未发货",dept:"售后组",who:"阿May",sla:"今天 14:00",overdue:false,tl:[["创建工单","买家 · 买家小李","发订单截图对话中建单（截图识别）"],["分派工单","AI 员工 · 服务台Agent","智能分派 → 售后组"],["推进工单","员工 · 阿May","已联系仓库，承诺今日 16:00 前出库"]]},
- {id:"···002",st:"已分派",kind:"退换货",pri:"",title:"收纳箱换 80L 加大号",dept:"售后组",who:"",sla:"今天 14:00",overdue:false,tl:[["创建工单","买家 · 张伟","服务台自助提交"],["分派工单","AI 员工 · 服务台Agent","智能分派 → 售后组"]]},
+ {id:"···001",st:"处理中",kind:"催发货",pri:"加急",title:"订单 OD-20260824-7781 超 48 小时未发货",dept:"售后组",who:"阿梅",sla:"今天 14:00",overdue:false,tl:[["创建工单","买家 · 买家小李","发订单截图对话中建单（截图识别）"],["分派工单","AI 员工 · 服务台员工","智能分派 → 售后组"],["推进工单","员工 · 阿梅","已联系仓库，承诺今日 16:00 前出库"]]},
+ {id:"···002",st:"已分派",kind:"退换货",pri:"",title:"收纳箱换 80L 加大号",dept:"售后组",who:"",sla:"今天 14:00",overdue:false,tl:[["创建工单","买家 · 张伟","服务台自助提交"],["分派工单","AI 员工 · 服务台员工","智能分派 → 售后组"]]},
  {id:"···003",st:"已完成",kind:"投诉纠纷",pri:"加急",title:"物流超时 5 天未更新",dept:"客服专家组",who:"刘经理",sla:"—",overdue:false,rate:5,tl:[["创建工单","买家 · 买家小李","投诉类必建单"],["办结工单","员工 · 刘经理","已补发并赔付 10 元券致歉"],["工单满意度评价","买家 · 买家小李","满意度 5 星"]]},
- {id:"···004",st:"已完成",kind:"价保申请",pri:"",title:"快充头 7 天内降价 ¥10 补差",dept:"客服专家组",who:"价保专员-阿May",sla:"—",overdue:false,rate:5,tl:[["创建工单","买家 · 王总","价保自助申请转人工复核"],["办结工单","员工 · 价保专员-阿May","差价已原路退回"]]},
- {id:"···005",st:"处理中",kind:"保修换新",pri:"加急",title:"充电头无法充电，申请换新",dept:"售后组",who:"阿May",sla:"今天 13:30",overdue:false,tl:[["创建工单","买家 · Mr. Smith","发故障视频建单（视频诊断）"],["推进工单","员工 · 阿May","检测确认非人为，安排免费换新"]]},
- {id:"···006",st:"已分派",kind:"补发",pri:"",title:"少发 1 个收纳箱，申请补发",dept:"售后组",who:"",sla:"今天 15:00",overdue:false,tl:[["创建工单","买家 · 李女士","服务台自助提交"],["分派工单","AI 员工 · 服务台Agent","智能分派 → 售后组"]]},
+ {id:"···004",st:"已完成",kind:"价保申请",pri:"",title:"快充头 7 天内降价 ¥10 补差",dept:"客服专家组",who:"价保专员-阿梅",sla:"—",overdue:false,rate:5,tl:[["创建工单","买家 · 王总","价保自助申请转人工复核"],["办结工单","员工 · 价保专员-阿梅","差价已原路退回"]]},
+ {id:"···005",st:"处理中",kind:"保修换新",pri:"加急",title:"充电头无法充电，申请换新",dept:"售后组",who:"阿梅",sla:"今天 13:30",overdue:false,tl:[["创建工单","买家 · 史密斯先生","发故障视频建单（视频诊断）"],["推进工单","员工 · 阿梅","检测确认非人为，安排免费换新"]]},
+ {id:"···006",st:"已分派",kind:"补发",pri:"",title:"少发 1 个收纳箱，申请补发",dept:"售后组",who:"",sla:"今天 15:00",overdue:false,tl:[["创建工单","买家 · 李女士","服务台自助提交"],["分派工单","AI 员工 · 服务台员工","智能分派 → 售后组"]]},
  {id:"···007",st:"已受理",kind:"发票",pri:"",title:"增值税专票红冲重开（抬头错误）",dept:"",who:"",sla:"已超时",overdue:true,tl:[["创建工单","买家 · 张先生","支付宝小程序提交"],["工单超时升级","系统","受理超时已升级为加急，客服主管介入督办"]]},
- {id:"···008",st:"已完成",kind:"跨境纠纷",pri:"加急",title:"跨境包裹清关延误 12 天，申请全额退款",dept:"跨境客服组",who:"Luna",sla:"—",overdue:false,rate:5,tl:[["创建工单","买家 · 王总","命中升级关键词转人工（R12）"],["办结工单","员工 · Luna","全额退款 + 复购券 ¥50"]]}];
+ {id:"···008",st:"已完成",kind:"跨境纠纷",pri:"加急",title:"跨境包裹清关延误 12 天，申请全额退款",dept:"跨境客服组",who:"Luna",sla:"—",overdue:false,rate:5,tl:[["创建工单","买家 · 王总","命中升级关键词转人工（R12）"],["办结工单","员工 · 林娜","全额退款 + 复购券 ¥50"]]}];
 /* 今日会话 ×6（多客群：金卡/白金/游客/外籍） */
 const P22_CONV=[
  ["张伟","金卡 M-GOLD-10086","微信小程序","发订单截图催发货 → 截图识别关联订单","多模态·截图","95%"],
  ["买家小李","游客","H5","收纳箱换 80L 加大号 → 退换工单","服务请求","91%"],
  ["李女士","金卡 M-GOLD-31520","微信小程序","发商品图片问加大号 → 图片找货商品卡","多模态·图片","96%"],
  ["王总","黑卡 M-BLACK-20888","微信小程序","价保申请：快充头降价 ¥10 → 秒级补差","业务查询","93%"],
- ["Mr. Smith","跨境买家","H5","发安装视频问第三步 → 视频诊断分步指导","多模态·视频","90%"],
- ["田中さん","跨境买家（日语）","H5","日语咨询：関税はかかりますか → DDP 应答","多语言","92%"]];
+ ["史密斯先生","跨境买家","H5","发安装视频问第三步 → 视频诊断分步指导","多模态·视频","90%"],
+ ["田中先生","跨境买家（日语）","H5","日语咨询：関税はかかりますか → DDP 应答","多语言","92%"]];
 /* 通知 ×8（模拟通道 · 已送达投影） */
 const P22_NOTIF=[
- ["···001","买家小李","催发货工单「订单超 48 小时未发货」已受理，售后组阿May处理中"],
+ ["···001","买家小李","催发货工单「订单超 48 小时未发货」已受理，售后组阿梅处理中"],
  ["···002","买家小李","投诉工单「物流超时 5 天未更新」已办结：已补发并赔付 10 元券"],
  ["···003","张伟","退换工单「收纳箱换 80L 加大号」已受理，售后组将尽快审核"],
  ["···004","王总","价保工单「快充头降价 ¥10」已办结：差价已原路退回"],
- ["···005","Mr. Smith","保修工单「充电头无法充电」已受理（加急），售后组阿May处理中"],
+ ["···005","史密斯先生","保修工单「充电头无法充电」已受理（加急），售后组阿梅处理中"],
  ["···006","李女士","补发工单「少发 1 个收纳箱」已受理，售后组将尽快补发"],
  ["···007","张先生","发票工单「专票红冲重开」受理超时已升级加急，客服主管介入督办"],
  ["···008","王总","跨境退款已完成，全额退款 + 复购券 ¥50 已发放"]];
 VIEWS.p22=()=>shell(
- `<div class="glabel">买家服务前台 · SERVICE DESK</div>
+ `<div class="glabel">买家服务前台 · 服务台</div>
   ${[["kb","▤ 知识中台","集合 3 · 文档 13 · 待审 1"],["tk","▦ 工单台","在列 8 · SLA 超时 1"],["st","▥ 服务报表","会话 6 · 问答 8"]].map(t=>`
   <a href="javascript:void 0" class="card hov" id="p22nav-${t[0]}" style="display:block;margin-bottom:6px;padding:8px 12px;${t[0]==="kb"?"border-color:var(--gline);color:var(--gold)":""}" onclick="p22tab('${t[0]}')">
    <span style="font-size:12px">${t[1]}</span><div class="mono" style="margin-top:2px">${t[2]}</div></a>`).join("")}
@@ -1143,7 +1147,7 @@ VIEWS.p22=()=>shell(
      <span style="color:var(--go)">· 有据率 100% 达标——回答基本带知识引用，不臆造。</span><br>
      <span style="color:var(--warn)">· SLA 超时 1 单——请到工单台优先处理超时工单（···007 已升级加急，客服主管介入督办）。</span><br>
      · 今日工单 8 单，完结率 38%，满意度均分 5。<br>· 平均首答延迟 25ms（会话消息投影）。</div></div></div>`,
- `<div class="glabel">数据口径 · GOVERNANCE</div>
+ `<div class="glabel">数据口径 · 治理</div>
   <div class="card" style="font-size:12px;line-height:2.2;color:var(--ink2);margin-bottom:10px">全部数据来自 service 路由；写操作落五元事件，批准生效联动 approvals 审批台。</div>
   <div class="card" style="margin-bottom:10px"><div class="mono" style="margin-bottom:2px">待审知识</div><b style="font-size:16px;color:var(--amberdk)">1</b> <span class="mono">篇（待审核）</span></div>
   <div class="card" style="margin-bottom:10px"><div class="mono" style="margin-bottom:2px">SLA 超时</div><b style="font-size:16px;color:var(--warn)">1</b> <span class="mono">单</span></div>
@@ -1224,14 +1228,14 @@ function p22Qr(){const cells=[];for(let y=0;y<12;y++)for(let x=0;x<12;x++){const
 /* ================= 路由与外壳 ================= */
 /* ---- #ask 全局 Ask · AskRail 交互策略讲解（镜像生产 StarRing.tsx 2026-08-25 定稿） ---- */
 VIEWS.ask=()=>`<div style="padding:18px 20px 8px">
- ${pageHead("#ask","AskRail · 全局AI 助手对话","PC 右侧固定通栏 · 全 23 视图常驻（本页右侧即实物）· 镜像生产 StarRing.tsx")}
+ ${pageHead("#ask","问询通栏 · 全局AI 助手对话","PC 右侧固定通栏 · 全 23 视图常驻（本页右侧即实物）· 镜像生产 StarRing.tsx")}
  <div class="grid2 panel">
   ${[
    ["① PC 右侧固定通栏常驻","320px 宽、贴界面最右、从顶到底的完整对话模块；任何页面不离开即可对话。Bridge 主区经 askrail-width 布局协作预留 320px，内容零遮挡。"],
-   ["② 可收起为 56px 图标条","头部「⇥」收起：金色场记板圆钮 + 竖排 ASK·AI 助手 + 待批红 badge，主区同步回弹；点圆钮或「⇤」随时展开——是收起，不是隐藏。"],
+   ["② 可收起为 56px 图标条","头部「⇥」收起：金色场记板圆钮 + 竖排 问询·AI 助手 + 待批红 badge，主区同步回弹；点圆钮或「⇤」随时展开——是收起，不是隐藏。"],
    ["③ 移动端底部首 Tab 即对话","B 端移动壳底部 Tab 第一个就是「对话」，与 PC 通栏同一消息流、同一分流口径（demo 移动版已镜像）。"],
    ["④ ⌘K 全局唤起","⌘K / Ctrl+K 任意页面聚焦输入框（收起态自动展开）；输入上限 500 字；Esc 不做强制退出，通栏始终在场。"],
-   ["⑤ 输入分流 ask · quest","问句走 ask（threads.dispatch 意图路由 → AI 助手即时应答，带引用事件号与回执）；明确任务走 quest（客服 Agent 自动立项 → P2 任务中心）；含糊指令反问澄清，不直接建任务。"],
+   ["⑤ 输入分流 问询 · 任务","问句走问询（意图路由 → AI 助手即时应答，带引用事件号与回执）；明确任务自动立项（客服质检官 接单 → P2 任务中心）；含糊指令反问澄清，不直接建任务。"],
    ["⑥ 情境感知 + 待批 badge","useLocation 读当前路由预置情境 chips（/p22 服务前台、/p13 订单、/p4 审批…）；红点 badge = approvals 待批数，10s 轮询，断线保留上次计数。"]
   ].map(c=>`<div class="card tint-blue"><b style="color:var(--goldhi);font-size:13px">${c[0]}</b><div style="font-size:12px;color:var(--ink2);line-height:1.9;margin-top:6px">${c[1]}</div></div>`).join("")}
  </div>
@@ -1242,20 +1246,20 @@ VIEWS.ask=()=>`<div style="padding:18px 20px 8px">
     <div style="width:300px;flex:none;display:flex;flex-direction:column;border:1px solid var(--gline);border-radius:12px;background:rgba(255,255,255,.96);overflow:hidden;box-shadow:0 16px 50px rgba(214,0,42,.15)">
      <div class="ar-head" style="flex-wrap:wrap;row-gap:6px;background:#fff0f4;border-bottom:1px solid #ebdde0">
       <span class="ar-logo">${CLAPPER(18)}</span>
-      <div><div class="ar-title">Ask · AI 助手对话</div><div class="ar-route">/p22 · 全局常驻</div></div>
+      <div><div class="ar-title">问询 · AI 助手对话</div><div class="ar-route">/p22 · 全局常驻</div></div>
       <span class="ar-badge" style="position:static">2</span>
       <span style="flex:1"></span><button class="ar-hbtn" onclick="location.hash='p0'">进经营主页 →</button><button class="ar-hbtn dim" data-toast="收起为 56px 图标条（右上实物可试）">⇥</button>
      </div>
      <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
       ${arHuman("汇总本周差评给我")}
-      ${arAgent({sender:"客服 Agent",action:"客服 Agent 已接单",refId:"线程 ···9106",receipt:"unverified",text:"明确任务已自动立项（quest）。",extra:arQuestCard("本周差评汇总","···9106","评价Agent")})}
+      ${arAgent({sender:"客服质检官",action:"客服质检官 已接单",refId:"线程 ···9106",receipt:"unverified",text:"明确任务已自动立项（任务）。",extra:arQuestCard("本周差评汇总","···9106","抖音客服")})}
      </div>
      <div class="ar-chips"><button class="kbd-chip" data-toast="情境快捷问：随当前路由预置">⚡ 试试知识库检索</button><button class="kbd-chip" data-toast="情境快捷问：随当前路由预置">⚡ 今天工单有什么超时风险</button></div>
-     <div class="ar-input"><input placeholder="问点什么，或派个任务…（⌘K 唤起）" readonly><button class="ar-send" data-toast="金色发送钮：问句走 ask · 任务走 quest">发送</button></div>
+     <div class="ar-input"><input placeholder="问点什么，或派个任务…（⌘K 唤起）" readonly><button class="ar-send" data-toast="金色发送钮：问句走问询 · 任务自动立项">发送</button></div>
     </div>
     <div style="flex:1;font-size:12px;line-height:2.2;color:var(--ink2)">
-     <div><span class="tag g">头部</span> 金色场记板圆钮 +「Ask · AI 助手对话」+ 当前路由（随 hash 实时更新）+ 待批红 badge +「进经营主页 →」+ 收起「⇥」</div>
-     <div><span class="tag g">消息流</span> HumanBubble 右蓝泡 / AgentActionMessage 左卡（发送者 + 引用事件号 + ✓/⚠/✗ 回执），quest 立项卡内嵌「→任务中心」</div>
+     <div><span class="tag g">头部</span> 金色场记板圆钮 +「问询 · AI 助手对话」+ 当前路由（随 hash 实时更新）+ 待批红 badge +「进经营主页 →」+ 收起「⇥」</div>
+     <div><span class="tag g">消息流</span> 人类右泡 / 员工左卡（发送者 + 引用事件号 + ✓/⚠/✗ 回执），任务立项卡内嵌「→任务中心」</div>
      <div><span class="tag g">情境快捷钮</span> 随路由切换：/p22「试试知识库检索 · 今天工单有什么超时风险」/p13「今天订单有什么异常」/p4「这批审批有高危项吗」默认「汇报当前经营概况 · 有哪些待我审批的事项」</div>
      <div><span class="tag g">输入栏</span> placeholder「问点什么，或派个任务…（⌘K 唤起）」+ 金色发送钮；发送中带「正在思考」动效，失败 ✗ 回执上屏、输入保留可重试</div>
      <div class="note" style="margin-top:10px">老策略（右下悬浮球 + 常显引导标签 + 直达弹层）已下线，全端统一为通栏 / 移动首 Tab。本页右上角即实物，可直接输入体验。</div>
@@ -1265,7 +1269,7 @@ VIEWS.ask=()=>`<div style="padding:18px 20px 8px">
   <div style="width:250px;flex:none">
    <div class="glabel">移动端 · 底部首 Tab 即对话</div>
    <div style="border:1px solid var(--line);border-radius:22px;background:var(--panel);padding:10px;display:flex;flex-direction:column;height:380px">
-    <div style="text-align:center;font-size:11px;color:var(--ink3);border-bottom:1px solid var(--line);padding-bottom:8px">Ask · AI 助手对话 <span class="mono">/p3</span></div>
+    <div style="text-align:center;font-size:11px;color:var(--ink3);border-bottom:1px solid var(--line);padding-bottom:8px">问询 · AI 助手对话 <span class="mono">/p3</span></div>
     <div style="flex:1;padding:10px 2px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
      ${arHuman("昨夜夜班汇报")}
      ${arAgent({action:"AI 助手 · 应答",refId:"事件 ···8998",receipt:"synced",text:"昨夜 9 完成 / 3 待审 / 2 需介入，日报 08:30 已送达。"})}
@@ -1283,7 +1287,7 @@ VIEWS.ask=()=>`<div style="padding:18px 20px 8px">
 /* ================= AskRail 右侧通栏（镜像生产 StarRing.tsx） ================= */
 const CLAPPER=(s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="7" width="20" height="13" rx="2.5" fill="#ffffff"/><path d="M3.2 5.4 20.6 3.2l.5 2.6L3.7 8z" fill="#ffffff"/><path d="M6.4 4.9l2 2.2M10.6 4.5l2 2.2M14.8 4l2 2.2" stroke="#ff2442" stroke-width="1.1"/><path d="M10.2 11.4v5.6l4.8-2.8z" fill="#ff2442"/></svg>`;
 /* 路由 → 情境快捷钮（镜像生产 CONTEXT_CHIPS，前缀匹配） */
-const AR_CHIPS=[["p22",["试试知识库检索","今天工单有什么超时风险"]],,["p13",["今天订单有什么异常","退款单进展到哪了"]],["p15",["有新增差评吗","这条差评怎么回"]],["p11",["现在价格健康吗","有渠道倒挂吗"]],["p4",["这批审批有高危项吗","汇总今日待审重点"]],["p2",["这线程卡在哪一步","预估剩余积分消耗"]],["p1",["昨夜经营有什么异常","今天优先级最高的三件事"]]];
+const AR_CHIPS=[["p22",["试试知识库检索","今天工单有什么超时风险"]],["p13",["今天订单有什么异常","退款单进展到哪了"]],["p15",["有新增差评吗","这条差评怎么回"]],["p11",["现在价格健康吗","有渠道倒挂吗"]],["p4",["这批审批有高危项吗","汇总今日待审重点"]],["p2",["这线程卡在哪一步","预估剩余积分消耗"]],["p1",["昨夜经营有什么异常","今天优先级最高的三件事"]]];
 const AR_DEFAULT_CHIPS=["汇报当前经营概况","有哪些待我审批的事项"];
 const AR_PENDING=2; /* 待批请示数（镜像 approvals pending 轮询 badge） */
 let arCollapsed=false,arSending=false,arSeq=0;
@@ -1296,7 +1300,7 @@ function arAgent(o){return `<div class="ar-am"><div>
  <div class="ar-action">${o.action}</div>
  <div class="ar-text">${o.text}</div>${o.extra||""}</div></div>`}
 function arQuestCard(title,threadId,agent){return `<div class="ar-quest">
- <div class="row" style="justify-content:space-between"><b style="font-size:12px;color:var(--goldhi)">quest 立项卡 · ${title}</b><span class="tag amber">排队中</span></div>
+ <div class="row" style="justify-content:space-between"><b style="font-size:12px;color:var(--goldhi)">任务立项卡 · ${title}</b><span class="tag amber">排队中</span></div>
  <div class="mono" style="margin-top:4px">线程 ${threadId} · 执行 ${agent} · →任务中心</div>
  <button class="btn sm" style="margin-top:8px" onclick="location.hash='p2'">→ 任务中心跟进（/p2）</button></div>`}
 function arCiteCard(){return `<div class="ar-cite">
@@ -1308,11 +1312,11 @@ function arCiteCard(){return `<div class="ar-cite">
 AR_MSGS.push(
  {role:"human",html:arHuman("有新增差评吗")},
  {role:"agent",html:arAgent({action:"AI 助手 · 应答",refId:"事件 ···8846",receipt:"synced",
-  text:"有，1 件新增：天猫 2 分差评「收纳箱有色差，客服半天没回复」已 26 小时未回复（引用事件 ···8846，SLA 已升级店主）。评价Agent 已生成致歉→核实→措施→承诺四段式回复草稿，待您审批（审批 ···8871 · R9 差评必审）。"})},
+  text:"有，1 件新增：抖音直播间 1 星差评「直播间展示与实物色差」，当场 2.3 万人在线，已 1.8 小时未回复（引用事件 ···8846，R9 差评 2 小时 SLA 倒计时）。抖音客服 已生成致歉→核实→措施→承诺四段式回复草稿，待您审批（审批 ···8871 · R9）。"})},
  {role:"human",html:arHuman("汇总本周差评给我")},
- {role:"agent",html:arAgent({sender:"客服 Agent",action:"客服 Agent 已接单",refId:"线程 ···9106",receipt:"unverified",
-  text:"明确任务已自动立项（quest），进展我会主动汇报。",
-  extra:arQuestCard("本周差评汇总","···9106","评价Agent")})},
+ {role:"agent",html:arAgent({sender:"客服质检官",action:"客服质检官 已接单",refId:"线程 ···9106",receipt:"unverified",
+  text:"明确任务已自动立项（任务），进展我会主动汇报。",
+  extra:arQuestCard("本周差评汇总","···9106","抖音客服")})},
  {role:"human",html:arHuman("试试知识库检索")},
  {role:"agent",html:arAgent({action:"AI 助手 · 应答",refId:"事件 ···9104",receipt:"synced",
   text:"已检索知识库（混合检索投影），「支持几天无理由退货」命中 3 块，Top1 如下：",extra:arCiteCard()})});
@@ -1324,8 +1328,8 @@ function arRender(){
   document.documentElement.style.setProperty("--railw","56px");
   rail.className="rail-min";
   rail.innerHTML=`
-   <button class="ar-logo" onclick="arExpand()" title="展开 Ask 对话栏" style="width:40px;height:40px">${CLAPPER(22)}<span class="ar-badge">${AR_PENDING}</span></button>
-   <div class="ar-vtext">ASK · AI 助手</div>
+   <button class="ar-logo" onclick="arExpand()" title="展开问询对话栏" style="width:40px;height:40px">${CLAPPER(22)}<span class="ar-badge">${AR_PENDING}</span></button>
+   <div class="ar-vtext">问询 · AI 助手</div>
    <div style="flex:1"></div>
    <button class="ar-x" onclick="arExpand()" title="展开（⌘K）">⇤</button>`;
   return;
@@ -1338,7 +1342,7 @@ function arRender(){
   <div class="ar-head">
    <span class="ar-logo">${CLAPPER(18)}</span>
    <div style="min-width:0">
-    <div class="ar-title">Ask · AI 助手对话</div>
+    <div class="ar-title">问询 · AI 助手对话</div>
     <div class="ar-route" id="arRoute">${arRouteLabel(v)} · 全局常驻</div>
    </div>
    <span class="ar-badge" style="position:static">${AR_PENDING}</span>
@@ -1366,12 +1370,12 @@ function arSyncRoute(v){
 function arAnswer(q){
  if(/检索|知识库/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···9104",receipt:"synced",text:`已检索知识库，「${esc(q.slice(0,20))}」命中 3 块，Top1 如下：`,extra:arCiteCard()});
  if(/超时/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···9105",receipt:"synced",text:"今日工单侧 1 起 SLA 超时：工单 ···007「增值税专票红冲重开」受理超时，系统已自动升级为加急并通知客服主管介入督办（引用事件 ···9105）。其余 7 单 SLA 正常，可去工单台跟进（/p22）。"});
- if(/差评|口碑/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8846",receipt:"synced",text:"本周差评 2 件：① 天猫 2 分「收纳箱有色差」已 26 小时未回复，回复草稿待您审批（审批 ···8871 · R9）；② 京东 4 分「物流慢了一天」已回复闭环。差评响应 SLA 达标率 75%（18h / 24h）。"});
- if(/汇总|报告|总结/.test(q))return arAgent({sender:"客服 Agent",action:"客服 Agent 已接单",refId:"线程 ···9107",receipt:"unverified",text:"明确任务已自动立项（quest），产出将投递掌上日报（/p3）。",extra:arQuestCard(esc(q.slice(0,14)),"···9107","评价Agent")});
- if(/订单/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8911",receipt:"synced",text:"今日订单侧 2 起异常均已收口：① 拼多多倒挂 23%——R18 硬阻断后已修复回 ¥129（回执 ···8908）；② 收纳箱 ERP 同步失败——临时下架防超卖，重试成功已上架（回执 ···8911）。另有大额退款 ¥1,180 待您审批（审批 ···9064）。"});
- if(/审批|高危|审批|待审/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8871",receipt:"synced",text:"当前待您审批 2 件：① L4 董事长级 · 差评应急回复（R9 差评必审 · 审批 ···8871）；② L3 集团CEO级 · 大额退款 ¥1,180（R5 · 审批 ···9064）。无越围栏高危项，可去审批中心逐条审（/p4）。"});
- if(/概况|怎么样|经营/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8999",receipt:"synced",text:"当前经营概况：月 GMV ¥10.8 万 · 转化率 3.4% · 客单价 ¥101；昨夜班组 9 完成 / 3 待审 / 2 需介入；天猫 2 分差评处置请您拍板，其余各线正常（晨报事件 ···8999）。"});
- return arAgent({sender:"客服 Agent",action:"客服 Agent 已接单",refId:"线程 ···9108",receipt:"unverified",text:`已立项执行：「${esc(q.slice(0,24))}」，每一步先请您确认再动手。`,extra:arQuestCard(esc(q.slice(0,14)),"···9108","公司CEO")});
+ if(/差评|口碑/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8846",receipt:"synced",text:"本周差评 2 件：① 抖音直播间 1 星「展示与实物色差」已 1.8 小时未回复，回复草稿待您审批（审批 ···8871 · R9 2 小时 SLA）；② 京东 4 分「物流慢了一天」已回复闭环。差评 2h 响应达标率 90%。"});
+ if(/汇总|报告|总结/.test(q))return arAgent({sender:"客服质检官",action:"客服质检官 已接单",refId:"线程 ···9107",receipt:"unverified",text:"明确任务已自动立项（任务），产出将投递掌上日报（/p3）。",extra:arQuestCard(esc(q.slice(0,14)),"···9107","抖音客服")});
+ if(/订单/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8911",receipt:"synced",text:"今日经营侧 2 起异常均已收口：① 拼多多倒挂 23%——R18 告警后已修复回 ¥129（回执 ···8908）；② 美区站跟卖 1 起——Buy Box 丢失，知识产权护盾已取证完毕（回执 ···8911）。另有 ACoS 保险丝降预算 30% 待您审批（审批 ···9064）。"});
+ if(/审批|高危|审批|待审/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8871",receipt:"synced",text:"当前待您审批 2 件：① L5 董事长级 · 差评应急回复（R9 差评 2 小时 SLA · 审批 ···8871）；② L4 数字CEO级 · ACoS 保险丝降预算 30%（R3 · 审批 ···9064）。无越围栏高危项，可去审批中心逐条审（/p4）。"});
+ if(/概况|怎么样|经营/.test(q))return arAgent({action:"AI 助手 · 应答",refId:"事件 ···8999",receipt:"synced",text:"当前经营概况：月 GMV ¥9.2 亿 · 毛利率 14.8% · ACoS 0.24 · 日均 9.6 万单；昨夜班组 9 完成 / 3 待审 / 2 需介入；抖音差评处置请您拍板，亚马逊保险丝已降预算 30% 待确认（晨报事件 ···8999）。"});
+ return arAgent({sender:"客服质检官",action:"客服质检官 已接单",refId:"线程 ···9108",receipt:"unverified",text:`已立项执行：「${esc(q.slice(0,24))}」，每一步先请您确认再动手。`,extra:arQuestCard(esc(q.slice(0,14)),"···9108","数字CEO")});
 }
 function arSend(raw){
  const q=String(raw||"").trim();if(!q||arSending)return;
@@ -1391,12 +1395,12 @@ function arSend(raw){
 arRender();
 
 /* ================= 路由与外壳 ================= */
-const DNAV=[["p0","经营主页","/"],["floor","办公区","/"],["ask","Ask 通栏","AskRail"],["p1","工作台","/p1"],["p2","任务中心","/p2"],["p3","日报","/p3"],["p4","审批","/p4"],["p5","规则","/p5"],["p6","技能","/p6"],["p8","团队","/p8"],["p9","夜班","/p9"],["p10","断点","/p10"],["p11","价健","/p11"],["p13","订单","/p13"],["p14","平台","/p14"],["p15","口碑","/p15"],["p16","语音","/p16"],["p17","仓储","/p17"],["p18","多店","/p18"],["p19","经营","/p19"],["p20","档案","/p20"],["p21","董事长","/p21"],["p22","服务前台","/p22"]];
-$("#demonav").innerHTML='<span class="dn-t">DEMO NAV · 真实路由对照</span>'+DNAV.map(d=>`<a href="#${d[0]}" data-h="${d[0]}">${d[1]}<small>${d[2]}</small></a>`).join("");
+const DNAV=[["p0","经营主页","/"],["floor","办公区","/"],["ask","问询通栏","问询"],["p1","工作台","/p1"],["p2","任务中心","/p2"],["p3","日报","/p3"],["p4","审批","/p4"],["p5","规则","/p5"],["p6","技能","/p6"],["p8","团队","/p8"],["p9","夜班","/p9"],["p10","断点","/p10"],["p11","价健","/p11"],["p13","订单","/p13"],["p14","平台","/p14"],["p15","口碑","/p15"],["p16","客服","/p16"],["p17","仓储","/p17"],["p18","多店","/p18"],["p19","经营","/p19"],["p20","档案","/p20"],["p21","董事长","/p21"],["p22","服务前台","/p22"]];
+$("#demonav").innerHTML='<span class="dn-t">演示导航 · 真实路由对照</span>'+DNAV.map(d=>`<a href="#${d[0]}" data-h="${d[0]}">${d[1]}<small>${d[2]}</small></a>`).join("");
 document.addEventListener("keydown",e=>{
-  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();arExpand();const i=$("#arIn");if(i){i.focus();toast("Ask · AI 助手对话已唤起（⌘K）")}}
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();arExpand();const i=$("#arIn");if(i){i.focus();toast("问询 · AI 助手对话已唤起（⌘K）")}}
 });
-$("#tickerin").innerHTML='<span class="lv">LIVE · 实时动态</span>'+D.ticker.concat(D.ticker).map(e=>`<span><b>${actionText(e.a)}</b> · ${e.w}</span>`).join("");
+$("#tickerin").innerHTML='<span class="lv">实时动态</span>'+D.ticker.concat(D.ticker).map(e=>`<span><b>${actionText(e.a)}</b> · ${e.w}</span>`).join("");
 ["brake","brake2","brake3"].forEach(id=>{const b=document.getElementById(id);});
 document.addEventListener("click",e=>{
   if(e.target.closest("#brake")||e.target.closest("#brake2")||e.target.closest("#brake3")){
