@@ -11,8 +11,9 @@ segments:
     pitch: 先体检，再托管——13 平台店铺只读扫描，系统不动一根手指，1-2 周出《店铺体检报告》
     fence_patch: fences/patches/audit-only-patch.yml
     presets: [inspection-agent, biz-analyst, data-warehouse, sku-pl-accountant, competitor-radar, market-intel, account-guardian, rule-sentinel, ip-shield, service-qc, mm-engineer]  # 全部只读/分析岗，无写通道
-    skills_ordered:  # 首屏顺序 = 五线巡检叙事：体检报告→五线检项→对账复核
-      - inspection-suite  # 旗舰：五线巡检套件（价格/库存/广告/客服口碑/合规）
+    skills_ordered:  # 首屏顺序 = 五线巡检叙事：快扫当场见效→持续巡检→对账复核
+      - fast-scan  # 旗舰：快照快扫，15-30 分钟当场出《快速体检报告》（售前验货与接入基线）
+      - inspection-suite  # 持续：五线巡检套件（价格/库存/广告/客服口碑/合规）
       - shop-health-check
       - door-open-check
       - price-parity-watch  # 价格健康：倒挂/毛利破防/促销失误
