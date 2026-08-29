@@ -1,11 +1,12 @@
 /**
- * 引擎编排：runFastScan
- * 纪律（fast-scan SKILL.md 四）：
- *  - 时间纪律：软预算默认 30 分钟，逐线检查耗时，超时后剩余线标注 not-covered 出部分报告；
- *  - 降级纪律：某数据源缺失 → 该线标注 not-covered / partial，不阻塞整体；
- *  - 估算透明：所有 Finding 金额必须带 confidence 与计算口径（分析器层已强制）。
+ * 引擎编排（行业薄封装）：LINE_ORDER + precheckLine 组装 LineDef[]，逐线执行/软预算/降级/
+ * 编号/排序纪律全部交给 @workloom/audit-core 内核 runFastScan，本层只做：
+ *  1) 电商六线的检线定义（precheck 数据源覆盖度预判）；
+ *  2) 对外 API 适配——行业报告视图（一店一份 + 集团总览 + Top10）形状保持不变。
  * 输出：一店一份 + 集团总览 + 按挽回金额降序 Top10。
  */
+import { runFastScan as runCoreFastScan } from "../../base/audit-core/index.js";
+import type { LineDef } from "../../base/audit-core/index.js";
 import { analyzeAds } from "./analyzers/ads.js";
 import { analyzeCompliance } from "./analyzers/compliance.js";
 import { analyzeInventory } from "./analyzers/inventory.js";
@@ -17,9 +18,9 @@ import type {
   AuditLine,
   AuditReport,
   AuditSnapshot,
+  Coverage,
   FastScanOptions,
   Finding,
-  LineCoverage,
   Severity,
   ShopReport,
 } from "./types.js";
@@ -38,9 +39,8 @@ const ANALYZERS: Record<AuditLine, (s: AuditSnapshot, ctx: AnalyzerContext) => F
 
 /**
  * 数据源覆盖度预判：某线所需数据集全空 → not-covered；关键子集缺失 → partial。
- * 返回 null 表示 fully covered。
  */
-function precheckLine(line: AuditLine, s: AuditSnapshot): { coverage: LineCoverage; note?: string } {
+function precheckLine(line: AuditLine, s: AuditSnapshot): { coverage: Coverage; note?: string } {
   switch (line) {
     case "price": {
       if (s.listings.length === 0) return { coverage: "not-covered", note: "商品源缺失，价格健康线未覆盖" };
@@ -90,42 +90,47 @@ function countBySeverity(findings: Finding[]): Record<Severity, number> {
  * 报告层把仓库挂到快照首店（单仓多店时集团口径不受影响，仅店级归集近似）。
  */
 function resolveShopId(f: Finding, snapshot: AuditSnapshot): string {
-  if (snapshot.shops.some((s) => s.shopId === f.shopId)) return f.shopId;
+  if (f.shopId && snapshot.shops.some((s) => s.shopId === f.shopId)) return f.shopId;
   // 仓库维度发现：归到快照首店（无店铺时保持原样，进"未归属"桶）
-  return snapshot.shops[0]?.shopId ?? f.shopId;
+  return snapshot.shops[0]?.shopId ?? f.shopId ?? "unknown";
 }
 
 /**
  * 快速体检主入口：快照 → 五线 + 对账 → 报告。
+ * 行业薄封装：检线定义交给内核 runFastScan 执行，报告视图在本层适配。
  * 纯函数（除耗时计量）：同一快照 + 同一 now 必得同一报告正文。
  */
 export function runFastScan(snapshot: AuditSnapshot, opts: FastScanOptions = {}): AuditReport {
-  const startedAt = Date.now();
-  const budgetMs = (opts.timeBudgetMinutes ?? 30) * 60_000;
-  const ctx: AnalyzerContext = {
-    now: opts.now ?? new Date(snapshot.generatedAt),
-    keywordSpendThreshold: opts.keywordSpendThreshold ?? 500,
-  };
+  const now = opts.now ?? new Date(snapshot.generatedAt);
+  const timeBudgetMinutes = opts.timeBudgetMinutes ?? 30;
+  const keywordSpendThreshold = opts.keywordSpendThreshold ?? 500;
 
-  const coverage = {} as Record<AuditLine, LineCoverage>;
+  // 检线定义：precheck 数据源预判 + 行业分析器（阈值经闭包注入，分析器签名不变）
+  const lines: LineDef<AuditSnapshot>[] = LINE_ORDER.map((line) => ({
+    line,
+    precheck: (s) => precheckLine(line, s),
+    analyze: (s) => ANALYZERS[line](s, { now, keywordSpendThreshold }),
+  }));
+
+  const core = runCoreFastScan(snapshot, lines, {
+    now,
+    softBudgetMs: timeBudgetMinutes * 60_000,
+    topN: 10,
+  });
+
+  /* ---------- 适配层：内核报告 → 行业报告视图 ---------- */
+  const coverage = {} as Record<AuditLine, Coverage>;
   const coverageNotes: string[] = [];
-  const allFindings: Finding[] = [];
+  for (const lr of core.lineResults) {
+    coverage[lr.line as AuditLine] = lr.coverage;
+    if (lr.note) coverageNotes.push(lr.note);
+  }
 
-  for (const line of LINE_ORDER) {
-    // 时间纪律：逐线检查软预算，超时后剩余线 not-covered（部分报告仍是有效交付）
-    if (Date.now() - startedAt > budgetMs) {
-      coverage[line] = "not-covered";
-      coverageNotes.push(`时间预算耗尽（${opts.timeBudgetMinutes ?? 30} 分钟），${line} 线未执行`);
-      continue;
-    }
-    const pre = precheckLine(line, snapshot);
-    coverage[line] = pre.coverage;
-    if (pre.note) coverageNotes.push(pre.note);
-    if (pre.coverage === "not-covered") continue;
-    const findings = ANALYZERS[line](snapshot, ctx);
-    // 统一编号：FND-<LINE>-<全局序号>（报告可回溯）
-    for (const f of findings) {
-      f.id = `FND-${line.toUpperCase()}-${String(allFindings.length + 1).padStart(3, "0")}`;
+  // 统一编号：FND-<LINE>-<全局序号>（覆盖内核线内序号，保持对外编号纪律不变）
+  const allFindings: Finding[] = [];
+  for (const lr of core.lineResults) {
+    for (const f of lr.findings) {
+      f.id = `FND-${lr.line.toUpperCase()}-${String(allFindings.length + 1).padStart(3, "0")}`;
       allFindings.push(f);
     }
   }
@@ -141,7 +146,7 @@ export function runFastScan(snapshot: AuditSnapshot, opts: FastScanOptions = {})
   const severityRank: Record<Severity, number> = { P0: 0, P1: 1, P2: 2 };
   const shops: ShopReport[] = snapshot.shops.map((s) => {
     const findings = (byShop.get(s.shopId) ?? []).sort(
-      (a, b) => severityRank[a.severity] - severityRank[b.severity] || (b.estimatedImpact?.amount ?? 0) - (a.estimatedImpact?.amount ?? 0),
+      (a, b) => severityRank[a.severity] - severityRank[b.severity] || (b.impact?.amount ?? 0) - (a.impact?.amount ?? 0),
     );
     return {
       shopId: s.shopId,
@@ -151,7 +156,7 @@ export function runFastScan(snapshot: AuditSnapshot, opts: FastScanOptions = {})
       findings,
       counts: countBySeverity(findings),
       // 同店同币种，直接求和；无金额的发现不计入
-      totalRecoverable: Math.round(findings.reduce((sum, f) => sum + (f.estimatedImpact?.amount ?? 0), 0) * 100) / 100,
+      totalRecoverable: Math.round(findings.reduce((sum, f) => sum + (f.impact?.amount ?? 0), 0) * 100) / 100,
     };
   });
   // 有发现但店铺不在快照 shops 里的兜底桶（防御性；正常快照不会触发）
@@ -161,28 +166,28 @@ export function runFastScan(snapshot: AuditSnapshot, opts: FastScanOptions = {})
       shopId,
       shopName: shopId,
       platformId: "unknown",
-      currency: findings[0]?.estimatedImpact?.currency ?? "CNY",
+      currency: findings[0]?.impact?.unit ?? "CNY",
       findings,
       counts: countBySeverity(findings),
-      totalRecoverable: Math.round(findings.reduce((sum, f) => sum + (f.estimatedImpact?.amount ?? 0), 0) * 100) / 100,
+      totalRecoverable: Math.round(findings.reduce((sum, f) => sum + (f.impact?.amount ?? 0), 0) * 100) / 100,
     });
   }
 
   /* ---------- 集团总览 + Top10 ---------- */
   const totalByCurrency: Record<string, number> = {};
   for (const f of allFindings) {
-    if (!f.estimatedImpact) continue;
-    const cur = f.estimatedImpact.currency;
-    totalByCurrency[cur] = Math.round(((totalByCurrency[cur] ?? 0) + f.estimatedImpact.amount) * 100) / 100;
+    if (!f.impact) continue;
+    const cur = f.impact.unit;
+    totalByCurrency[cur] = Math.round(((totalByCurrency[cur] ?? 0) + f.impact.amount) * 100) / 100;
   }
   const top10 = [...allFindings]
-    .filter((f) => f.estimatedImpact)
-    .sort((a, b) => (b.estimatedImpact?.amount ?? 0) - (a.estimatedImpact?.amount ?? 0))
+    .filter((f) => f.impact)
+    .sort((a, b) => (b.impact?.amount ?? 0) - (a.impact?.amount ?? 0))
     .slice(0, 10);
 
   return {
     reportId: `RPT-${snapshot.snapshotId}`,
-    generatedAt: ctx.now.toISOString(),
+    generatedAt: now.toISOString(),
     snapshotId: snapshot.snapshotId,
     coverage,
     coverageNotes,
@@ -194,7 +199,7 @@ export function runFastScan(snapshot: AuditSnapshot, opts: FastScanOptions = {})
       totalRecoverableByCurrency: totalByCurrency,
     },
     top10,
-    elapsedMs: Date.now() - startedAt,
-    timeBudgetMinutes: opts.timeBudgetMinutes ?? 30,
+    elapsedMs: core.durationMs,
+    timeBudgetMinutes,
   };
 }

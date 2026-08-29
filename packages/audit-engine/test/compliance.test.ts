@@ -17,7 +17,7 @@ describe("compliance · Listing 违禁词扫描", () => {
     const fs = analyzeCompliance(s, CTX).filter((f) => f.title.includes("违禁词"));
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P0");
-    expect(fs[0]!.calculation.inputs["words"]).toContain("全网最低价");
+    expect(fs[0]!.calculation).toContain("words=全网最低价");
   });
 
   it("详情含侵权词「迪士尼同款」→ 命中 P0；普通标题不命中", () => {

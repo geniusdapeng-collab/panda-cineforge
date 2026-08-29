@@ -212,7 +212,7 @@ function printReport(snapshot: AuditSnapshot, report: ReturnType<typeof runFastS
   console.log(line);
   console.log("Top 行动清单（按挽回金额降序，最多 10 条）：");
   report.top10.forEach((f: Finding, i: number) => {
-    const impact = f.estimatedImpact ? `${f.estimatedImpact.amount.toLocaleString()} ${f.estimatedImpact.currency}/${f.estimatedImpact.period} [${f.estimatedImpact.confidence}]` : "—";
+    const impact = f.impact ? `${f.impact.amount.toLocaleString()} ${f.impact.unit}/${f.impact.period} [${f.impact.confidence}]` : "—";
     // 仓库维度发现（shopId=warehouseId）显示其报告归集店，避免读者误解
     const owner = report.shops.find((s) => s.findings.some((x) => x.id === f.id));
     const where = owner && owner.shopId !== f.shopId ? `仓=${f.shopId}（归集:${owner.shopName}）` : `店=${owner?.shopName ?? f.shopId}`;
@@ -268,7 +268,7 @@ async function main(): Promise<void> {
               counts: report.overview.counts,
               totalRecoverableByCurrency: report.overview.totalRecoverableByCurrency,
               coverage: report.coverage,
-              top10: report.top10.map((f) => ({ id: f.id, line: f.line, severity: f.severity, title: f.title, impact: f.estimatedImpact })),
+              top10: report.top10.map((f) => ({ id: f.id, line: f.line, severity: f.severity, title: f.title, impact: f.impact })),
             },
             basis: ["fast-scan 五线扫描（bundles/ecommerce/skills/fast-scan）", "全程只读：未调用任何平台写接口"],
           },

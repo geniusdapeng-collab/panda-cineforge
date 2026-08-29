@@ -72,8 +72,8 @@ describe("price · 毛利破防", () => {
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P1");
     // (46 − 45) × 20 件 = 20
-    expect(fs[0]!.estimatedImpact?.amount).toBe(20);
-    expect(fs[0]!.estimatedImpact?.confidence).toBe("baseline");
+    expect(fs[0]!.impact?.amount).toBe(20);
+    expect(fs[0]!.impact?.confidence).toBe("baseline");
   });
 
   it("售价 38 < 成本 40 → 升 P0（卖一件亏一件）", () => {
@@ -113,7 +113,7 @@ describe("price · 价保风险", () => {
     const fs = analyzePrice(s, CTX).filter((f) => f.title.includes("价保"));
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P2");
-    expect(fs[0]!.calculation.inputs["minDealPrice"]).toBe(95);
+    expect(fs[0]!.calculation).toContain("minDealPrice=95");
   });
 
   it("31 天前的成交不计入窗口 → 不命中", () => {

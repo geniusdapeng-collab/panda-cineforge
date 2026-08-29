@@ -10,8 +10,8 @@ describe("inventory · 积压", () => {
     });
     const fs = analyzeInventory(s, CTX).filter((f) => f.title.includes("积压"));
     expect(fs).toHaveLength(1);
-    expect(fs[0]!.estimatedImpact?.amount).toBe(6000); // 150 × 40
-    expect(fs[0]!.estimatedImpact?.confidence).toBe("exact");
+    expect(fs[0]!.impact?.amount).toBe(6000); // 150 × 40
+    expect(fs[0]!.impact?.confidence).toBe("exact");
   });
 
   it("周转恰好 60 天 → 不命中（边界 >60）", () => {
@@ -65,7 +65,7 @@ describe("inventory · 库龄", () => {
     const fs = analyzeInventory(s, CTX).filter((f) => f.title.includes("库龄"));
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P1");
-    expect(fs[0]!.estimatedImpact?.amount).toBe(800); // 20 × 40
+    expect(fs[0]!.impact?.amount).toBe(800); // 20 × 40
   });
 
   it("库龄恰好 90 → 不命中（边界 >90）；国内仓不扫库龄", () => {

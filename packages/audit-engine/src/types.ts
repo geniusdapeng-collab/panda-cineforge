@@ -1,25 +1,41 @@
 /**
- * @workloom/audit-engine · 核心类型
- * 质检模式（audit_only）「快速体检」的确定性检测引擎数据模型。
+ * @workloom/audit-engine · 电商行业类型
+ * 质检模式（audit_only）「快速体检」的行业数据模型。
  * 方法论事实源：bundles/ecommerce/skills/fast-scan/SKILL.md（五线扫描）。
+ *
+ * 分层纪律：通用质检模型（Finding/Severity/EstimatedImpact/EvidenceRef/Coverage…）
+ * 一律复用 @workloom/audit-core 内核（packages/base/audit-core，vendored from workloom-im），
+ * 本文件只保留电商行业快照数据集与行业报告视图，不再重复定义内核类型。
  *
  * 数据流：连接器只读快照 → AuditSnapshot（归一化数据集）→ 六个分析器 → Finding[] → AuditReport。
  * 全程只读：引擎不触碰任何平台写接口，只读快照进、发现/报告出。
  */
 
-// ---------- 枚举 ----------
+// ---------- 内核通用类型（re-export，事实源在 audit-core） ----------
+
+import type { Coverage, Finding, Severity } from "../../base/audit-core/index.js";
+
+export type {
+  Severity,
+  ImpactConfidence,
+  /** 兼容旧名：Confidence = ImpactConfidence */
+  ImpactConfidence as Confidence,
+  ImpactPeriod,
+  EstimatedImpact,
+  EvidenceRef,
+  Finding,
+  Coverage,
+  /** 兼容旧名：LineCoverage = Coverage */
+  Coverage as LineCoverage,
+  LineResult,
+  Analyzer,
+  LineDef,
+} from "../../base/audit-core/index.js";
+
+// ---------- 行业检线 ----------
 
 /** 五线 + 对账复核线（对账在 SKILL.md 中与口碑合轨叙述，工程上独立成线） */
 export type AuditLine = "price" | "inventory" | "ads" | "reputation" | "compliance" | "recon";
-
-/** 严重度：P0=立即止损/合规红线，P1=显著渗漏需本周处理，P2=优化项 */
-export type Severity = "P0" | "P1" | "P2";
-
-/** 估算置信度：exact=可逐笔勾稽的精确值；baseline=按店铺/类目基准估算；estimate=经验估计 */
-export type Confidence = "exact" | "baseline" | "estimate";
-
-/** 金额口径周期 */
-export type ImpactPeriod = "one-off" | "monthly" | "yearly";
 
 // ---------- 快照数据集（输入） ----------
 
@@ -182,53 +198,7 @@ export interface AuditSnapshot {
   forbiddenWords: string[];
 }
 
-// ---------- 发现（输出） ----------
-
-/** 证据记录引用：指向快照中的具体单据 */
-export interface EvidenceRef {
-  /** 证据类别：listing/order/campaign/keyword/inventory/review/statement/shop */
-  kind: string;
-  id: string;
-  /** 关键字段快照（审计留痕，原样透传） */
-  fields?: Record<string, string | number>;
-}
-
-/** 计算过程快照：公式 + 输入 + 结果，报告可复算（SKILL.md 回执=计算过程快照） */
-export interface CalculationSnapshot {
-  formula: string;
-  inputs: Record<string, number | string>;
-  result: number | string;
-}
-
-/** 估算挽回金额（禁止把估算说成确定值——confidence 必填） */
-export interface EstimatedImpact {
-  amount: number;
-  currency: string;
-  period: ImpactPeriod;
-  confidence: Confidence;
-  /** 计算口径说明（如"按近30天日均销量×价差"） */
-  basis: string;
-}
-
-export interface Finding {
-  /** 引擎内唯一编号：FND-<线>-<序号> */
-  id: string;
-  line: AuditLine;
-  severity: Severity;
-  shopId: string;
-  title: string;
-  /** 问题描述 + 建议动作 */
-  description: string;
-  suggestion: string;
-  evidence: EvidenceRef[];
-  calculation: CalculationSnapshot;
-  estimatedImpact?: EstimatedImpact;
-}
-
-// ---------- 报告（输出） ----------
-
-/** 单条线的覆盖度：covered=已扫描；partial=部分子项因数据缺失降级；not-covered=数据源缺失/超时未扫 */
-export type LineCoverage = "covered" | "partial" | "not-covered";
+// ---------- 行业报告视图（输出；内核 AuditReport 的行业适配层） ----------
 
 /** 一店一份 */
 export interface ShopReport {
@@ -252,13 +222,17 @@ export interface GroupOverview {
   totalRecoverableByCurrency: Record<string, number>;
 }
 
+/**
+ * 行业体检报告（对外 API 形状保持不变）：
+ * 由内核 AuditReport 适配而来——一店一份 + 集团总览 + Top10。
+ */
 export interface AuditReport {
   reportId: string;
   generatedAt: string;
   /** 快照引用（审计留痕） */
   snapshotId: string;
   /** 各线覆盖度（未覆盖的线在此标注，报告仍为有效部分报告） */
-  coverage: Record<AuditLine, LineCoverage>;
+  coverage: Record<AuditLine, Coverage>;
   /** 覆盖度备注（如"订单源缺失，价保子项降级"） */
   coverageNotes: string[];
   shops: ShopReport[];
@@ -270,7 +244,7 @@ export interface AuditReport {
   timeBudgetMinutes: number;
 }
 
-/** runFastScan 选项 */
+/** runFastScan 选项（行业层；内核软预算/锚定钟由 engine 适配映射） */
 export interface FastScanOptions {
   /** 软时间预算（分钟），默认 30；超时后剩余线标注 not-covered 出部分报告 */
   timeBudgetMinutes?: number;

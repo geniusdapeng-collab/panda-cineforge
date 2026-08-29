@@ -114,43 +114,43 @@ describe("埋点考卷 · 6 个已知埋点必须全部检出", () => {
     expect(f, "埋点①未检出").toBeDefined();
     expect(f!.severity).toBe("P1"); // 18% > 15%，未超 20% 升级线
     expect(f!.shopId).toBe("tmall-flagship-001");
-    expect(f!.calculation.inputs["minPrice"]).toBe(82);
-    expect(f!.calculation.inputs["maxPrice"]).toBe(100);
-    expect(f!.calculation.result).toBe("18%");
+    expect(f!.calculation).toContain("minPrice=82");
+    expect(f!.calculation).toContain("maxPrice=100");
+    expect(f!.calculation).toContain("结果：18%");
   });
 
   it("② ACoS 连续 3 天越线 → 检出，P1，盈亏线 0.44，金额 = 窗口超支月度折算", () => {
     const f = find((x) => x.line === "ads" && x.title.includes("连续 3 天"));
     expect(f, "埋点②未检出").toBeDefined();
     expect(f!.severity).toBe("P1");
-    expect(f!.calculation.inputs["breakeven"]).toBe(0.44);
+    expect(f!.calculation).toContain("breakeven=0.44");
     // 每日超支 500−1000×0.44=60，3 天 180，月度 180/3×30=1800
-    expect(f!.estimatedImpact?.amount).toBe(1800);
-    expect(f!.estimatedImpact?.confidence).toBe("baseline");
+    expect(f!.impact?.amount).toBe(1800);
+    expect(f!.impact?.confidence).toBe("baseline");
   });
 
   it("③ 海外仓库龄 95 天 → 检出，P1，占用资金 = 20 件 × 成本 55 = 1100", () => {
     const f = find((x) => x.line === "inventory" && x.title.includes("库龄 95"));
     expect(f, "埋点③未检出").toBeDefined();
     expect(f!.severity).toBe("P1");
-    expect(f!.estimatedImpact?.amount).toBe(1100);
-    expect(f!.estimatedImpact?.confidence).toBe("exact");
+    expect(f!.impact?.amount).toBe(1100);
+    expect(f!.impact?.confidence).toBe("exact");
   });
 
   it("④ 「全网最低价」违禁词 → 检出，P0（广告法高危）", () => {
     const f = find((x) => x.line === "compliance" && x.title.includes("违禁词"));
     expect(f, "埋点④未检出").toBeDefined();
     expect(f!.severity).toBe("P0");
-    expect(String(f!.calculation.inputs["words"])).toContain("全网最低价");
+    expect(f!.calculation).toContain("words=全网最低价");
     expect(f!.evidence[0]!.id).toBe("TM-L-6604");
   });
 
   it("⑤ 佣金多提 0.8pp → 检出，金额 = 80（10000×0.008，exact）", () => {
     const f = find((x) => x.line === "recon" && x.title.includes("佣金错算"));
     expect(f, "埋点⑤未检出").toBeDefined();
-    expect(f!.calculation.result).toBe("0.80pp");
-    expect(f!.estimatedImpact?.amount).toBe(80);
-    expect(f!.estimatedImpact?.confidence).toBe("exact");
+    expect(f!.calculation).toContain("结果：0.80pp");
+    expect(f!.impact?.amount).toBe(80);
+    expect(f!.impact?.confidence).toBe("exact");
   });
 
   it("⑥ 差评约 72h 未回 → 检出，P1（>48h 命中，未触发 >72h 升级）", () => {

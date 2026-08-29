@@ -33,8 +33,8 @@ describe("recon · 佣金错算", () => {
     const fs = analyzeRecon(s, CTX).filter((f) => f.title.includes("佣金错算"));
     expect(fs).toHaveLength(1);
     // 应提 10000×0.05 = 500，实提 580 → 多提 80
-    expect(fs[0]!.estimatedImpact?.amount).toBe(80);
-    expect(fs[0]!.estimatedImpact?.confidence).toBe("exact");
+    expect(fs[0]!.impact?.amount).toBe(80);
+    expect(fs[0]!.impact?.confidence).toBe("exact");
   });
 
   it("差 0.4pp ≤ 0.5pp → 不命中（边界）", () => {
@@ -89,7 +89,7 @@ describe("recon · 退款未冲抵", () => {
     const fs = analyzeRecon(s, CTX).filter((f) => f.title.includes("退款未冲抵"));
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P1");
-    expect(fs[0]!.estimatedImpact?.amount).toBe(2000);
+    expect(fs[0]!.impact?.amount).toBe(2000);
   });
 
   it("有 refund 行 → 不命中", () => {
@@ -140,7 +140,7 @@ describe("recon · 广告费与物流", () => {
     });
     const fs = analyzeRecon(s, CTX).filter((f) => f.title.includes("广告费与后台不符"));
     expect(fs).toHaveLength(1);
-    expect(fs[0]!.estimatedImpact?.amount).toBe(100);
+    expect(fs[0]!.impact?.amount).toBe(100);
   });
 
   it("物流账单 900 vs 应计 100单×8=800（多收 12.5% > 1%）→ 命中 P2", () => {
@@ -157,7 +157,7 @@ describe("recon · 广告费与物流", () => {
     });
     const fs = analyzeRecon(s, CTX).filter((f) => f.title.includes("物流多收"));
     expect(fs).toHaveLength(1);
-    expect(fs[0]!.estimatedImpact?.amount).toBe(100);
+    expect(fs[0]!.impact?.amount).toBe(100);
   });
 });
 
@@ -181,7 +181,7 @@ describe("recon · 差异率统计", () => {
     expect(stat).toHaveLength(1);
     // 差异 80 / 订单总额 10000 = 0.8% > 0.3% → P1
     expect(stat[0]!.severity).toBe("P1");
-    expect(stat[0]!.calculation.result).toBe("0.800%");
+    expect(stat[0]!.calculation).toContain("结果：0.800%");
   });
 
   it("无差异账单 → 差异率 0%，P2 留档", () => {

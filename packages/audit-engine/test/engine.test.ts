@@ -56,7 +56,7 @@ describe("engine · 汇总", () => {
     });
     const r = runFastScan(s, { now: NOW });
     expect(r.top10.length).toBe(2);
-    expect(r.top10[0]!.estimatedImpact!.amount).toBeGreaterThanOrEqual(r.top10[1]!.estimatedImpact!.amount);
+    expect(r.top10[0]!.impact!.amount).toBeGreaterThanOrEqual(r.top10[1]!.impact!.amount);
   });
 
   it("店铺归集：发现挂到对应店，totalRecoverable 同店求和；finding id 全局唯一", () => {

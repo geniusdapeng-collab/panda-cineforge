@@ -41,8 +41,8 @@ describe("ads · 连续越线", () => {
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P1");
     // 每日超支 = 500 − 1000×0.44 = 60；3 天 = 180；月度 = 180/3×30 = 1800
-    expect(fs[0]!.estimatedImpact?.amount).toBe(1800);
-    expect(fs[0]!.estimatedImpact?.confidence).toBe("baseline");
+    expect(fs[0]!.impact?.amount).toBe(1800);
+    expect(fs[0]!.impact?.confidence).toBe("baseline");
   });
 
   it("仅连续 2 天越线 → 不命中", () => {
@@ -71,8 +71,8 @@ describe("ads · 烧钱词", () => {
     const fs = analyzeAds(s, CTX);
     expect(fs).toHaveLength(1);
     expect(fs[0]!.severity).toBe("P2");
-    expect(fs[0]!.estimatedImpact?.amount).toBe(600);
-    expect(fs[0]!.estimatedImpact?.confidence).toBe("exact");
+    expect(fs[0]!.impact?.amount).toBe(600);
+    expect(fs[0]!.impact?.confidence).toBe("exact");
   });
 
   it("花费恰好 500 → 不命中（边界 >500）；有转化 → 不命中", () => {
