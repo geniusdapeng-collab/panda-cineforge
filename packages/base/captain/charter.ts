@@ -20,9 +20,9 @@ export const charterSchema = z.object({
   }).default(() => ({ name: "公司CEO", persona: "稳健经营型" })),
   autonomy: z.object({
     price_band: z.tuple([z.number(), z.number()]).default(() => [0.85, 1.15] as [number, number]),
-    procurement_cap: z.number().default(5000),
-    campaign_cap: z.number().default(2000),
-  }).default(() => ({ price_band: [0.85, 1.15] as [number, number], procurement_cap: 5000, campaign_cap: 2000 })),
+    procurement_cap: z.number().default(100_000),
+    campaign_cap: z.number().default(50_000),
+  }).default(() => ({ price_band: [0.85, 1.15] as [number, number], procurement_cap: 100_000, campaign_cap: 50_000 })),
   /** L4 必请示清单（只紧不松：运行期只可加、不可减） */
   escalate: z.array(z.string()).default([
     "修改保底价/安全禁区相关",

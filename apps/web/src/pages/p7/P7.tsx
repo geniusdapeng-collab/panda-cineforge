@@ -50,7 +50,7 @@ export default function P7() {
   const [wizardErr, setWizardErr] = useState("");
   const [draft, setDraft] = useState({
     slug: "", displayName: "", version: "0.1.0", changelog: "",
-    fenceRef: "ecom-baseline/v1", ownerMemberNo: "MEM-001",
+    fenceRef: "ecom-baseline/v1", ownerMemberNo: "", // 打开向导时以当前登录身份填充
   });
 
   const load = useCallback(async (silent = false, slug?: string | null) => {
@@ -58,11 +58,12 @@ export default function P7() {
     try {
       await ensureDemoLogin();
       const [meR, mem, st] = await Promise.all([
-        trpc.members.me.query() as Promise<{ identity: { role: string } }>,
+        trpc.members.me.query() as Promise<{ identity: { role: string; memberNo?: string } }>,
         trpc.members.list.query() as Promise<MemberRow[]>,
         trpc.bundles.status.query(slug ? { slug } : {}) as Promise<StatusResp>,
       ]);
       setRole(meR.identity.role);
+      if (meR.identity.memberNo) setDraft((d) => (d.ownerMemberNo ? d : { ...d, ownerMemberNo: meR.identity.memberNo! }));
       setMembers(mem);
       setData(st);
       if (!slug) setSelectedSlug(st.selected?.slug ?? st.activeSlug);

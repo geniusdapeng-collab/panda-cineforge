@@ -180,7 +180,7 @@ ${o.label} ${JSON.stringify(o.params)}
       const price = Number(o.params.price ?? item.priceCtx.afterPrice ?? 0);
       const band = defaultCharter().autonomy.price_band; // 语义底线用标准带（±15%）
       const ratio = price / item.priceCtx.basePrice;
-      o.fenceOk = ratio >= band[0] * 0.85 && ratio <= band[1] * 1.15; // 底线 1.3 倍宽限外即不过
+      o.fenceOk = ratio >= band[0] * 0.85 && ratio <= band[1] * 1.15; // 标准带再放宽 ±15%：下限≈0.72、上限≈1.32，越线即不过
     }
     // ⑤ 影响预估（历史归因：同类动作近 30 天频次与反馈）
     const similar = await qRows<{ n: string }>(

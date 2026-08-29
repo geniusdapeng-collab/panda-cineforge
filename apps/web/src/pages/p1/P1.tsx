@@ -305,7 +305,7 @@ export default function P1() {
           <div className="flex-1 space-y-3.5">
             <SystemDivider
               time={new Date().toTimeString().slice(0, 5)}
-              summary={`熊猫优选集团 · ${me?.identity.name ?? ""} 已上线（演示身份 MEM-001）`}
+              summary={`熊猫优选集团 · ${me?.identity.name ?? ""} 已上线（演示身份）`}
             />
 
             {/* P1E3 交接班卡（夜班未启用 → 空态「去配置」F4.8） */}

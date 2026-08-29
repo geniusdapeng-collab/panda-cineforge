@@ -137,9 +137,9 @@ async function activeRules(): Promise<RuntimeRule[]> {
 /* ================= A · 意图路由（三模式 + clarify，34 条） ================= */
 const a = C("A");
 for (const [text, mode] of [
-  ["请问上周 OCC 多少？", "ask"], ["查一下昨天的转化率", "ask"], ["统计本月差评分布", "ask"],
-  ["什么是保底价？", "ask"], ["为什么周末房价高？", "ask"], ["哪家渠道评分最低？", "ask"],
-  ["今天天气怎么样？", "ask"], ["现在满房了吗？", "ask"], ["问一下夜班跑完了吗", "ask"], ["房价是多少", "ask"],
+  ["请问上周 GMV 多少？", "ask"], ["查一下昨天的转化率", "ask"], ["统计本月差评分布", "ask"],
+  ["什么是毛利红线？", "ask"], ["为什么大促转化高？", "ask"], ["哪家平台评分最低？", "ask"],
+  ["今天天气怎么样？", "ask"], ["现在断货了吗？", "ask"], ["问一下夜班跑完了吗", "ask"], ["售价是多少", "ask"],
 ] as const) a(`ask 句式「${text.slice(0, 12)}」→ ask`, () => eq(ruleBasedRoute(text).mode, mode, "路由"));
 for (const text of ["逐步生成三版文案，每一步给我审", "一步步来，先草稿给我看", "我们商量着调价", "先采集再让我确认每一步", "每一步都要我点头", "先出个初稿给我看再定"]) {
   a(`agent 句式「${text.slice(0, 10)}」→ agent`, () => eq(ruleBasedRoute(text).mode, "agent", "路由"));
@@ -158,7 +158,7 @@ a("LLM 分类器正常 JSON", async () => {
 });
 a("LLM 输出垃圾 → 规则兜底", async () => {
   const c = new LlmIntentClassifier(async () => "我不是 JSON");
-  eq((await routeIntent("请问 OCC", c)).via, "rule", "垃圾回落");
+  eq((await routeIntent("请问 GMV", c)).via, "rule", "垃圾回落");
 });
 a("LLM 输出 markdown 包裹 JSON 可解析", async () => {
   const c = new LlmIntentClassifier(async () => '```json\n{"mode":"quest","rationale":"x"}\n```');
@@ -166,7 +166,7 @@ a("LLM 输出 markdown 包裹 JSON 可解析", async () => {
 });
 a("LLM 输出越权 mode → 规则兜底", async () => {
   const c = new LlmIntentClassifier(async () => '{"mode":"hack","rationale":"x"}');
-  eq((await routeIntent("请问 OCC", c)).via, "rule", "白名单外回落");
+  eq((await routeIntent("请问 GMV", c)).via, "rule", "白名单外回落");
 });
 a("提示词注入不劫持分类（分隔符内为数据）", async () => {
   let promptSeen = "";
@@ -766,7 +766,7 @@ e("expire 竞态：过期瞬间 decide 与 sweep 并发，终态恰其一", asyn
 const f = C("F");
 f("合法入站消息落事件 + 成员映射", async () => {
   await qApp(`UPDATE members SET im_openids = im_openids || $2::jsonb WHERE workspace_id=$1 AND member_no='MEM-001'`, [scope.workspaceId, JSON.stringify({ dingtalk: `ou_boss_${SFX}` })]);
-  const r = await ingestInbound(app, gw, scope, { channel: "dingtalk", channelMsgId: `m-${SFX}-1`, conversationId: `cv-${SFX}`, kind: "direct", senderOpenId: `ou_boss_${SFX}`, text: "今晚满房吗" });
+  const r = await ingestInbound(app, gw, scope, { channel: "dingtalk", channelMsgId: `m-${SFX}-1`, conversationId: `cv-${SFX}`, kind: "direct", senderOpenId: `ou_boss_${SFX}`, text: "今晚有货吗" });
   eq(r.identity, "member", "成员识别");
   eq(r.memberNo, "MEM-001", "映射正确");
 });
@@ -1743,7 +1743,7 @@ n("压测：审批批量 50 建 50 批", async () => {
 const o = C("O");
 
 o("晨间问数：口语化提问路由 ask + NL 检索可达", async () => {
-  const r = ruleBasedRoute("请问上周 OCC 多少？");
+  const r = ruleBasedRoute("请问上周 GMV 多少？");
   eq(r.mode, "ask", "问数路由 ask");
   const nl = await nlSearchEvents(app, scope, "上周的调价记录", new MockNlTranslator());
   assert(nl.page !== undefined || nl.degraded, "NL 检索可达（正常或降级）");
@@ -2791,7 +2791,7 @@ h2("chooseSegment global_group：全量 82 岗幂等覆盖（体检→托管旅�
   RC("简报双轨：LLM stub → via=llm；模型异常 → via=rule 兜底（推理管道验证）", async () => {
     const arc = await getArchive();
     try {
-      const ok = await runBriefingBeat(app, scope, "daily", { llmCall: async () => "【stub】昨日 OCC 86%，无请示。" });
+      const ok = await runBriefingBeat(app, scope, "daily", { llmCall: async () => "【stub】昨日 GMV 860万，无请示。" });
       eq(ok.via, "llm", "stub 合成 via=llm");
       const boom = await runBriefingBeat(app, scope, "daily", { llmCall: async () => { throw new Error("model down"); } });
       eq(boom.via, "rule", "异常兜底 via=rule（不静默）");
