@@ -33,6 +33,7 @@ import { routeIntent, runAsk, runQuest } from "@workloom/runtime";
 import { LlmIntentClassifier, type IntentClassifier } from "@workloom/runtime";
 import { providerFromEnv, OpenAiCompatibleProvider } from "@workloom/base/model-router";
 import { routedLlmCall, resetLlmAssembly } from "../service/llm.js";
+import { creditsRouter, modelFeedbackRouter } from "./credits-router.js";
 import {
   loadCharter, parseCharter, transition, defaultCharter,
   runBriefingBeat, runQueueBeat, runDeviationBeat, runBreakerBeat, buildScorecard,
@@ -2877,6 +2878,8 @@ export const appRouter = router({
   captain: captainRouter,
   service: serviceRouter,
   twin: twinRouter,
+  credits: creditsRouter,
+  modelFeedback: modelFeedbackRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -17,6 +17,7 @@ import { demoRailMessages } from "../../lib/demo-conversation";
 import { useLocation, useNavigate } from "react-router";
 import { ensureDemoLogin, trpc } from "../../lib/trpc";
 import { AgentActionMessage, HumanBubble } from "../hud/messages";
+import { AIFeedback } from "../AIFeedback";
 import { COMMON_STATUS_TEXT, THREAD_MODE_TEXT, dictText } from "../../lib/display";
 
 /** 路由 → 情境快捷钮（前缀匹配；越靠上越优先） */
@@ -39,6 +40,8 @@ interface RingMsg {
   refId?: string;
   receipt?: "synced" | "unverified" | "failed";
   linkTo?: string;
+  /** ask 应答的原始提问（👎 升级重答入参，v3.0 反馈环） */
+  prompt?: string;
 }
 interface DispatchResult {
   kind?: string;
@@ -163,7 +166,7 @@ export function StarRing() {
         });
       } else if (isQuestion(text)) {
         if (r.mode === "ask" && r.answer) {
-          pushMsg({ role: "agent", action: "AI 助手 · 应答", receipt: "synced", refId: r.threadId, text: r.answer });
+          pushMsg({ role: "agent", action: "AI 助手 · 应答", receipt: "synced", refId: r.threadId, text: r.answer, prompt: text });
         } else {
           pushMsg({
             role: "agent", action: "已转立项处理", receipt: "unverified", refId: r.threadId,
@@ -293,6 +296,15 @@ export function StarRing() {
               {m.text}
               {m.linkTo && (
                 <a href={m.linkTo} className="ml-1 text-holo underline">→ 任务中心跟进</a>
+              )}
+              {m.prompt && (
+                <AIFeedback
+                  scene="ask-synthesize"
+                  action="ask-synthesize"
+                  prompt={m.prompt}
+                  originalText={m.text}
+                  fromTier="L2"
+                />
               )}
             </AgentActionMessage>
           ))
