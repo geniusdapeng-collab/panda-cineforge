@@ -157,7 +157,7 @@ export async function handleMessage(input: {
 }): Promise<DialogResult> {
   await ensureServiceSchema();
   const t0 = Date.now();
-  const llm = llmCall();
+  const llm = llmCall("cs-answer"); // v3.0：客服组答场景（L1 轻量档；低置信/点踩可升级重答）
   const mock = !llm;
   const conversationId = await ensureConversation(input);
   await logMessage({ workspaceId: input.workspaceId, conversationId, role: "user", content: input.text });
