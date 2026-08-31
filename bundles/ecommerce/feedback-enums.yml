@@ -1,0 +1,42 @@
+# 自主经营电商 Bundle · 第⑧装配槽：反馈枚举表（D24 自我进化飞轮 M1）
+# 口径：电商反馈主锚是客观数值（价格/库存/退款/佣金）与合规红线；枚举码只增不改。
+version: ecommerce-feedback-enums/v1
+enums:
+  # ---- 定价与促销类 ----
+  - code: price.too_low
+    label: 定价低于毛利底线
+    appliesTo: [reject]
+  - code: price.too_high
+    label: 定价偏离带/损害转化
+    appliesTo: [reject]
+  - code: promo.over_discount
+    label: 折扣过深（击穿价保/毛利）
+    appliesTo: [reject]
+  # ---- 履约与库存类 ----
+  - code: stock.oversell_risk
+    label: 超卖风险（库存不足）
+    appliesTo: [reject]
+  - code: refund.over_policy
+    label: 退款/赔付超政策口径
+    appliesTo: [reject]
+  # ---- 内容与合规类 ----
+  - code: listing.fact_wrong
+    label: 商品信息错误（参数/规格/资质）
+    appliesTo: [reject, edit]
+  - code: compliance.platform
+    label: 平台合规风险（违禁词/极限词/类目错放）
+    appliesTo: [reject]
+  - code: tone.mismatch
+    label: 文案语气不符品牌调性
+    appliesTo: [reject, edit]
+  # ---- 资金类 ----
+  - code: amount.too_high
+    label: 金额过高（采购/投放/返现）
+    appliesTo: [reject]
+  # ---- 通用 ----
+  - code: data.stale
+    label: 数据陈旧/依据不足
+    appliesTo: [reject]
+  - code: other
+    label: 其他（须附自由文本说明）
+    appliesTo: [reject, edit]
