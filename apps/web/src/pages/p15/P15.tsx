@@ -8,6 +8,7 @@ import { Bridge } from "../../shell/Bridge";
 import { EmptyState, SkeletonBlock, SystemDivider } from "../../components/hud";
 import { PageNav } from "../../components/PageNav";
 import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../../components/Twin";
+import { AIFeedback } from "../../components/AIFeedback";
 
 const rightPanel = (
   <>
@@ -67,6 +68,15 @@ export default function P15() {
               <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone={isBad ? "warn" : "go"}>{rating} 分 · {isBad ? "R9 已审" : "auto"}</Tag>}>
                 <b className="text-ink2">{ev.object.id}</b>
                 <span className="text-ink3"> · {ev.context.channel} · {isBad ? String(ev.decision.after?.draft ?? "致歉草稿").slice(0, 30) + "…" : "感谢回复已发布"}</span>
+                {isBad && (
+                  <AIFeedback
+                    scene="review-reply"
+                    action="review.reply"
+                    prompt={`客人差评（${rating} 分，渠道 ${ev.context.channel}）：${String(ev.decision.params?.review_text ?? ev.decision.before?.content ?? "（原文见事件 " + ev.event_id + "）")}`}
+                    originalText={String(ev.decision.after?.draft ?? "致歉草稿")}
+                    fromTier="L2"
+                  />
+                )}
               </Row>
             );
           })}
