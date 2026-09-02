@@ -1,7 +1,7 @@
 # panda-ecom · 能力导览（人类版）
 
 > WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）
-> 本文件由 `node scripts/generate-capabilities.mjs` 从代码事实**自动生成**（2026-08-28），
+> 本文件由 `node scripts/generate-capabilities.mjs` 从代码事实**自动生成**（2026-09-02），
 > 请勿手改——能力变更后重跑生成器即可。Agent 版机器清单见 docs/capability-map.md。
 
 ## 🚀 5 分钟体验路径
@@ -72,7 +72,7 @@ pnpm install && pnpm preview:all
 |---|---|---|
 | **高保真演示页 ×6** | 糖果色，含手机壳容器 | http://localhost:3001 |
 | **官网静态站** | 对外产品故事 | apps/site/index.html |
-| **自带技能 ×3** | industry-entry / product-feedback / release-gate | skills/official/ |
+| **自带技能 ×4** | component-integration / industry-entry / product-feedback / release-gate | skills/official/ |
 | **能力导览 PPT** | 路演/汇报直接用 | docs/capability-tour.pptx |
 | **Mock 数据体系** | 种子 + 离线模型 + 演示直登，开箱即用 | mock/README.md |
 

@@ -1,7 +1,7 @@
 {
  "repo": "panda-ecom",
  "description": "WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）",
- "generatedAt": "2026-08-28T19:13:46.686Z",
+ "generatedAt": "2026-09-02T08:45:10.182Z",
  "demoPages": [
   "panda-ecom-demo-c.html",
   "panda-ecom-demo-mobile.html",
@@ -162,9 +162,9 @@
      "desc": "对外产品故事"
     },
     {
-     "name": "自带技能 ×3",
+     "name": "自带技能 ×4",
      "how": "skills/official/",
-     "desc": "industry-entry / product-feedback / release-gate"
+     "desc": "component-integration / industry-entry / product-feedback / release-gate"
     },
     {
      "name": "能力导览 PPT",

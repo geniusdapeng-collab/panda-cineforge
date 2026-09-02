@@ -65,7 +65,7 @@ WorkLoom 熊猫电商运营系统就是为这件事来的：**把过去只有超
 > 中性测算年化价值 **112–347 万**；最保守情景仍数倍于订阅成本。（示例测算，可按您店铺实际情况替换）
 
 <!-- CAPABILITIES:BEGIN -->
-<!-- 本区块由 scripts/generate-capabilities.mjs 自动生成（2026-08-28），请勿手改；重跑 pnpm capabilities 更新 -->
+<!-- 本区块由 scripts/generate-capabilities.mjs 自动生成（2026-09-02），请勿手改；重跑 pnpm capabilities 更新 -->
 
 ## 🧩 系统能力速览（自动生成 · 与代码同步）
 
@@ -74,7 +74,7 @@ WorkLoom 熊猫电商运营系统就是为这件事来的：**把过去只有超
 - 🖐 **操作电脑能力（本仓自带 · 可装生产工作站）**：computer-use 三层感知（65 动作） · HTTP 远程驱动 + MCP server
 - 🤖 **AI 自动化引擎（系统内置能力）**：围栏 DSL 引擎 · L2 编排（ASK/QUEST） · 夜班自动运行 · 模型路由 · 五元事件 + RLS 隔离 · IM 渠道 等 9 项
 - ✅ **验证与质量（工程纪律）**：一键安装（bootstrap） · 主测试套件 · 发布门禁 · 五元事件验链 · Agent 能力巡游 · 环境自检
-- 🎁 **演示与交付资产**：高保真演示页 ×6 · 官网静态站 · 自带技能 ×3 · 能力导览 PPT · Mock 数据体系
+- 🎁 **演示与交付资产**：高保真演示页 ×6 · 官网静态站 · 自带技能 ×4 · 能力导览 PPT · Mock 数据体系
 
 > 📖 完整能力导览（含截图与体验路径）：[docs/capabilities.auto.md](docs/capabilities.auto.md) ｜ 🤖 AI Agent 入口：[AGENTS.md](AGENTS.md) ｜ 🎯 首启必跑：`pnpm preview:all`
 <!-- CAPABILITIES:END -->
