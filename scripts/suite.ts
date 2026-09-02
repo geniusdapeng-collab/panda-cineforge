@@ -3376,10 +3376,18 @@ h2("chooseSegment global_group：全量 82 岗幂等覆盖（体检→托管旅�
   YC("夜班自动同步：窗口内到期执行且事件归因 system:night-shift；auto_sync 关闭不执行（P1）", async () => {
     const { autoSyncWorkspace, inNightWindow } = await import("@workloom/base/skill-ops");
     const { setSilentMode } = await import("@workloom/base/skill-ops");
-    assert(inNightWindow(new Date(Date.now() + 15 * 3600_000)) === true, "次日凌晨应在夜班窗内（纯函数自检）");
+    const nightNow = (() => {
+      // 下一个上海凌晨 3 点（恒在夜班窗内——不随运行时刻漂移）
+      const now = new Date();
+      const sh = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
+      const cand = new Date(sh);
+      cand.setHours(3, 0, 0, 0);
+      if (sh.getTime() >= cand.getTime()) cand.setDate(cand.getDate() + 1);
+      return new Date(cand.getTime() - (sh.getTime() - now.getTime()));
+    })();
+    assert(inNightWindow(nightNow) === true, "次日凌晨应在夜班窗内（纯函数自检）");
     const skillId = `skill-y-auto-${SFX}`;
     await yCleanup(skillId);
-    const nightNow = new Date(Date.now() + 15 * 3600_000);
     const r = await autoSyncWorkspace(app, gw, scope, {
       registryUrl: "u", signingKey: YKEY, instance: yInst,
       fetcher: yFetch([yPkg(skillId)]), now: nightNow, intervalMs: 0,
