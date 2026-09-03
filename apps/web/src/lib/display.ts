@@ -20,8 +20,8 @@ export const TICKET_STATUS_TEXT: Record<string, string> = {
 };
 
 export const TICKET_KIND_TEXT: Record<string, string> = {
-  delivery: "物流查询",
-  repair: "退换售后",
+  delivery: "送物服务",
+  repair: "维修报修",
   complaint: "投诉建议",
   other: "其他需求",
   service_request: "服务请求",
@@ -34,7 +34,7 @@ export const TICKET_PRIORITY_TEXT: Record<string, string> = {
 };
 
 export const TICKET_ACTOR_TEXT: Record<string, string> = {
-  c_user: "买家",
+  c_user: "住客",
   staff: "员工",
   agent: "AI 员工",
   system: "系统",
@@ -71,21 +71,6 @@ export const INTENT_TEXT: Record<string, string> = {
   complaint: "投诉",
 };
 
-// —— 客服会话意图 ——
-export const CS_INTENT_TEXT: Record<string, string> = {
-  pre_sale: "售前",
-  aftersale: "售后",
-  logistics: "物流",
-  complaint: "投诉",
-  consult: "咨询",
-};
-
-// —— 语种码 ——
-export const LANG_TEXT: Record<string, string> = {
-  zh: "中文", en: "英语", ja: "日语", es: "西班牙语", de: "德语",
-  fr: "法语", pt: "葡萄牙语", ko: "韩语",
-};
-
 // —— 围栏级别 ——
 export const FENCE_LEVEL_TEXT: Record<string, string> = {
   auto: "自动放行",
@@ -116,50 +101,20 @@ export const COMMON_STATUS_TEXT: Record<string, string> = {
   expired: "已过期",
   rolled_back: "已回滚",
   ready: "就绪",
-  queued: "排队中",
 };
 
 // —— 线程模式 ——
 export const THREAD_MODE_TEXT: Record<string, string> = {
-  quest: "任务",
+  quest: "主线任务",
   ask: "问询",
-  agent: "托管",
+  agent: "委托执行",
 };
-
-// —— 经营阶段 ——
-export const STAGE_TEXT: Record<string, string> = {
-  launch: "上新期",
-  growth: "成长期",
-  burst: "爆款期",
-  stable: "稳定期",
-  decline: "衰退期",
-  clearance: "清仓期",
-  promo_prep: "大促备战",
-  promo_peak: "大促峰值",
-};
-
-/** 经营阶段 → 中文展示名（未收录走兜底分词） */
-export function stageText(stage: string | null | undefined): string {
-  return dictText(STAGE_TEXT, stage);
-}
-
-// —— 成员角色 ——
-export const ROLE_TEXT: Record<string, string> = {
-  owner: "所有者",
-  manager: "管理员",
-  readonly: "只读",
-};
-
-/** 成员角色 → 中文展示名 */
-export function roleText(role: string | null | undefined): string {
-  return dictText(ROLE_TEXT, role);
-}
 
 /** 动作码 → 中文（底座通用域） */
 export const ACTION_TEXT: Record<string, string> = {
   // 经营动作
-  "price.adjust": "调整售价",
-  "price.query": "查询售价",
+  "price.adjust": "调整房价",
+  "price.query": "查询房价",
   "comment.reply": "回复评论",
   "memory.upsert": "更新组织记忆",
   // 夜班
@@ -182,57 +137,29 @@ export const ACTION_TEXT: Record<string, string> = {
   "kb.crawl": "抓取官网建库",
   // CEO
   "ceo.briefing": "CEO 晨报",
+  "ceo.board_pack": "董事会简报",
+  "im.outbound": "外发消息",
   "captain.decision": "CEO 决策",
   "captain.grant": "签署授权宪章",
   "captain.transit": "宪章状态流转",
 };
 
-/** 行业扩展动作码（电商域 twin 事件动作码；行业版可在此追加，组件零改动） */
+/** 行业扩展动作码（视频域等；行业版可在此追加，组件零改动） */
 export const ACTION_TEXT_EXT: Record<string, string> = {
-  // 订单与履约
-  "order.create": "创建订单",
-  "order.confirm": "确认订单",
-  "order.reconcile": "订单对账",
-  "order.refund": "订单退款",
-  "settlement.reconcile": "多平台对账",
-  "aftersale.refund": "售后退款",
-  // 价格与刊登
-  "price.publish": "发布价格",
-  "price.parity.watch": "价格倒挂巡检",
-  "pricing.fx.reprice.assess": "汇率重定价评估",
-  "listing.publish": "刊登上架",
-  "listing.image.block": "主图合规阻断",
-  // 库存与仓储
-  "inventory.sync": "同步库存",
-  "inventory.sync.restore": "恢复库存上架",
-  "stock.inbound": "采购入库",
-  "stock.outbound": "出库履约",
-  "stock.transfer": "仓间调拨",
-  "stock.count": "循环盘点",
-  "stock.stockout.alert": "断货预警",
-  "fba.replenish": "FBA 补货",
-  // 广告
-  "ads.acos.alert": "ACoS 爆表告警",
-  "ads.budget.fuse": "广告预算熔断",
-  "ads.budget.raise": "广告预算上调",
-  // 客服与评价
-  "cs.reply": "客服应答",
-  "cs.escalate": "客服升级转人工",
-  "review.detect": "差评侦测",
-  "review.reply": "回复评价",
-  "review.asset.boost": "好评资产化",
-  // 风控与合规
-  "hijack.alert": "跟卖突袭告警",
-  "hijack.evidence.file": "跟卖证据固化",
-  "fx.volatility.alert": "汇率波动告警",
-  "procurement.urgent.request": "紧急采购请示",
-  "alert.escalate": "告警升级",
-  "incident.report": "断点上报",
-  "incident.resolve": "断点处置",
-  // 经营快照
-  "store.daily.summary": "店铺日结快照",
-  "content.publish": "内容发布",
-  "competitor.fetch": "竞对采集",
+  "render.submit": "提交渲染",
+  "render.approve": "审批渲染",
+  "publish.post": "发布内容",
+  "publish.quota": "发布配额",
+  "script.update": "更新渲染脚本",
+  "comment.monitor": "评论监控",
+  "deal.quote": "商单报价",
+  "dossier.confirm": "确认情报档案",
+  "theme.select": "选定主题方向",
+  "prd.confirm": "确认产品需求",
+  "prompt_package.confirm": "确认镜头提示词",
+  "portrait_set.confirm": "确认定妆照",
+  "pipeline.started": "启动制作管线",
+  "pipeline.gate": "管线质量门",
 };
 
 const ACTION_PART_TEXT: Record<string, string> = {
@@ -330,100 +257,39 @@ export function latencyText(ms: number | null | undefined): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-// —— 行动者/员工代号 → 中文名（F-CN1：界面不出现 reconcile-agent/channel-operations 这类原始 ID）——
+// —— 行动者/员工代号 → 中文名（F-CN1：界面不出现 reconcile-agent/guest-success 这类原始 ID）——
 /** preset_key / actor id → 中文名。成员编号（MEM-xxx）与事件编号（E-xxx）属代号，原样保留 */
 export const ACTOR_TEXT: Record<string, string> = {
-  // —— 集团指挥层（4）——
-  "group-ceo": "集团数字CEO",
-  "biz-analyst": "经营分析参谋",
-  "budget-controller": "预算管控官",
-  "digital-hr": "数字HR",
-  // —— 共享中台（27）——
-  "data-warehouse": "数据口径官",
-  "sku-pl-accountant": "SKU损益核算师",
-  "competitor-radar": "竞对雷达",
-  "market-intel": "市场情报员",
-  "selection-analyst": "选品算账师",
-  "spu-master": "全球商品库官",
-  "listing-factory": "刊登工厂长",
-  "localization-editor": "本地化主编",
-  "demand-planner": "需求预测师",
-  "procurement-buyer": "采购执行员",
-  "cn-warehouse": "国内仓网管家",
-  "overseas-warehouse": "海外仓调拨官",
-  "freight-forwarder": "头程物流官",
-  "reverse-logistics": "逆向物流专员",
-  "multi-reconciler": "多平台对账师",
-  "fx-settler": "多币种结算师",
-  "vat-specialist": "VAT税务师",
-  "cash-forecaster": "资金沙盘师",
-  "rule-sentinel": "平台规则哨兵",
-  "ip-shield": "知识产权护盾",
-  "account-guardian": "账号健康官",
-  "creative-studio": "素材工场长",
-  "brand-private": "品牌私域运营",
-  "kb-trainer": "客服知识训练师",
-  "service-qc": "客服质检官",
-  "mm-engineer": "多模态理解工程师",
-  "live-producer": "直播中控长",
-  // —— 国内作战军（26）——
-  "tmall-head": "天猫店长",
-  "tmall-ops": "天猫活动运营",
-  "tmall-ads": "天猫投手",
-  "tmall-cs": "天猫客服",
-  "jd-head": "京东店长",
-  "jd-ops": "京东采销协同运营",
-  "jd-cs": "京东客服",
-  "pdd-head": "拼多多店长",
-  "pdd-ops": "拼多多活动运营",
-  "pdd-cs": "拼多多客服",
-  "douyin-head": "抖音店长",
-  "douyin-ads": "千川投手",
-  "douyin-live": "抖音直播运营",
-  "douyin-video": "抖音短视频编导",
-  "douyin-cs": "抖音客服",
-  "kuaishou-head": "快手店长",
-  "kuaishou-ads": "磁力金牛投手",
-  "kuaishou-cs": "快手客服",
-  "xhs-head": "小红书店长",
-  "xhs-content": "小红书笔记内容",
-  "xhs-cs": "小红书客服",
-  "channels-head": "视频号店长",
-  "channels-cs": "视频号客服",
-  "tmallg-head": "天猫国际店长",
-  "tmallg-ops": "天猫国际进口跨境运营",
-  "tmallg-cs": "天猫国际客服",
-  // —— 跨境作战军（24）——
-  "amz-us-head": "亚马逊美区店长",
-  "amz-eu-head": "亚马逊欧洲店长",
-  "amz-jp-head": "亚马逊日本店长",
-  "amz-ppc": "亚马逊PPC投手",
-  "amz-listing": "亚马逊Listing优化师",
-  "amz-account": "亚马逊账号绩效专员",
-  "amz-fba": "亚马逊FBA补货协同",
-  "temu-head": "Temu半托管店长",
-  "temu-pricing": "Temu核价运营",
-  "tts-us-head": "TikTokShop美区店长",
-  "tts-sea-head": "TikTokShop东南亚店长",
-  "tts-creator": "TikTok达人建联",
-  "tts-live": "TikTok直播运营",
-  "shopee-head": "Shopee/Lazada店长",
-  "shopee-cs": "Shopee/Lazada客服",
-  "ae-head": "速卖通店长",
-  "shein-supply": "SHEIN供货协同",
-  "dtc-webmaster": "独立站站长",
-  "dtc-seo": "独立站SEO/内容",
-  "dtc-edm": "独立站EDM私域",
-  "dtc-ads": "独立站投手",
-  "cs-en": "英语客服组",
-  "cs-eu": "欧洲语言组",
-  "cs-apac": "亚太语言组",
-  // —— 底座继承 ——
-  "inspection-agent": "巡检 Agent",
-  "desktop-agent": "桌面 Agent",
+  // 酒店域
+  "reconcile-agent": "财务司库官",
+  "competitor-agent": "市场侦察官",
+  "channel-watcher": "渠道哨兵官",
+  "ai-receptionist": "AI 接待员",
+  "content-agent": "内容主笔官",
+  "voice-front-agent": "语音前台官",
+  "guest-success": "住客满意官",
+  "owner-cockpit": "业主驾驶舱",
+  "groupbuy-agent": "团购运营官",
+  "pricing-agent": "收益定价官",
+  "desktop-agent": "数字执行官",
+  "review-agent": "口碑公关官",
+  "coupon-operator": "优惠券运营官",
+  "lead-concierge": "线索管家官",
+  "company-ceo": "公司CEO",
   captain: "编排官",
+  "im-channels": "IM 渠道",
   system: "系统",
   "night-shift": "夜班中心",
+  "morning-briefing": "夜班晨报",
+  "inspection-agent": "品质巡检官",
+  // 视频域常见
+  director: "总导演",
+  producer: "制片人",
+  editor: "剪辑师",
+  renderer: "渲染师",
+  publisher: "发布专员",
+  "data-analyst": "数据看板官",
+  "script-writer": "剧本师",
 };
 
 /**
@@ -435,14 +301,10 @@ export function actorText(id: string): string {
   const hit = ACTOR_TEXT[id];
   if (hit) return hit;
   if (/^(MEM|E|T|VID|R|G)-/.test(id)) return id; // 编号类保留
-  if (id.startsWith("agt-")) {
-    const root = id.slice(4);
-    const rootHit = ACTOR_TEXT[root];
-    if (rootHit) return rootHit;
-  }
   if (id.endsWith("-agent")) {
     const root = id.slice(0, -6);
-    return `${ACTOR_TEXT[root] ?? root.replace(/[-_]/g, " ")} Agent`;
+    // 未收录岗位：词根转空格+"数字员工"（界面不出现英文 Agent 后缀）
+    return ACTOR_TEXT[root] ? `${ACTOR_TEXT[root]}` : `${root.replace(/[-_]/g, " ")} · 数字员工`;
   }
   return id.replace(/[-_]/g, " ");
 }
@@ -463,7 +325,7 @@ export const ACTION_OPS_TEXT: Record<string, string> = {
   "coupon.promote": "券推广",
   "funnel.weekly": "漏斗周报",
   "geo.publish": "GEO 发布",
-  "buyer.care.send": "买家关怀",
+  "guest.care.send": "住客关怀",
   "inspection.scan": "巡检扫描",
   "intent.radar.report": "意图雷达播报",
   "lead.assign": "线索分派",
@@ -503,13 +365,8 @@ export const ACTION_OPS_TEXT: Record<string, string> = {
 
 /** 行动载荷人性化：常见 JSON 键 → 中文键值对；非对象原样返回（F-CN1） */
 const PAYLOAD_KEY_TEXT: Record<string, string> = {
-  diff: "差异", rounds: "轮次", card: "竞对", price: "价格", sku: "SKU", count: "数量",
-  note: "备注", gmv: "GMV", acos: "ACoS", margin_rate: "毛利率", qty: "数量", amount: "金额",
-  warehouse: "仓库", days_cover: "可售天数", rating: "评分", score: "评分", status: "状态",
-  intent: "意图", lang: "语种", currency: "币种",
-  cards: "竞对卡片", hijack_suspects: "疑似跟卖", price_band_shift: "价格带偏移",
-  diff_rate: "差异率", gmv_sample: "GMV 样本", resolved: "已解决",
-  first_response_sec: "首响秒数", multimodal: "多模态",
+  diff: "差异", rounds: "轮次", card: "竞对", price: "价格", sku: "单品", count: "数量",
+  note: "备注", occ: "入住率", revpar: "RevPAR", adr: "均价", score: "评分", status: "状态",
 };
 export function payloadText(after: unknown, maxLen = 160): string {
   if (after == null) return "";
@@ -521,3 +378,49 @@ export function payloadText(after: unknown, maxLen = 160): string {
   });
   return parts.join(" · ").slice(0, maxLen);
 }
+
+/* ============ panda-cineforge 行业扩展（电商域文案映射） ============ */
+export const CS_INTENT_TEXT: Record<string, string> = {
+  pre_sale: "售前",
+  aftersale: "售后",
+  logistics: "物流",
+  complaint: "投诉",
+  consult: "咨询",
+};
+
+// —— 语种码 ——
+export const LANG_TEXT: Record<string, string> = {
+  zh: "中文", en: "英语", ja: "日语", es: "西班牙语", de: "德语",
+  fr: "法语", pt: "葡萄牙语", ko: "韩语",
+};
+
+// —— 围栏级别 ——
+export const STAGE_TEXT: Record<string, string> = {
+  launch: "上新期",
+  growth: "成长期",
+  burst: "爆款期",
+  stable: "稳定期",
+  decline: "衰退期",
+  clearance: "清仓期",
+  promo_prep: "大促备战",
+  promo_peak: "大促峰值",
+};
+
+/** 经营阶段 → 中文展示名（未收录走兜底分词） */
+export function stageText(stage: string | null | undefined): string {
+  return dictText(STAGE_TEXT, stage);
+}
+
+// —— 成员角色 ——
+export const ROLE_TEXT: Record<string, string> = {
+  owner: "所有者",
+  manager: "管理员",
+  readonly: "只读",
+};
+
+/** 成员角色 → 中文展示名 */
+export function roleText(role: string | null | undefined): string {
+  return dictText(ROLE_TEXT, role);
+}
+
+/** 动作码 → 中文（底座通用域） */
