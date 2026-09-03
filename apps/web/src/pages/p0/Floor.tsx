@@ -77,11 +77,13 @@ export function FloorView({
     const cv = ref.current!;
     const ctx = cv.getContext("2d")!;
     let raf = 0;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
 
     const frame = () => {
       const scene = floorRef.current.scene;
       const W = cv.offsetWidth, H = cv.offsetHeight;
+      // DPR 每帧重读：Electron 固定比例画布 zoomFactor 会改变 devicePixelRatio，
+      // 取常量会导致 zoom>1 时 Canvas 按旧位图放大模糊（客户端适配纪律）
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
       if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
@@ -181,7 +183,11 @@ export function FloorView({
       ctx.fillStyle = "#d4002a"; ctx.font = "bold 9px sans-serif"; ctx.textAlign = "center";
       ctx.fillText(ceoName, cd.sx, cd.sy + 14);
 
-      /* 员工：更新目标 + 插值走位 */
+      /* 员工：更新目标 + 插值走位（先清理已离场员工的运行时，防泄漏） */
+      const alive = new Set(floorRef.current.agents.map((a) => a.id));
+      for (const id of [...actors.current.keys()]) {
+        if (!alive.has(id)) actors.current.delete(id);
+      }
       hitboxes.current = [];
       const list = floorRef.current.agents;
       const sorted = [...list].sort((a, b) => { // 远的先画（遮挡）
@@ -250,11 +256,11 @@ export function FloorView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ceoName]);
 
-  /* 点击：命中员工 → 请示卡 / 绩效卡 */
+  /* 点击：命中员工 → 请示卡 / 绩效卡（绘制顺序远→近，点击逆序=上层优先） */
   const onClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    for (const h of hitboxes.current) {
+    for (const h of [...hitboxes.current].reverse()) {
       if ((mx - h.sx) ** 2 + (my - h.sy) ** 2 < h.r ** 2 * 2.2) {
         const agent = floorRef.current.agents.find((a) => a.id === h.id);
         if (!agent) return;
