@@ -32,7 +32,7 @@ export function RadarAlertCard({
   return (
     <div
       className={`relative overflow-hidden rounded-msg border ${m.border} px-4 py-3.5`}
-      style={{ background: `linear-gradient(150deg, ${m.bg}, #ffffff 70%)` }}
+      style={{ background: `linear-gradient(150deg, ${m.bg}, #15181c 70%)` }}
     >
       {/* 雷达扫动（4s/圈；reduced-motion 降级静态——tokens.css 全局纪律） */}
       <div

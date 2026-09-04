@@ -24,12 +24,12 @@ export function KpiGauge({
       className={`relative overflow-hidden rounded-[13px] border px-3.5 py-3 ${
         stale ? "border-line opacity-55 grayscale-[.6]" : "border-gline"
       }`}
-      style={{ background: "linear-gradient(160deg, #ffffff, #fff0f4)" }}
+      style={{ background: "linear-gradient(160deg, #1c2025, #15181c)" }}
     >
       {/* 扫描线纹理（珊瑚色系低透明度，§5.7） */}
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: "repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,36,66,.04) 3px 4px)" }}
+        style={{ background: "repeating-linear-gradient(0deg, transparent 0 3px, rgba(214,220,228,.04) 3px 4px)" }}
       />
       <div className="relative text-micro tracking-[.12em] text-ink2">{name}</div>
       <div className="relative my-1 font-orb text-[22px] font-bold text-ink">{value}</div>

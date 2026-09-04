@@ -907,7 +907,7 @@ function makeEvent(i: number, time: Date, presets: Preset[]): SeedEvent {
           action: "settlement.reconcile",
           after: {
             gmv_sample: gmv, currency, diff, diff_rate: Math.round((diff / gmv) * 10000) / 10000, rounds: 3,
-            ...(hasDiff ? { note: "三方差异 ≈0.3%，已立项追查（对账Agent 演示发现点）" } : {}),
+            ...(hasDiff ? { note: "三方差异 ≈0.3%，已立项追查（财务司库官演示发现点）" } : {}),
           },
           basis: ["订单流水 × 平台账单 × 广告/售后扣款三方比对（账单与订单/广告/售后可对平）"],
         },

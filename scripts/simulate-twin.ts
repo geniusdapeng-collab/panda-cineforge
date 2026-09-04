@@ -315,7 +315,7 @@ function evReconcile(t: Date, withDiff: boolean): TwinEvent {
     object: { type: "settlement", id: `STL-${shop.platform}-${int(100, 999)}` },
     decision: {
       action: "settlement.reconcile",
-      after: { gmv_sample: gmv, currency: shop.currency, diff, diff_rate: Math.round((diff / gmv) * 10000) / 10000, rounds: 3, ...(withDiff ? { note: "三方差异 ≈0.3%，已立项追查（对账Agent 演示发现点）" } : {}) },
+      after: { gmv_sample: gmv, currency: shop.currency, diff, diff_rate: Math.round((diff / gmv) * 10000) / 10000, rounds: 3, ...(withDiff ? { note: "三方差异 ≈0.3%，已立项追查（财务司库官演示发现点）" } : {}) },
       basis: ["订单流水 × 平台账单 × 广告/售后扣款三方比对（账单可对平）"],
     },
     rule_impact: [], model_trace: mt("standard", true),
