@@ -10,7 +10,7 @@ import { actionCategory, calibratedThreshold, clusterEvents } from "./awareness.
 import type { BusinessEvent } from "@workloom/shared";
 
 const skillRow = (over: Partial<SkillRow>): SkillRow => ({
-  id: "skill-x", level: "official", bundle: "ecommerce", name: "x", version: "1.0.0",
+  id: "skill-x", level: "official", bundle: "hotel", name: "x", version: "1.0.0",
   description: "", fence_bindings: [], body: "", desensitized: false, ...over,
 });
 
@@ -46,8 +46,8 @@ describe("SKILL.md 渲染与 ID（F8.3/F8.1）", () => {
     expect(md).toContain("## 边界（什么不做）\n不破保底价");
   });
   it("team 技能 ID 落 skill-t- 命名空间（白名单标识）", () => {
-    expect(teamSkillId("差评跟进 SOP", "ws-demo")).toBe("skill-t-ws-demo-差评跟进-sop");
-    expect(teamSkillId("  ", "ws-demo")).toBe("skill-t-ws-demo-unnamed");
+    expect(teamSkillId("差评跟进 SOP", "ws-yunqi")).toBe("skill-t-ws-yunqi-差评跟进-sop");
+    expect(teamSkillId("  ", "ws-yunqi")).toBe("skill-t-ws-yunqi-unnamed");
   });
 });
 
@@ -100,7 +100,7 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
   const { gatewayAppend } = await import("../workdata/gateway.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
   /** app 池断言查询辅助：事务内设 RLS 上下文（与生产口径一致；池直查在 RLS 下恒 0 行） */
   const qApp = async <T extends Record<string, any> = Record<string, any>>(sql: string, params: unknown[] = []) => {
     const c = await app.connect();
@@ -140,9 +140,7 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
     await uninstallSkill(app, gw, scope, { skillId: revenue!.id, by: "MEM-001" }).catch(() => undefined);
 
     const i1 = await installSkill(app, gw, scope, { skillId: revenue!.id, by: "MEM-001" });
-    expect(i1.installed).toBe(true);
-    expect(i1.deduped).toBe(false);
-    expect(i1.bindings).toEqual(expect.arrayContaining(["R1", "R2"])); // ecommerce v3 技能绑定含追加项
+    expect(i1).toMatchObject({ installed: true, deduped: false, bindings: ["R1", "R2"] });
 
     const agent = await qApp<{ id: string }>(`SELECT id FROM agents WHERE workspace_id=$1 AND preset_key='pricing-agent'`, [scope.workspaceId]);
     const bindings = await resolveAgentFenceBindings(app, scope, agent.rows[0]!.id);
@@ -153,7 +151,7 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
     expect(i2.deduped).toBe(true); // 重复安装不报错不重复留痕
 
     const u = await uninstallSkill(app, gw, scope, { skillId: revenue!.id, by: "MEM-001" });
-    expect(u.revokedBindings).toEqual(expect.arrayContaining(["R1", "R2"])); // L8.3 卸载即撤销（含追加绑定）
+    expect(u.revokedBindings).toEqual(["R1", "R2"]); // L8.3 卸载即撤销
     const installs = await listInstalls(app, scope);
     expect(installs.find((x) => x.skill_id === revenue!.id)).toBeUndefined();
     const bindingsAfter = await resolveAgentFenceBindings(app, scope, agent.rows[0]!.id);
@@ -205,8 +203,8 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
 
     await qApp(
       `INSERT INTO skills (id, level, bundle, name, version, description, fence_bindings, body, desensitized)
-       VALUES ('skill-conflict','official','ecommerce','conflict-skill','1.0.0','', '["R1","R99"]', '', false)
-       ON CONFLICT (id) DO UPDATE SET fence_bindings='["R1","R99"]'`,
+       VALUES ('skill-conflict','official','hotel','conflict-skill','1.0.0','', '["R1","R9"]', '', false)
+       ON CONFLICT (id) DO UPDATE SET fence_bindings='["R1","R9"]'`,
     );
     await expect(installSkill(app, gw, scope, { skillId: "skill-conflict", by: "MEM-001" }))
       .rejects.toMatchObject({ code: "FENCE_CONFLICT" });
@@ -223,7 +221,7 @@ describe.runIf(RUN_DB)("技能/意识 PG 集成（M8 铁律）", async () => {
       triplet: { trigger: "出现 ≤3 分差评", steps: ["归因", "起草回复", "挂审批"], boundary: "不承诺档案外补偿" },
       fenceBindings: ["R6"], by: "MEM-002",
     });
-    expect(draft.skillId).toBe(`skill-t-ws-demo-差评跟进打法-${RUN}`.toLowerCase());
+    expect(draft.skillId).toBe(`skill-t-ws-yunqi-差评跟进打法-${RUN}`.toLowerCase());
     expect(draft.version).toMatch(/^\d+\.\d+\.0$/); // 同名再生成版本递增（重跑安全）
 
     await expect(installSkill(app, gw, scope, { skillId: draft.skillId, by: "MEM-002" }))

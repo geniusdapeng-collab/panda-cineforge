@@ -1,6 +1,6 @@
 /**
  * runtime · preset 装配三要素校验（F3.6/L3.7）：生成前必读「档案+阶段+目标」，缺一拒绝执行
- * 装配内容：工具集 + 提示词段 + 围栏声明 + 档案上下文（bundles/ecommerce presets 装载形态）
+ * 装配内容：工具集 + 提示词段 + 围栏声明 + 档案上下文（bundles/hotel presets 装载形态）
  */
 import type pg from "pg";
 

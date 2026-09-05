@@ -81,11 +81,11 @@ d("PG 集成夜班闭环（种子库）", async () => {
   const { upsertTrigger, setTriggerEnabled, tickTriggers } = await import("./triggers.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
   const runDate = `test-${Date.now().toString(36)}`;
   // 0013 口径：nr-<workspaceId>-<runDate>（PK 已改 (workspace_id, run_date)，id 保留唯一约束兼容旧查询）
   const runId = nightRunId(scope.workspaceId, runDate);
-  expect(runId).toBe(`nr-ws-demo-${runDate}`);
+  expect(runId).toBe(`nr-ws-yunqi-${runDate}`);
 
   it("18:00 候选清单：夜班 preset 覆盖 3 项 + 谷时价 + 围栏摘要", async () => {
     const list = await buildCandidateList(app, scope);
@@ -94,14 +94,14 @@ d("PG 集成夜班闭环（种子库）", async () => {
     expect(list.some((i) => i.type === "对账")).toBe(true);
   });
 
-  it("开启夜班：ready→running + 围栏快照 ecom-baseline/v1（F2.6）+ 留痕", async () => {
+  it("开启夜班：ready→running + 围栏快照 hotel-baseline/v1（F2.6）+ 留痕", async () => {
     await ensureReady(app, gw, scope, runDate);
     await confirmNight(app, gw, scope, runId, "MEM-001", ["nt-reconcile", "nt-review"]);
     const c = await app.connect();
     try {
       await c.query("SELECT set_config('app.workspace_id', $1, false)", [scope.workspaceId]);
       const r = await c.query(`SELECT status, fence_snapshot_version, candidate_count FROM night_runs WHERE id=$1`, [runId]);
-      expect(r.rows[0]).toMatchObject({ status: "running", fence_snapshot_version: "ecom-baseline/v3", candidate_count: 2 });
+      expect(r.rows[0]).toMatchObject({ status: "running", fence_snapshot_version: "hotel-baseline/v1", candidate_count: 2 });
     } finally { c.release(); }
   });
 
@@ -133,7 +133,7 @@ d("PG 集成夜班闭环（种子库）", async () => {
 
   it("pauseAll 对不存在班次抛错（拒绝空班次操作）", async () => {
     await expect(
-      pauseAll(app, gw, scope, `nr-ws-demo-missing-${Date.now().toString(36)}`, { memberNo: "MEM-001", channel: "mobile" }),
+      pauseAll(app, gw, scope, `nr-ws-yunqi-missing-${Date.now().toString(36)}`, { memberNo: "MEM-001", channel: "mobile" }),
     ).rejects.toThrow(/不存在/);
   });
 

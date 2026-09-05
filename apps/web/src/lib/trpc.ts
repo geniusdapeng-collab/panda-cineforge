@@ -34,9 +34,9 @@ export const trpc = createTRPCClient<AppRouter>({
 /**
  * 演示身份自动登录（演示/开发便利；生产部署用真实登录替代）。
  * 工作区与成员均可经 VITE_DEMO_WORKSPACE / VITE_DEMO_MEMBER 覆盖——
- * 不写死在调用侧，客户自建工作区（非 panda-group 种子库）时演示登录仍可用。
+ * 不写死在调用侧，客户自建工作区（非种子库默认工作区）时演示登录仍可用。
  */
-const DEMO_WORKSPACE = (import.meta.env.VITE_DEMO_WORKSPACE as string | undefined) ?? "panda-group";
+const DEMO_WORKSPACE = (import.meta.env.VITE_DEMO_WORKSPACE as string | undefined) ?? "yunqi-hotel";
 const DEMO_MEMBER = (import.meta.env.VITE_DEMO_MEMBER as string | undefined) ?? "MEM-001";
 export async function ensureDemoLogin(memberNo = DEMO_MEMBER): Promise<void> {
   if (getToken()) return;

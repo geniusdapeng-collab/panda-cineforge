@@ -20,15 +20,15 @@ const RUN = Date.now().toString(36);
 
 const snapshot: InspectionSnapshot = {
   channels: [
-    { channel: `天猫-${RUN}`, price: 480, parity: true, status: "online" },
-    { channel: `京东-${RUN}`, price: 480, parity: false, status: "online" },
-    { channel: `拼多多-${RUN}`, status: "offline" },
+    { channel: `携程-${RUN}`, price: 480, parity: true, status: "online" },
+    { channel: `美团-${RUN}`, price: 480, parity: false, status: "online" },
+    { channel: `飞猪-${RUN}`, status: "offline" },
   ],
-  stockUnits: [
-    { sku: `SKU-3C-${RUN}`, synced: true },
-    { sku: `SKU-HM-${RUN}`, synced: false },
+  stateUnits: [
+    { unit: `标准单元-${RUN}`, synced: true },
+    { unit: `豪华单元-${RUN}`, synced: false },
   ],
-  reviews: [{ id: `rv-${RUN}`, channel: "天猫", score: 2 }],
+  reviews: [{ id: `rv-${RUN}`, channel: "携程", score: 2 }],
   violations: [],
 };
 
@@ -37,9 +37,9 @@ describe("巡检探针（F9.1 内置四检，确定性）", () => {
     const findings = runChecks(DEFAULT_CHECKS, snapshot);
     const price = findings.filter((f) => f.checkId === "chk-channel-price");
     expect(price).toHaveLength(3);
-    expect(price.find((f) => f.objectId === `拼多多-${RUN}`)).toMatchObject({ status: "anomaly", severity: "high" });
-    expect(price.find((f) => f.objectId === `京东-${RUN}`)).toMatchObject({ status: "anomaly", severity: "medium" });
-    expect(price.find((f) => f.objectId === `天猫-${RUN}`)).toMatchObject({ status: "ok" });
+    expect(price.find((f) => f.objectId === `飞猪-${RUN}`)).toMatchObject({ status: "anomaly", severity: "high" });
+    expect(price.find((f) => f.objectId === `美团-${RUN}`)).toMatchObject({ status: "anomaly", severity: "medium" });
+    expect(price.find((f) => f.objectId === `携程-${RUN}`)).toMatchObject({ status: "ok" });
   });
 
   it("差评 ≤3 分高优；违规列表空=正常；快照缺项=nodata 不计正常", () => {
@@ -86,7 +86,7 @@ describe.runIf(RUN_DB)("巡检 PG 集成（M9 铁律）", async () => {
   const { runInspectionScan, inspectionStatusBar, dispatchFromAnomaly, resolveAnomaly } = await import("./index.js");
   const app = new pg.Pool({ connectionString: process.env.DATABASE_APP_URL });
   const gw = new pg.Pool({ connectionString: process.env.DATABASE_GATEWAY_URL });
-  const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
+  const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
   /** app 池断言查询辅助：事务内设 RLS 上下文（与生产口径一致；池直查在 RLS 下恒 0 行） */
   const qApp = async <T extends Record<string, any> = Record<string, any>>(sql: string, params: unknown[] = []) => {
     const c = await app.connect();
@@ -109,9 +109,9 @@ describe.runIf(RUN_DB)("巡检 PG 集成（M9 铁律）", async () => {
   it("L9.1 只读前置通过 + F9.2 异常分级事件 + G3 高优推送 + F9.4 状态条", async () => {
     const report = await runInspectionScan(app, gw, scope, { snapshot });
     expect(report.ok).toBe(true);
-    expect(report.anomalies.filter((a) => !a.deduped)).toHaveLength(4); // 拼多多/京东/SKU-HM/差评
+    expect(report.anomalies.filter((a) => !a.deduped)).toHaveLength(4); // 飞猪/美团/豪华单元/差评
     expect(report.notifyEventIds.length).toBeGreaterThanOrEqual(2); // channel_price 源 + review 源各一条摘要
-    expect(report.okCount).toBe(3); // 天猫/SKU-3C/违规
+    expect(report.okCount).toBe(3); // 携程/标准单元/违规
 
     const bar = await inspectionStatusBar(app, scope);
     expect(bar.lastRunAt).not.toBeNull();
@@ -133,7 +133,7 @@ describe.runIf(RUN_DB)("巡检 PG 集成（M9 铁律）", async () => {
     const report = await runInspectionScan(app, gw, scope, {
       snapshot,
       retries: 1,
-      probes: { channel_price: boom, stock_sync: boom, review: boom, violation: boom },
+      probes: { channel_price: boom, state_sync: boom, review: boom, violation: boom },
     });
     expect(report.ok).toBe(false);
     expect(report.attempts).toBe(2);
