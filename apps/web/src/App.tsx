@@ -31,6 +31,7 @@ import { Bridge } from "./shell/Bridge";
 import { SideNav } from "./shell/SideNav";
 import { useLocation } from "react-router";
 import { StarRing } from "./components/star-ring/StarRing";
+import { LoomMate } from "./components/loommate/LoomMate";
 
 /** 阶段三路由：页面自包 Bridge（注入真实左右栏）；/dev 矩阵保持壳内平铺 */
 function Shell() {
@@ -40,6 +41,7 @@ function Shell() {
   return (
     <div className="flex min-h-screen">
       {!bare && <SideNav />}
+      {!bare && <LoomMate />}
       <div className="min-w-0 flex-1">
     {/* AI 助手 AskRail：全局右侧通栏对话框（任何页面常驻；⌘K 唤起） */}
         <StarRing />
