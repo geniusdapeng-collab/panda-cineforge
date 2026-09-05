@@ -1,0 +1,31 @@
+{
+  "baseRepo": "geniusdapeng-collab/workloom-im",
+  "lastSyncedBaseSha": null,
+  "lastSyncAt": null,
+  "filesTouched": 0,
+  "note": "机制初始化基线；lastSyncedBaseSha 由下次 detect/pull 自动刷新",
+  "extraExclude": [
+    "apps/server/src/service/contract.test.ts",
+    "apps/server/src/service/dialog.test.ts",
+    "apps/server/src/service/e2e.test.ts",
+    "packages/base/im-channels/im-channels.test.ts",
+    "packages/base/model-router/model-router.test.ts",
+    "packages/base/review-console/approvals.test.ts",
+    "packages/base/service-dialog/**",
+    "packages/base/service-kb/**",
+    "packages/base/service-ticket/scenarios.test.ts",
+    "packages/base/service-ticket/service-ticket.test.ts",
+    "packages/base/tenancy/tenancy.test.ts",
+    "packages/base/workdata/atomicity.test.ts",
+    "packages/base/workdata/memory.test.ts",
+    "packages/base/workdata/recall.test.ts",
+    "packages/base/workdata/recall.ts",
+    "packages/base/workdata/security-audit.test.ts",
+    "packages/base/workdata/workdata.test.ts",
+    "packages/shared/src/constants.ts",
+    "packages/shared/src/event-schema.test.ts",
+    "scripts/agent-tour.sh",
+    "scripts/e2e-service-c.mjs",
+    "scripts/release-gate.ts"
+  ]
+}
