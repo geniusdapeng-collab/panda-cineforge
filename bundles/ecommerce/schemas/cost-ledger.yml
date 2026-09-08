@@ -1,0 +1,66 @@
+# cost-ledger.yml · 全口径成本与利润瀑布口径（P0 口径即资产）
+# 铁律：这里是"口径"的唯一事实源——代码（0027 迁移 CHECK 枚举 / 决策金额化计算器 /
+#      利润驾驶舱 P29 / fast-scan 报告）必须与本文档对账；卖家 onboarding 时以其真实
+#      核算表格为准覆盖本文件（经 P27 配置录入 / P3 表格导入），不允许 AI 自造口径。
+# 对账纪律：cost_items.category CHECK 枚举 == cost_categories[].id；
+#          shipments.status / shipment_milestones.node == 本文档节点定义。
+
+version: "1.0.0"
+
+# 六类成本（与 cost_items.category CHECK 一一对应；顺序=利润瀑布扣减顺序）
+cost_categories:
+  - id: purchase      # 采购成本（货值）
+    label: 采购
+    source_tables: [purchase_orders, cost_items]
+  - id: freight       # 头程物流（海/空/铁/快递 + 清关杂费）
+    label: 头程物流
+    source_tables: [shipments, cost_items]
+  - id: storage       # 仓储（国内仓/海外仓/FBA 月度仓储 + 长期仓储费）
+    label: 仓储
+    source_tables: [cost_items]
+  - id: ads           # 广告（SP/SB/SD/站外，按账期归集）
+    label: 广告
+    source_tables: [cost_items]
+  - id: platform_fee  # 平台佣金与服务费（payouts.fee_amount 同源）
+    label: 平台费
+    source_tables: [payouts, cost_items]
+  - id: penalty       # 平台罚款（ODR/迟发/违规/押金扣款——必须单列，不得并入平台费）
+    label: 罚款
+    source_tables: [platform_penalties, cost_items]
+
+# 罚款细分（platform_penalties.kind 枚举）
+penalty_kinds: [odr, late-shipment, violation, deposit, other]
+
+# 利润瀑布（shop_profit_waterfall 视图运行时参数）
+waterfall:
+  # 净利 = 回款净额 − Σ扣减项（顺序即展示顺序；enabled=false 的项不参与计算与展示）
+  base: payout_net            # 真实锚点：平台结算实际到账（payouts.net_amount）
+  deductions: [purchase, freight, storage, ads, platform_fee, penalty]
+  # 店铺→SKU 分摊规则（sku 层无回款口径时的分摊方式；卖家表格为准可覆盖）
+  allocation:
+    purchase: by_sku_direct   # 采购按 PO 明细直达 SKU
+    freight: by_units         # 头程按件数分摊
+    storage: by_ageing_value  # 仓储按库龄货值分摊
+    ads: by_sku_direct        # 广告按 SKU 报表直达
+    platform_fee: by_revenue_share  # 平台费按销售额占比分摊
+    penalty: at_shop_level    # 罚款默认店铺级（大卖实战口径：罚款难归因到 SKU，不强行摊派）
+
+# 头程八节点状态机（shipment_milestones.node；顺序即时间轴顺序；eta 节点允许为预计）
+shipment_milestones:
+  - { node: departed,     label: 国内仓发货 }
+  - { node: consolidated, label: 集货完成 }
+  - { node: loaded,       label: 已装柜 }
+  - { node: sailed,       label: 船期开船 }
+  - { node: arrived,      label: 到达目的港 }
+  - { node: clearing,     label: 清关处理中 }
+  - { node: signed,       label: 仓库签收 }
+  - { node: shelved,      label: 入网上架 }
+# 异常位：shipments.status ∈ exception/lost（不占节点序，走告警与联系物流商动作）
+
+# 库龄分桶（inventory_ageing.bucket；与 R6 周转>60 天清仓请示、库存现金线 inventory-cashline★ 同源）
+ageing_buckets: ["0-30", "31-60", "61-90", "90+"]
+
+# 回款率口径（利润驾驶舱仪表：回款率 = payout_net / gross_amount；大卖实战参考水位 72%）
+payout_rate:
+  formula: payout_net / gross_amount
+  healthy_floor: 0.70         # 低于 70% 触发利润巡检 P2

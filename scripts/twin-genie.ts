@@ -129,7 +129,7 @@ function ambientEvent(): GenieEvent {
     };
   }
   return {
-    event_id: id, who: { type: "agent", id: "review-agent" }, context: ctx(t, pick(CHANNELS)),
+    event_id: id, who: { type: "agent", id: "service-qc" }, context: ctx(t, pick(CHANNELS)),
     object: { type: "review", id: `RV-${int(10000, 99999)}` },
     decision: { action: "review.reply", params: { rating: int(4, 5) }, after: { published: true }, basis: ["好评感谢模板+个性化元素"] },
     rule_impact: [],
@@ -151,7 +151,7 @@ async function runScenario(kind: ScenarioKind): Promise<string[]> {
   if (kind === "bad_review") {
     const id = nextId();
     await push({
-      event_id: id, who: { type: "agent", id: "review-agent" }, context: ctx(t, pick(CHANNELS)),
+      event_id: id, who: { type: "agent", id: "service-qc" }, context: ctx(t, pick(CHANNELS)),
       object: { type: "review", id: `RV-${int(10000, 99999)}` },
       decision: {
         action: "review.reply", params: { rating: 2 },
@@ -189,7 +189,7 @@ async function runScenario(kind: ScenarioKind): Promise<string[]> {
   } else if (kind === "review_sla") {
     const id = nextId();
     await push({
-      event_id: id, who: { type: "agent", id: "review-agent" }, context: ctx(t, "京东"),
+      event_id: id, who: { type: "agent", id: "service-qc" }, context: ctx(t, "京东"),
       object: { type: "review", id: `RV-${int(10000, 99999)}` },
       decision: {
         action: "alert.escalate", params: { review_age_hours: 3, replied: false, rating: 2 },

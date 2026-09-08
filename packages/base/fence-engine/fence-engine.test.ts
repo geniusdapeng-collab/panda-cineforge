@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const BUNDLE_YML = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../../../bundles/hotel/fences/hotel-baseline.yml",
+  "../../../bundles/ecommerce/fences/ecom-baseline.yml",
 );
 
 describe("表达式求值器（L2.5 沙箱）", () => {
@@ -48,37 +48,39 @@ describe("表达式求值器（L2.5 沙箱）", () => {
 describe("判定器（F2.1/E2.1/E2.2，真实基线包）", () => {
   const pack = loadFencePack(readFileSync(BUNDLE_YML, "utf-8"));
 
-  it("R1 涨幅 ≤8% → auto 放行；>8% 无命中 → default review", () => {
+  it("R1 降幅 ≤10% → auto 放行；>10% 无命中 → default review", () => {
     const ok = judge(
-      { object: { type: "room_price" }, action: "price.adjust", before: { price: 400 }, after: { price: 420 }, context: { channel_new: false } },
+      // 电商基线多规则求值面（R2 成本/R14 汇率/R18 跨平台价）需带齐参数——缺参数按 E2.1 求值异常→block
+      { object: { type: "price" }, action: "price.adjust", before: { price: 400, rate: 7.2 }, after: { price: 420, rate: 7.2 }, params: { cost: 300, channel_price: 420, other_platform_min: 400 }, context: { channel_new: false } },
       pack.rules, pack.defaultLevel,
     );
     expect(ok.level).toBe("auto");
     expect(ok.impacts[0]).toMatchObject({ rule_id: "R1", result: "pass" });
 
     const over = judge(
-      { object: { type: "room_price" }, action: "price.adjust", before: { price: 400 }, after: { price: 460 }, context: { channel_new: false } },
+      { object: { type: "price" }, action: "price.adjust", before: { price: 400, rate: 7.2 }, after: { price: 460, rate: 7.2 }, params: { cost: 300, channel_price: 460, other_platform_min: 400 }, context: { channel_new: false } },
       pack.rules, pack.defaultLevel,
     );
     expect(over.level).toBe("review"); // default_level
   });
 
-  it("R2 保底价熔断 → block（即便 R1 也命中，deny 优先并集 E2.2）", () => {
+  it("R2 毛利红线熔断 → block（即便 R1 也命中，deny 优先并集 E2.2）", () => {
     const v = judge(
-      { object: { type: "room_price" }, action: "price.adjust", before: { price: 398 }, after: { price: 368 } },
+      { object: { type: "price" }, action: "price.adjust", before: { price: 398, rate: 7.2 }, after: { price: 360, rate: 7.2 }, params: { cost: 320, channel_price: 360, other_platform_min: 400 } },
       pack.rules, pack.defaultLevel,
     );
+    // 降幅 9.5% 命中 R1 auto；但 360 < 320×1.15=368 命中 R2 block，deny 优先压制
     expect(v.level).toBe("block");
     expect(v.impacts).toContainEqual({ rule_id: "R2", version: pack.version, result: "blocked" });
   });
 
-  it("R6 差评必审 → review", () => {
+  it("R9 差评 2h SLA 必审 → review", () => {
     const v = judge(
-      { object: { type: "review" }, action: "review.reply", params: { rating: 2 } },
+      { object: { type: "review" }, action: "review.reply", params: { rating: 2, age_hours: 3, replied: false } },
       pack.rules, pack.defaultLevel,
     );
     expect(v.level).toBe("review");
-    expect(v.impacts[0]!.rule_id).toBe("R6");
+    expect(v.impacts[0]!.rule_id).toBe("R9");
   });
 
   it("求值异常按 block（E2.1）", () => {
@@ -94,13 +96,13 @@ describe("判定器（F2.1/E2.1/E2.2，真实基线包）", () => {
   it("子调用同瀑布（H-4）：同输入同判定，无后门", () => {
     const input = {
       object: { type: "order" }, action: "order.refund",
-      params: { amount: 800 },
+      params: { amount: 800, amount_cny: 800, amount_usd: 0 }, // R5 求值面 amount_cny/amount_usd 双侧皆需（|| 不短路，缺省按 E2.1 异常→block）
     };
     const a = judge(input, pack.rules, pack.defaultLevel);
     const b = judgeSubCall(input, pack.rules, pack.defaultLevel);
     expect(b.level).toBe(a.level);
     expect(b.impacts).toEqual(a.impacts);
-    expect(a.level).toBe("review"); // R4 大额退款
+    expect(a.level).toBe("review"); // 退款金额未达 R5 阈值（¥1000）→ default_level review
   });
 });
 

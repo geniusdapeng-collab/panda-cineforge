@@ -47,6 +47,9 @@ const ICON_PATHS: Record<string, string> = {
   "/p18": "M3 21h18M6 21V5h12v16M10 9h1M10 13h1M13 9h1M13 13h1M10 17h4",             // 多店·楼群
   "/p19": "M3 3v18h18M7 15l4-6 3 3 5-8",                                            // 收益·分析
   "/p20": "M4 4h6l2 3h8v13H4zM4 4v16",                                              // 档案·夹
+  "/p28": "M12 2v4M12 18v4M2 12h4M18 12h4M12 8a4 4 0 100 8 4 4 0 000-8z",            // 数据源·连接
+  "/p29": "M3 3v18h18M7 14v3M12 9v8M17 5v12",                                        // 利润·瀑布柱
+  "/p30": "M3 17h18M5 17l2-9h10l2 9M9 8V5h6v3M12 20h.01",                             // 头程·船
 };
 
 export function SideNav({ entries = NAV_ENTRIES }: { entries?: NavEntry[] }) {

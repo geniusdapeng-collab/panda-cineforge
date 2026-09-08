@@ -39,7 +39,7 @@ function maybeUnverified(result: Record<string, unknown>): ToolResult {
 
 /** 确定性剧本工具表（内置演示口径；数字与种子剧本一致） */
 export const DEMO_TOOLS: Record<string, ToolFn> = {
-  "biz.price.read": async (p) => maybeUnverified({ object_id: p.object_id ?? "OBJ-DLX-01", current: 458, sold_7d: 126 }),
+  "biz.price.read": async (p) => maybeUnverified({ object_id: p.object_id ?? "SKU-DLX-01", current: 458, sold_7d: 126 }),
   "biz.price.write": async (p) => maybeUnverified({ object_id: p.object_id, price: p.price, applied: true }),
   "channel.price.write": async (p) => maybeUnverified({ channel: p.channel ?? "美团", price: p.price, applied: true }),
   "competitor.fetch": async () => maybeUnverified({ card: "竞品门店", price: 472, ts: new Date().toISOString() }),

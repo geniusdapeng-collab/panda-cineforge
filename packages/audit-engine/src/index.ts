@@ -39,3 +39,10 @@ export {
   TOTAL_DIFF_RATE_REDLINE,
 } from "./analyzers/recon.js";
 export type { AnalyzerContext } from "./analyzers/util.js";
+export * as skillExecutors from "./executors/index.js";
+export type {
+  ExecutorResult, ExecTrace, AcosFuseRow, SkuProfitRow, ReconRow,
+  StockoutRisk, AgeingStructure, DataSourceHealth,
+  ReplenishInput, ReplenishPlan, FxRepriceInput, FxRepricePlan,
+  StoryboardInput, StoryboardShot,
+} from "./executors/index.js";

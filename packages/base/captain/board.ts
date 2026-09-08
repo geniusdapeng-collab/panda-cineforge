@@ -96,9 +96,11 @@ export async function scanOrgHealth(app: pg.Pool, scope: Scope): Promise<OrgHeal
       [scope.workspaceId],
     );
     await c.query("COMMIT");
+    // 行动域 → 专职 preset（键必须存在于行业包 presets，否则 coverage 缺口永远误报）；
+    // night. 域归只读巡检员（夜班是班次机制而非编制岗位，不产生招聘提案）
     const DOMAIN_PRESET: Record<string, string> = {
-      "price.": "pricing-agent", "review.": "customer-service", "order.": "channel-operations",
-      "inventory.": "inventory-procurement", "night.": "night-shift", "content.": "content-marketing",
+      "price.": "temu-pricing", "review.": "service-qc", "order.": "tmall-ops",
+      "inventory.": "cn-warehouse", "night.": "inspection-agent", "content.": "xhs-content",
     };
     const uncovered = new Set<string>();
     for (const a of actions.rows) {

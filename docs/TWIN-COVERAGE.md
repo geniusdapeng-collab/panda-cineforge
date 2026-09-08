@@ -74,7 +74,7 @@
 | P3 档案 | 集团一档 + 14 店铺档案字段组全量 + FAQ 候选待确认 | ✅ | — |
 | P4 决断队列 | pending ×2（最新）+ 历史 approved/rejected | ✅ | Genie 持续产生新 pending |
 | P5 围栏 | R1–R30 规则卡 / dry-run ×3 / rolled_back 旧版 / 三客群 patch | ✅ | Genie 现场发起 dry-run |
-| P6 技能市场 | 160 技能 / 采纳率看板 / 待装行业技能 / 客群清单 | ✅ | — |
+| P6 技能市场 | 161 技能 / 采纳率看板 / 待装行业技能 / 客群清单 | ✅ | — |
 | P7 组织记忆 | 8 条记忆 + 归因 + confidence | ✅ | Genie 周频沉淀新记忆 |
 | P8 班组 | 82 preset / 只读·夜班·高危徽标 / 协作拓扑 | ✅ | — |
 | P9 夜班驾驶舱 | 30 晚班次 / 决策包三栏 / 黑五 escalate 样本 / 快照 v1 | ✅ | Genie live tick 推进「今晚」 |

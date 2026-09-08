@@ -66,7 +66,7 @@ export const members = pgTable(
 export const agents = pgTable("agents", {
   id: text("id").primaryKey(),
   workspaceId: text("workspace_id").notNull().references(() => workspaces.id),
-  /** preset 标识：pricing-agent 等（bundles/ecommerce/presets） */
+  /** preset 标识：temu-pricing 等（bundles/ecommerce/presets） */
   presetKey: text("preset_key").notNull(),
   name: text("name").notNull(),
   /** who.version 归因必需 */

@@ -7,3 +7,4 @@ export * from "./registry.js";
 export * from "./inbound.js";
 export * from "./cards.js";
 export * from "./callback.js";
+export * from "./webhook.js";

@@ -206,7 +206,7 @@ async function main(): Promise<void> {
   );
   const run = await trpc<{ status: string; stepsDone: number; stepsTotal: number }>(
     "threads.run",
-    { token, method: "mutation", input: { threadId: disp.threadId, goal, presetKey: "pricing-agent" } },
+    { token, method: "mutation", input: { threadId: disp.threadId, goal, presetKey: "temu-pricing" } },
   );
   check(
     "Quest 自主执行：每步过围栏瀑布（auto 放行/review 挂起/block 熔断）",
@@ -245,12 +245,12 @@ async function main(): Promise<void> {
   if (target?.eventId) {
     const dsp = await trpc<{ threadId: string; eventId: string; deduped: boolean }>(
       "inspection.dispatch",
-      { token, method: "mutation", input: { anomalyEventId: target.eventId, presetKey: "review-agent" } },
+      { token, method: "mutation", input: { anomalyEventId: target.eventId, presetKey: "service-qc" } },
     );
     check("一键派单：以异常事件 spawn 业务 Agent 建 P2 线程（F9.3）", !dsp.deduped && dsp.threadId.length > 0, `线程 ${dsp.threadId}`);
     const dup = await trpc<{ threadId: string; deduped: boolean }>(
       "inspection.dispatch",
-      { token, method: "mutation", input: { anomalyEventId: target.eventId, presetKey: "review-agent" } },
+      { token, method: "mutation", input: { anomalyEventId: target.eventId, presetKey: "service-qc" } },
     );
     check("同事件重复派单幂等去重（L9.3）", dup.deduped && dup.threadId === dsp.threadId);
     const rsv = await trpc<{ eventId: string; deduped: boolean }>(

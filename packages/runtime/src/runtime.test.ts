@@ -70,8 +70,8 @@ describe("LLM 任务规划（B9 planQuestSmart）", async () => {
 
   it("合法规划被采用，且价格类步骤自动数据水合（before/after/context 防 E2.1 误熔断）", async () => {
     const llm = async () => JSON.stringify([
-      { action: "biz.price.read", objectType: "room_price", tool: "biz.price.read", params: {}, label: "读价" },
-      { action: "price.adjust", objectType: "room_price", tool: "biz.price.write", params: { price: 468 }, label: "调价" },
+      { action: "biz.price.read", objectType: "price", tool: "biz.price.read", params: {}, label: "读价" },
+      { action: "price.adjust", objectType: "price", tool: "biz.price.write", params: { price: 468 }, label: "调价" },
     ]);
     const steps = await planQuestSmart("调价", fakePreset as never, llm);
     expect(steps).toHaveLength(2);

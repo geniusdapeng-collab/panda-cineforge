@@ -71,6 +71,14 @@ export default function P1() {
   const [profile, setProfile] = useState<ProfileResp | null>(null);
   const [agents, setAgents] = useState<Array<{ preset_key: string; name: string; version: string; kind: string; status: string }>>([]);
   const [members, setMembers] = useState<Array<{ memberNo: string; name: string; role: string }>>([]);
+  // 金额化决策卡片（P2：金额只来自 SQL 计算器；决策→任务闭环）
+  const [cards, setCards] = useState<Array<{
+    id: string; title: string; severity: "high" | "mid" | "low"; status: string;
+    currency: string; amount_impact: number; suggested_action: string; assignee: string;
+    attribution: Array<{ step: string; text: string }>;
+    calculation: { formula: string; result: string };
+  }>>([]);
+  const [cardOpen, setCardOpen] = useState<string>("");
 
   // 派遣栏状态（P1E1）
   const [draft, setDraft] = useState("");
@@ -90,6 +98,8 @@ export default function P1() {
         trpc.workspace.agents.query() as Promise<typeof agents>,
         trpc.members.list.query() as Promise<typeof members>,
       ]);
+      (trpc.ecom as unknown as { decision: { list: { query: () => Promise<{ cards: typeof cards }> } } })
+        .decision.list.query().then((r) => setCards(r.cards)).catch(() => setCards([]));
       setMe(meR); setThreads(th); setNight(ni); setInsp(ins);
       setPendingCount(ap.length); setProfile(prof); setAgents(ag ?? []); setMembers(mb ?? []);
       setError(null);
@@ -357,6 +367,56 @@ export default function P1() {
                     />
                   ))
                 )}
+              </div>
+            )}
+
+            {/* P2 金额化决策卡片（金额只来自 SQL；归因链可展开；采纳/驳回/一键转任务闭环） */}
+            {cards.length > 0 && (
+              <div className="space-y-2">
+                <div className="px-1 text-[11px] tracking-[.2em] text-ink3">AI 决策 · 金额化（{cards.filter((c) => c.status === "pending").length} 待处理）</div>
+                {cards.slice(0, 5).map((c) => (
+                  <div key={c.id} className="rounded-lg border border-line bg-card p-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`h-2 w-2 rounded-full ${c.severity === "high" ? "bg-alert" : c.severity === "mid" ? "bg-warn" : "bg-ink3"}`} />
+                      <span className="flex-1 text-xs font-semibold text-ink2">{c.title}</span>
+                      <span className={`font-mono text-sm font-black ${c.amount_impact >= 0 ? "text-go" : "text-alert"}`}>
+                        {c.amount_impact >= 0 ? "+" : "−"}¥{Math.abs(c.amount_impact).toLocaleString()}
+                      </span>
+                    </div>
+                    {cardOpen === c.id && (
+                      <div className="mt-2 space-y-1 border-t border-line pt-2">
+                        {c.attribution.map((a, i) => (
+                          <div key={i} className="flex gap-2 text-[11px]">
+                            <span className="w-14 shrink-0 text-gold">{a.step}</span>
+                            <span className="text-ink3">{a.text}</span>
+                          </div>
+                        ))}
+                        <div className="font-mono text-[10px] text-ink3">计算口径：{c.calculation.formula} → {c.calculation.result}</div>
+                      </div>
+                    )}
+                    <div className="mt-2 flex items-center gap-1.5 text-[11px]">
+                      <span className="text-ink3">建议：{c.suggested_action} → {c.assignee}</span>
+                      <span className="ml-auto flex gap-1.5">
+                        <button onClick={() => setCardOpen(cardOpen === c.id ? "" : c.id)}
+                          className="rounded border border-line px-2 py-0.5 text-ink2">归因</button>
+                        {c.status === "pending" ? (
+                          <>
+                            <button onClick={() => void (trpc.ecom as unknown as { decision: { decide: { mutate: (i: { cardId: string; status: "accepted" | "dismissed" }) => Promise<unknown> } } }).decision.decide.mutate({ cardId: c.id, status: "accepted" }).then(() => load())}
+                              className="rounded border border-go/40 px-2 py-0.5 text-go">采纳</button>
+                            <button onClick={() => void (trpc.ecom as unknown as { decision: { convertToTask: { mutate: (i: { cardId: string; dueAt: string }) => Promise<unknown> } } }).decision.convertToTask.mutate({ cardId: c.id, dueAt: new Date(Date.now() + 3 * 86400000).toISOString() }).then(() => load())}
+                              className="rounded border border-gline px-2 py-0.5 text-gold">转任务</button>
+                            <button onClick={() => void (trpc.ecom as unknown as { decision: { decide: { mutate: (i: { cardId: string; status: "accepted" | "dismissed" }) => Promise<unknown> } } }).decision.decide.mutate({ cardId: c.id, status: "dismissed" }).then(() => load())}
+                              className="rounded border border-line px-2 py-0.5 text-ink3">驳回</button>
+                          </>
+                        ) : (
+                          <span className={`rounded border px-2 py-0.5 ${c.status === "tasked" ? "border-gline text-gold" : c.status === "accepted" ? "border-go/40 text-go" : "border-line text-ink3"}`}>
+                            {c.status === "tasked" ? "已转任务" : c.status === "accepted" ? "已采纳" : "已驳回"}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 

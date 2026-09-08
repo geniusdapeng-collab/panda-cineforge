@@ -34,6 +34,8 @@ import { LlmIntentClassifier, type IntentClassifier } from "@workloom/runtime";
 import { providerFromEnv, OpenAiCompatibleProvider } from "@workloom/base/model-router";
 import { routedLlmCall, resetLlmAssembly } from "../service/llm.js";
 import { creditsRouter, modelFeedbackRouter } from "./credits-router.js";
+import { overlayRouter } from "./overlay-router.js";
+import { ecomRouter } from "./ecom-router.js";
 import { runRouterReviewBeat } from "@workloom/base/model-router";
 import {
   loadCharter, parseCharter, transition, defaultCharter,
@@ -110,6 +112,7 @@ import {
   ingestInbound,
   listChannels,
   MockChannelDriver,
+  WebhookChannelDriver,
   sendApprovalCard,
   stableStringify,
   verifyChannelSignature,
@@ -774,7 +777,7 @@ const threadsRouter = router({
     .input(
       z.object({
         title: z.string().min(1).max(500), // F3.1：≤500 字
-        presetKey: z.string().default("pricing-agent"),
+        presetKey: z.string().default("temu-pricing"),
         runImmediately: z.boolean().default(false),
       }),
     )
@@ -908,7 +911,7 @@ const threadsRouter = router({
 
   /** 运行/续跑线程（replay 断点续跑幂等，E3.3/H-5；按线程模式分流：ask 应答 / agent 逐步确认 / quest 自主执行） */
   run: capabilityWriteProcedure("quest")
-    .input(z.object({ threadId: z.string(), goal: z.string(), presetKey: z.string().default("pricing-agent") }))
+    .input(z.object({ threadId: z.string(), goal: z.string(), presetKey: z.string().default("temu-pricing") }))
     .mutation(async ({ ctx, input }) => {
       const scope = scopeOf(ctx.identity);
       const app = getAppPool();
@@ -1095,7 +1098,7 @@ const inspectionRouter = router({
   }),
   /** 一键派单（F9.3：以异常事件为输入唤起业务 Agent；幂等 L9.3） */
   dispatch: writeProcedure
-    .input(z.object({ anomalyEventId: z.string(), presetKey: z.string().default("review-agent") }))
+    .input(z.object({ anomalyEventId: z.string(), presetKey: z.string().default("service-qc") }))
     .mutation(async ({ ctx, input }) => {
       try {
         return await dispatchFromAnomaly(getAppPool(), getGatewayPool(), scopeOf(ctx.identity), {
@@ -2034,7 +2037,7 @@ const rosterRouter = router({
         const skillRows = agent.skills.length === 0 ? [] : (await client.query<{
           id: string; name: string; level: string; version: string; fence_bindings: string[]; installed: boolean;
         }>(
-          // preset 声明为短名（revenue-manager），注册表主键带 skill- 前缀——两种形态都匹配
+          // preset 声明为短名（margin-guard），注册表主键带 skill- 前缀——两种形态都匹配
           `SELECT s.id, s.name, s.level, s.version, s.fence_bindings,
                   EXISTS(SELECT 1 FROM skill_installs si WHERE si.skill_id=s.id AND si.workspace_id=$1) AS installed
            FROM skills s
@@ -2142,6 +2145,23 @@ function mockDriverFor(channel: ApprovalChannel): MockChannelDriver {
   }
   return d;
 }
+/** 真实 webhook 驱动缓存（P3：IM_DRIVER=webhook 或对应 IM_WEBHOOK_* 已配置时启用真实通道） */
+const webhookDrivers = new Map<ApprovalChannel, WebhookChannelDriver>();
+/**
+ * 审批出站驱动装配（D4 纪律：无凭据回退 mock 并显式标注；IM_DRIVER=webhook 强制真实——
+ * 真实模式下 URL 缺失由驱动层显式抛错，禁止静默回退）。
+ */
+function driverFor(channel: ApprovalChannel): ChannelDriver {
+  const wantsReal = imDriverKind === "webhook"
+    || process.env[`IM_WEBHOOK_${channel.toUpperCase().replace(/-/g, "_")}`];
+  if (!wantsReal) return mockDriverFor(channel);
+  let d = webhookDrivers.get(channel);
+  if (!d) {
+    d = new WebhookChannelDriver(channel);
+    webhookDrivers.set(channel, d);
+  }
+  return d;
+}
 /** 通道域错误 → tRPC 映射：身份未映射=403（E5.2 无权审批）；其余通道错误=400 */
 function imRethrow(err: unknown): never {
   if (err instanceof ChannelError) {
@@ -2231,7 +2251,7 @@ const imRouter = router({
         const sent = await sendApprovalCard(
           getGatewayPool(),
           scope,
-          mockDriverFor(input.channel),
+          driverFor(input.channel),
           { conversationId: input.conversationId },
           card,
           ctx.identity.memberNo,
@@ -2285,7 +2305,7 @@ const imRouter = router({
           getGatewayPool(),
           scope,
           input,
-          mockDriverFor(input.channel),
+          driverFor(input.channel),
         );
         return { ...r, unsigned: sig.unsigned };
       } catch (err) {
@@ -3213,6 +3233,8 @@ export const appRouter = router({
   modelFeedback: modelFeedbackRouter,
   memory: memoryRouter,
   evolution: evolutionRouter,
+  overlay: overlayRouter,
+  ecom: ecomRouter,
 });
 
 export type AppRouter = typeof appRouter;

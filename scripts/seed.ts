@@ -1310,6 +1310,196 @@ async function main(): Promise<void> {
   }
   console.log("✓ 凭据引用 ×2（占位密文，事件只记引用 ID）");
 
+  /* ================= 财务与供应链演示数据（P0 真实化升级 · 0027 表） =================
+   * 口径：金额=演示缩放口径（非真实流水，与全仓"全模拟运行态"一致）；
+   *      期间取当前月与上月（页面默认当期口径）；全部行级 RLS 上下文内写入。 */
+  {
+    const nowD = new Date();
+    const ym = (d: Date) => d.toISOString().slice(0, 7);
+    const curPeriod = ym(nowD);
+    // 上月期间从当前期间字符串推算（本地时区 new Date(y,m-1,1) 经 toISOString 转 UTC 会串月）
+    const [cy, cm] = curPeriod.split("-").map(Number);
+    const prevPeriod = cm === 1 ? `${cy - 1}-12` : `${cy}-${String(cm - 1).padStart(2, "0")}`;
+    const monthStart = (p: string) => `${p}-01`;
+
+    // ① 店铺回款（payouts）：国内两店 + 亚马逊美国站；含费率与退款冲抵
+    const payouts = [
+      { shop: "SHOP-TMALL", platform: "tmall", cur: "CNY", gross: 8424580, fee: 421229, refund: 316842, rate: 0.72 },
+      { shop: "SHOP-JD", platform: "jd", cur: "CNY", gross: 5236000, fee: 366520, refund: 188496, rate: 0.78 },
+      { shop: "SHOP-AMZ", platform: "amazon", cur: "USD", gross: 1284360, fee: 192654, refund: 64218, rate: 0.81 },
+    ];
+    for (const p of payouts) {
+      for (const period of [prevPeriod, curPeriod]) {
+        const scale = period === curPeriod ? 1 : 0.86; // 上月略低（趋势可用）
+        const gross = Math.round(p.gross * scale);
+        const net = Math.round(gross * p.rate);
+        await q(
+          `INSERT INTO payouts (id, workspace_id, shop_id, platform, period_start, period_end, currency,
+                                gross_amount, fee_amount, refund_amount, net_amount, settled_at, source)
+           VALUES ($1,$2,$3,$4,$5::date,($5::date + interval '1 month' - interval '1 day')::date,$6,$7,$8,$9,$10,
+                   CASE WHEN $5 < $11 THEN now() - interval '15 days' ELSE NULL END, 'mock')
+           ON CONFLICT (workspace_id, shop_id, period_start, period_end) DO NOTHING`,
+          [`po-demo-${p.shop}-${period}`, WS_ID, p.shop, p.platform, monthStart(period), p.cur,
+            gross, Math.round(p.fee * scale), Math.round(p.refund * scale), net, monthStart(curPeriod)],
+        );
+      }
+    }
+    console.log(`✓ 店铺回款 ×${payouts.length * 2}（payouts，两期，亚马逊回款率 81% / 天猫 72%）`);
+
+    // ② 平台罚款（platform_penalties）：ODR/迟发/违规三型，亚马逊本月环比 spike（决策卡片素材）
+    const penalties = [
+      { shop: "SHOP-AMZ", platform: "amazon", kind: "odr", cur: "USD", amt: 2340, period: prevPeriod, days: 20 },
+      { shop: "SHOP-AMZ", platform: "amazon", kind: "late-shipment", cur: "USD", amt: 5680, period: curPeriod, days: 6 },
+      { shop: "SHOP-AMZ", platform: "amazon", kind: "violation", cur: "USD", amt: 1200, period: curPeriod, days: 2 },
+      { shop: "SHOP-TMALL", platform: "tmall", kind: "deposit", cur: "CNY", amt: 5000, period: curPeriod, days: 9 },
+    ];
+    for (const [i, x] of penalties.entries()) {
+      await q(
+        `INSERT INTO platform_penalties (id, workspace_id, shop_id, platform, kind, currency, amount, reason, occurred_at, source)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8, now() - ($9 || ' days')::interval, 'mock')
+         ON CONFLICT (id) DO NOTHING`,
+        [`pp-demo-${i}`, WS_ID, x.shop, x.platform, x.kind, x.cur, x.amt,
+          x.kind === "odr" ? "订单缺陷率越线扣款" : x.kind === "late-shipment" ? "迟发率超标扣款" : x.kind === "violation" ? "违规词上架扣款" : "保证金扣款",
+          String(x.days)],
+      );
+    }
+    console.log(`✓ 平台罚款 ×${penalties.length}（亚马逊本月环比 spike ×2.9，决策卡片素材）`);
+
+    // ③ 全口径成本项（cost_items）：六类 × 三店 × 两期（SKU 级挂爆款）
+    const costSeed: Array<{ shop: string; sku: string | null; cat: string; cur: string; amt: number }> = [
+      { shop: "SHOP-TMALL", sku: "SKU-3C-MAG-001", cat: "purchase", cur: "CNY", amt: 2680000 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-MAG-001", cat: "ads", cur: "CNY", amt: 486000 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-CAB-002", cat: "purchase", cur: "CNY", amt: 920000 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-CAB-002", cat: "ads", cur: "CNY", amt: 152000 },
+      { shop: "SHOP-TMALL", sku: null, cat: "storage", cur: "CNY", amt: 168000 },
+      { shop: "SHOP-TMALL", sku: null, cat: "freight", cur: "CNY", amt: 96000 },
+      { shop: "SHOP-JD", sku: "SKU-3C-MAG-001", cat: "purchase", cur: "CNY", amt: 1520000 },
+      { shop: "SHOP-JD", sku: null, cat: "storage", cur: "CNY", amt: 122000 },
+      { shop: "SHOP-AMZ", sku: "SKU-US-MAG-101", cat: "purchase", cur: "USD", amt: 412000 },
+      { shop: "SHOP-AMZ", sku: "SKU-US-MAG-101", cat: "ads", cur: "USD", amt: 96800 },
+      { shop: "SHOP-AMZ", sku: "SKU-US-MAG-101", cat: "freight", cur: "USD", amt: 68400 },
+      { shop: "SHOP-AMZ", sku: null, cat: "storage", cur: "USD", amt: 42800 },
+    ];
+    let ciCnt = 0;
+    for (const c of costSeed) {
+      for (const period of [prevPeriod, curPeriod]) {
+        const scale = period === curPeriod ? 1 : 0.88;
+        await q(
+          `INSERT INTO cost_items (id, workspace_id, shop_id, sku, category, currency, amount, period, source, note)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8::date,'mock','种子演示') ON CONFLICT (id) DO NOTHING`,
+          [`ci-demo-${c.shop}-${c.cat}-${c.sku ?? "shop"}-${period}`, WS_ID, c.shop, c.sku, c.cat, c.cur,
+            Math.round(c.amt * scale), monthStart(period)],
+        );
+        ciCnt++;
+      }
+    }
+    console.log(`✓ 全口径成本项 ×${ciCnt}（cost_items 六类 × 三店 × 两期）`);
+
+    // ④ 采购单与应付（purchase_orders/payables）
+    await q(
+      `INSERT INTO purchase_orders (id, workspace_id, shop_id, supplier, status, currency, total_amount, items, expected_at, created_by)
+       VALUES ('po-demo-001',$1,'SHOP-AMZ','深圳磁吸科技','shipped','USD',186000,
+               '[{"sku":"SKU-US-MAG-101","qty":6000,"unit_price":31}]'::jsonb,
+               now() + interval '12 days','seed') ON CONFLICT (id) DO NOTHING`,
+      [WS_ID],
+    );
+    await q(
+      `INSERT INTO payables (id, workspace_id, po_id, supplier, currency, amount, paid_amount, due_at, status)
+       VALUES ('py-demo-001',$1,'po-demo-001','深圳磁吸科技','USD',186000,93000, now() + interval '21 days','partial'),
+              ('py-demo-002',$1,NULL,'义乌家居供应链','CNY',62840,0, now() - interval '3 days','overdue')
+       ON CONFLICT (id) DO NOTHING`,
+      [WS_ID],
+    );
+    console.log("✓ 采购单 ×1 + 应付 ×2（含一笔逾期 3 天 ¥62,840——财务中心素材）");
+
+    // ⑤ 头程批次与八节点（shipments/shipment_milestones）：一票海运在清关，一票装柜异常
+    const ships = [
+      {
+        id: "sh-demo-001", shop: "SHOP-AMZ", no: "MSKU-8842-2026", carrier: "马士基", ch: "sea",
+        from: "深圳盐田仓", to: "FBA-ONT8", boxes: 86, units: 2580, node: "clearing",
+        items: [{ sku: "SKU-US-MAG-101", qty: 2580, unit_cost: 28 }],
+        nodes: ["departed", "consolidated", "loaded", "sailed", "arrived", "clearing"],
+      },
+      {
+        id: "sh-demo-002", shop: "SHOP-AMZ", no: "COSCO-3391-2026", carrier: "中远海运", ch: "sea",
+        from: "宁波北仑仓", to: "FBA-LGB8", boxes: 64, units: 1920, node: "loaded",
+        items: [{ sku: "SKU-US-MAG-101", qty: 1920, unit_cost: 31 }],
+        nodes: ["departed", "consolidated", "loaded"],
+      },
+      {
+        id: "sh-demo-003", shop: "SHOP-TEMU", no: "YT-EXP-7781", carrier: "云途物流", ch: "air",
+        from: "东莞仓", to: "TEMU-US-3", boxes: 22, units: 660, node: "exception",
+        items: [{ sku: "SKU-US-HOME-201", qty: 660, unit_cost: 42 }],
+        nodes: ["departed", "consolidated"],
+      },
+    ];
+    const NODE_ORDER = ["departed", "consolidated", "loaded", "sailed", "arrived", "clearing", "signed", "shelved"];
+    for (const s of ships) {
+      const status = s.node === "exception" ? "exception" : s.node;
+      await q(
+        `INSERT INTO shipments (id, workspace_id, shop_id, tracking_no, carrier, channel, origin, destination,
+                                boxes, units, items, status, current_node, loss_flag, created_at, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12,$13,$14, now() - interval '26 days', now() - interval '2 days')
+         ON CONFLICT (id) DO NOTHING`,
+        [s.id, WS_ID, s.shop, s.no, s.carrier, s.ch, s.from, s.to, s.boxes, s.units,
+          JSON.stringify(s.items), status, s.node === "exception" ? "consolidated" : s.node, s.node === "exception"],
+      );
+      for (const [i, nd] of s.nodes.entries()) {
+        await q(
+          `INSERT INTO shipment_milestones (id, workspace_id, shipment_id, node, occurred_at, eta, note, created_by)
+           VALUES ($1,$2,$3,$4, now() - ($5 || ' days')::interval, false, '', 'seed') ON CONFLICT (id) DO NOTHING`,
+          [`sm-demo-${s.id}-${nd}`, WS_ID, s.id, nd, String(26 - i * 3)],
+        );
+      }
+      void NODE_ORDER;
+    }
+    console.log(`✓ 头程批次 ×${ships.length}（清关中/已装柜/异常滞留各一，八节点时间轴就绪）`);
+
+    // ⑥ 库龄分桶快照（inventory_ageing）：四桶结构，90+ 天压现金素材
+    const ageing = [
+      { shop: "SHOP-AMZ", sku: "SKU-US-MAG-101", bucket: "0-30", qty: 3200, val: 89600 },
+      { shop: "SHOP-AMZ", sku: "SKU-US-MAG-101", bucket: "31-60", qty: 2100, val: 58800 },
+      { shop: "SHOP-AMZ", sku: "SKU-US-MAG-101", bucket: "61-90", qty: 900, val: 25200 },
+      { shop: "SHOP-AMZ", sku: "SKU-US-HOME-201", bucket: "90+", qty: 480, val: 20160 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-MAG-001", bucket: "0-30", qty: 8600, val: 430000 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-MAG-001", bucket: "31-60", qty: 5400, val: 270000 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-CAB-002", bucket: "61-90", qty: 1500, val: 52500 },
+      { shop: "SHOP-TMALL", sku: "SKU-3C-CAB-002", bucket: "90+", qty: 620, val: 21700 },
+    ];
+    for (const a of ageing) {
+      await q(
+        `INSERT INTO inventory_ageing (id, workspace_id, shop_id, sku, bucket, qty, currency, value_amount, snapshot_date)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8, current_date)
+         ON CONFLICT (workspace_id, shop_id, sku, bucket, snapshot_date) DO NOTHING`,
+        [`ia-demo-${a.shop}-${a.sku}-${a.bucket}`, WS_ID, a.shop, a.sku, a.bucket, a.qty,
+          a.shop === "SHOP-AMZ" ? "USD" : "CNY", a.val],
+      );
+    }
+    console.log(`✓ 库龄分桶快照 ×${ageing.length}（四桶结构，90+ 天货值现金线素材）`);
+
+    // ⑦ 数据源卡片（data_sources）：真实/mock 混合口径（接入中心演示）
+    const dsSeed = [
+      { id: "ds-demo-amz", platform: "amazon", shop: "SHOP-AMZ", label: "亚马逊·美国站", kind: "api", ok: true, lag: 320 },
+      { id: "ds-demo-tmall", platform: "tmall", shop: "SHOP-TMALL", label: "天猫·旗舰店", kind: "api", ok: true, lag: 540 },
+      { id: "ds-demo-jd", platform: "jd", shop: "SHOP-JD", label: "京东·自营", kind: "api", ok: true, lag: 890 },
+      { id: "ds-demo-douyin", platform: "douyin", shop: "SHOP-DOUYIN", label: "抖音·严选店", kind: "api", ok: false, lag: null },
+      { id: "ds-demo-temu", platform: "temu", shop: "SHOP-TEMU", label: "Temu·PandaHome", kind: "rpa", ok: true, lag: 2100 },
+    ];
+    for (const d of dsSeed) {
+      await q(
+        `INSERT INTO data_sources (id, workspace_id, platform, shop_id, label, auth_kind, credential_ref, enabled,
+                                   last_sync_at, last_sync_status, sync_lag_sec)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,true,
+                 CASE WHEN $8 THEN now() - interval '12 minutes' ELSE now() - interval '2 days' END,
+                 $9, $10)
+         ON CONFLICT (workspace_id, platform, shop_id) DO NOTHING`,
+        [d.id, WS_ID, d.platform, d.shop, d.label, d.kind, `panda/${d.id}`,
+          d.ok, d.ok ? "ok" : "failed", d.lag],
+      );
+    }
+    console.log(`✓ 数据源卡片 ×${dsSeed.length}（4 正常 + 1 失败断流——数据质量巡检素材）`);
+  }
+
   // —— 事件写入：切 gateway 角色（F1.2 唯一可 INSERT biz_events）
   await owner.end();
   const gw = new pg.Client({ connectionString: GATEWAY_URL });

@@ -83,7 +83,7 @@ const tokens: Record<string, string> = {};
 const WS_CANDIDATES = [
   { key: "video", slug: "video-studio", member: "MEM-V01", name: "AI 视频经营（ws-video）", wsId: "ws-video", preset: "director" },
   { key: "geo", slug: "geo-growth", member: "MEM-G01", name: "社媒×GEO 双域（ws-geo）", wsId: "ws-geo", preset: "director" },
-  { key: "ecommerce", slug: "panda-group", member: "MEM-001", name: "熊猫优选集团（ws-panda）", wsId: "ws-panda", preset: "pricing-agent" },
+  { key: "ecommerce", slug: "panda-group", member: "MEM-001", name: "熊猫优选集团（ws-panda）", wsId: "ws-panda", preset: "temu-pricing" },
 ];
 const WS_LIST: typeof WS_CANDIDATES = [];
 {

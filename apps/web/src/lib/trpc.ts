@@ -36,7 +36,7 @@ export const trpc: ReturnType<typeof createTRPCClient<AppRouter>> = createTRPCCl
  * 工作区与成员均可经 VITE_DEMO_WORKSPACE / VITE_DEMO_MEMBER 覆盖——
  * 不写死在调用侧，客户自建工作区（非种子库默认工作区）时演示登录仍可用。
  */
-const DEMO_WORKSPACE = (import.meta.env.VITE_DEMO_WORKSPACE as string | undefined) ?? "yunqi-hotel";
+const DEMO_WORKSPACE = (import.meta.env.VITE_DEMO_WORKSPACE as string | undefined) ?? "panda-group";
 const DEMO_MEMBER = (import.meta.env.VITE_DEMO_MEMBER as string | undefined) ?? "MEM-001";
 export async function ensureDemoLogin(memberNo = DEMO_MEMBER): Promise<void> {
   if (getToken()) return;

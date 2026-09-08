@@ -12,3 +12,12 @@ export {
 } from "./registry.js";
 export { createMockConnector, PLATFORM_PROFILES } from "./mock/index.js";
 export type { PlatformProfile } from "./mock/index.js";
+export {
+  AmazonSpApiConnector, amazonConnectorFromEnv, signSigV4, ConnectorUnsupportedError,
+  type SpApiCredentials, type SpApiDeps,
+} from "./amazon/sp-api.js";
+export {
+  DouyinOpenConnector, douyinConnectorFromEnv, douyinSign,
+  type DouyinCredentials, type DouyinDeps,
+} from "./cn/douyin-open.js";
+export { registerRealConnectors, realConnectorStatus, type RealConnectorStatus } from "./real.js";

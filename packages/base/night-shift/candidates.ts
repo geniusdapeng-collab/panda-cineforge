@@ -27,8 +27,8 @@ export interface CandidateItem {
 /** 夜班例行任务模板（通用版；行业包结构同构后补——D2） */
 export const NIGHT_TASK_TEMPLATES: CandidateItem[] = [
   { id: "nt-reconcile", name: "夜间对账（订单×渠道×担保三轮）", type: "对账", estCredits: 12, fenceSummary: "R4 退款≥¥500必审 / R5 担保异常需介入", presetKey: "reconcile-agent" },
-  { id: "nt-review", name: "差评跟进（起草回复，必审挂起）", type: "评价", estCredits: 8, fenceSummary: "R6 差评≤3分必审", presetKey: "review-agent" },
-  { id: "nt-price", name: "次日调价准备（竞对采集+建议单）", type: "调价", estCredits: 15, fenceSummary: "R1 涨幅≤8%自动 / R2 保底价熔断", presetKey: "pricing-agent" },
+  { id: "nt-review", name: "差评跟进（起草回复，必审挂起）", type: "评价", estCredits: 8, fenceSummary: "R9 差评 2h SLA 必审", presetKey: "service-qc" },
+  { id: "nt-price", name: "次日调价准备（竞对采集+建议单）", type: "调价", estCredits: 15, fenceSummary: "R1 调价≤10%自动 / R2 毛利红线熔断", presetKey: "temu-pricing" },
 ];
 
 /** 生成候选清单：例行模板（按夜班 preset 覆盖过滤）+ 积压项动态折算 */
