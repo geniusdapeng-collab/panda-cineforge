@@ -58,7 +58,8 @@ for d in apps/server apps/web packages bundles; do
   rsync -aR --exclude node_modules --exclude dist --exclude .dsh-home --exclude 'dsh-gate/out' "$d" "$R/"
 done
 mkdir -p "$R/scripts"
-cp scripts/migrate.ts scripts/seed.ts "$R/scripts/"
+cp scripts/migrate.ts scripts/desktop-bootstrap-db.mjs "$R/scripts/"
+cp scripts/seed*.ts "$R/scripts/"  # 全部行业种子随包（按 .env.defaults DESKTOP_SEED_SCRIPT 选用）
 printf '%s\n' "$VERSION" > "$R/VERSION"
 
 # 3. 依赖与 web 构建产物（需在装配机先 pnpm install + build）
@@ -98,6 +99,23 @@ else
   [ -x "$APP/Contents/Resources/pg/Postgres.app/Contents/Versions/17/bin/postgres" ] || { echo "❌ Postgres.app 结构异常"; exit 1; }
   ls "$APP/Contents/Resources/pg/Postgres.app/Contents/Versions/17/lib/postgresql/vector.dylib" >/dev/null || { echo "❌ pgvector 未随包"; exit 1; }
   ls "$APP/Contents/Resources/pg/Postgres.app/Contents/Versions/17/share/postgresql/extension/vector.control" >/dev/null || { echo "❌ pgvector control 缺失"; exit 1; }
+fi
+
+# ---------- 5.5 内嵌 nats-server（P0-3 决策点 4：+20MB 开箱即持久化事件总线） ----------
+NATS_VER="v2.11.4"
+case "$ARCH" in arm64) NATS_ARCH="arm64" ;; x86_64) NATS_ARCH="amd64" ;; *) echo "❌ 未知 arch $ARCH"; exit 1 ;; esac
+if [ "$STRUCTURE_ONLY" = "1" ]; then
+  mkdir -p "$APP/Contents/Resources/nats"
+  printf 'structure-only placeholder
+' > "$APP/Contents/Resources/nats/PLACEHOLDER-NOT-FOR-RELEASE"
+else
+  echo "→ nats-server ${NATS_VER} darwin-${NATS_ARCH}…"
+  curl -sfL --retry 4 -o "$STAGE/nats.tgz" "https://github.com/nats-io/nats-server/releases/download/${NATS_VER}/nats-server-${NATS_VER}-darwin-${NATS_ARCH}.tar.gz"
+  tar -xzf "$STAGE/nats.tgz" -C "$STAGE"
+  mkdir -p "$APP/Contents/Resources/nats"
+  cp "$STAGE/nats-server-${NATS_VER}-darwin-${NATS_ARCH}/nats-server" "$APP/Contents/Resources/nats/"
+  chmod +x "$APP/Contents/Resources/nats/nats-server"
+  [ -x "$APP/Contents/Resources/nats/nats-server" ] || { echo "❌ nats-server 未随包"; exit 1; }
 fi
 
 # 6. 打包 + 校验和（保软链）

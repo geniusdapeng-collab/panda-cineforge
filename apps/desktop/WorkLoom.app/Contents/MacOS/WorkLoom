@@ -43,6 +43,7 @@ if [ "$PAYLOAD_VER" != "$INSTALLED_VER" ]; then
   rm -rf "$SUPPORT/node" "$SUPPORT/pg"
   copy "$RESOURCES/node" "$SUPPORT/node" || die "Node 运行时复制失败"
   copy "$RESOURCES/pg" "$SUPPORT/pg" || die "Postgres 运行时复制失败"
+  [ -d "$RESOURCES/nats" ] && { rm -rf "$SUPPORT/nats"; copy "$RESOURCES/nats" "$SUPPORT/nats" || die "nats-server 复制失败"; }
   # 解除隔离属性（zip 分发+用户已手动打开主 App，内嵌运行时继承放行）
   xattr -dr com.apple.quarantine "$SUPPORT" >/dev/null 2>&1
   printf '%s' "$PAYLOAD_VER" > "$SUPPORT/VERSION"
@@ -81,6 +82,27 @@ fi
   "$PGBIN/createdb" -h 127.0.0.1 -p 5432 -U postgres -O postgres workloom
 "$PGBIN/psql" -h 127.0.0.1 -p 5432 -U postgres -d workloom -c "CREATE EXTENSION IF NOT EXISTS vector" >/dev/null || die "pgvector 扩展装载失败"
 
+# ---------- 1.5 NATS JetStream：内嵌事件总线（P0-3：开箱即持久化；缺失/失败降级 memory 不阻断） ----------
+NATSBIN="$SUPPORT/nats/nats-server"
+if [ -x "$NATSBIN" ]; then
+  if port_busy 4222; then
+    say "✅ NATS 已在运行（复用）"
+  else
+    say "→ 启动内嵌 nats-server（JetStream，用户态）…"
+    mkdir -p "$SUPPORT/nats-data"
+    "$NATSBIN" -js --store_dir "$SUPPORT/nats-data" -a 127.0.0.1 -p 4222 >>"$LOGDIR/nats.log" 2>&1 &
+    for _i in 1 2 3 4 5 6 7 8 9 10; do port_busy 4222 && break; sleep 1; done
+  fi
+  if port_busy 4222; then
+    export EVENT_BUS=nats EVENT_BUS_URL=nats://127.0.0.1:4222
+    say "✅ 事件总线：nats（JetStream 持久化）"
+  else
+    say "⚠️ nats-server 未就绪——事件总线降级 memory（详见 $LOGDIR/nats.log）"
+  fi
+else
+  say "⚠️ 内嵌 nats-server 未随包——事件总线降级 memory"
+fi
+
 # ---------- 2. 配置：.env 默认即本地自足 ----------
 if [ ! -f "$RUNTIME/.env" ]; then
   cp "$RUNTIME/.env.defaults" "$RUNTIME/.env"
@@ -93,7 +115,11 @@ fi
 if [ ! -f "$SUPPORT/.bootstrapped" ]; then
   say "→ 首航引导：数据库迁移 + 演示数据种子…"
   (cd "$RUNTIME" && "$TSX" --env-file=.env scripts/migrate.ts) || die "数据库迁移失败"
-  (cd "$RUNTIME" && BUNDLE_DIR=bundles/hotel "$TSX" --env-file=.env scripts/seed.ts) || die "演示数据种子失败"
+  # 种子脚本按仓配置（.env.defaults DESKTOP_SEED_SCRIPT；不在 base-sync 同步范围）——
+  # 基座出厂 AI 产品经理包；行业版子仓配自己行业种子（672cf7b 硬编码 hotel 根因）
+  SEED_SCRIPT="$(grep -E '^DESKTOP_SEED_SCRIPT=' "$RUNTIME/.env.defaults" 2>/dev/null | head -1 | cut -d= -f2)"
+  SEED_SCRIPT="${SEED_SCRIPT:-scripts/seed-aipm.ts}"
+  (cd "$RUNTIME" && "$TSX" --env-file=.env "$SEED_SCRIPT") || die "演示数据种子失败"
   touch "$SUPPORT/.bootstrapped"
   say "✅ 首航引导完成"
 fi
