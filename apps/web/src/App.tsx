@@ -1,4 +1,5 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, Navigate } from "react-router";
+import { isGuest } from "./lib/trpc";
 import P1 from "./pages/p1/P1";
 import P2 from "./pages/p2/P2";
 import P9 from "./pages/p9/P9";
@@ -11,17 +12,6 @@ import P5 from "./pages/p5/P5";
 import P6 from "./pages/p6/P6";
 import P7 from "./pages/p7/P7";
 import P8 from "./pages/p8/P8";
-import P10 from "./pages/p10/P10";
-import P11 from "./pages/p11/P11";
-import P12 from "./pages/p12/P12";
-import P13 from "./pages/p13/P13";
-import P14 from "./pages/p14/P14";
-import P15 from "./pages/p15/P15";
-import P16 from "./pages/p16/P16";
-import P17 from "./pages/p17/P17";
-import P18 from "./pages/p18/P18";
-import P19 from "./pages/p19/P19";
-import P20 from "./pages/p20/P20";
 import P23 from "./pages/p23/P23";
 import P24 from "./pages/p24/P24";
 import P25 from "./pages/p25/P25";
@@ -52,7 +42,6 @@ function Shell() {
       {!bare && <SideNav />}
       {!bare && <LoomMate />}
       <div className="min-w-0 flex-1">
-    {/* AI 助手 AskRail：全局右侧通栏对话框（任何页面常驻；⌘K 唤起） */}
         <StarRing />
         <Routes>
       <Route path="/" element={<P0 />} />
@@ -69,17 +58,6 @@ function Shell() {
       <Route path="/p7" element={<P7 />} />
       <Route path="/p8" element={<P8 />} />
       <Route path="/p8/agent/:agentId" element={<P8 />} />
-      <Route path="/p10" element={<P10 />} />
-      <Route path="/p11" element={<P11 />} />
-      <Route path="/p12" element={<P12 />} />
-      <Route path="/p13" element={<P13 />} />
-      <Route path="/p14" element={<P14 />} />
-      <Route path="/p15" element={<P15 />} />
-      <Route path="/p16" element={<P16 />} />
-      <Route path="/p17" element={<P17 />} />
-      <Route path="/p18" element={<P18 />} />
-      <Route path="/p19" element={<P19 />} />
-      <Route path="/p20" element={<P20 />} />
       <Route path="/p23" element={<P23 />} />
       <Route path="/p24" element={<P24 />} />
       <Route path="/p25" element={<P25 />} />
@@ -92,11 +70,23 @@ function Shell() {
       <Route path="/login" element={<Login />} />
       <Route path="/activate" element={<Activate />} />
       <Route path="/invite" element={<InviteAccept />} />
-      <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/onboarding" element={
+        // F-GUEST1：游客可完整体验系统，进入配置引导（正式开通）才要求登录
+        isGuest() ? <Navigate to="/login?next=/onboarding" replace /> : <Onboarding />
+      } />
       <Route path="/dev" element={<Bridge><DevMatrix /></Bridge>} />
-      <Route path="*" element={<P0 />} />
+          <Route path="*" element={<P0 />} />
         </Routes>
       </div>
+      {/* 游客模式浮标（F-GUEST1：随时可去正式开通/登录） */}
+      {!bare && isGuest() && (
+        <a
+          href="/login"
+          className="fixed bottom-5 right-5 z-50 rounded-full border border-amber-500/40 bg-neutral-900/95 px-4 py-2 text-sm text-amber-300 shadow-lg hover:border-amber-400"
+        >
+          游客体验中 · <span className="font-semibold underline">正式开通 →</span>
+        </a>
+      )}
     </div>
   );
 }
