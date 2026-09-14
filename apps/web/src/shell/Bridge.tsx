@@ -112,9 +112,9 @@ export function Bridge({
               {left ?? (<>
               <div className="mb-2 px-1 text-[11px] tracking-[.2em] text-ink3">会话</div>
               {[
-                { id: "T-101", title: "周五旺季调价", status: "completed", cls: "text-go" },
-                { id: "T-102", title: "差评应急回复", status: "pending_review", cls: "text-warn" },
-                { id: "T-103", title: "飞猪首图发布", status: "running", cls: "text-holo" },
+                { id: "T-101", title: "本周经营复盘", status: "completed", cls: "text-go" },
+                { id: "T-102", title: "待审批事项处理", status: "pending_review", cls: "text-warn" },
+                { id: "T-103", title: "重点任务推进", status: "running", cls: "text-holo" },
               ].map((t) => (
                 <div
                   key={t.id}
