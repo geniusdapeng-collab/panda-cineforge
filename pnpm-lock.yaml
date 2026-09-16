@@ -318,7 +318,7 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.21.0)(pg@8.23.0)
       pg:
-        specifier: ^8.13.0
+        specifier: 8.23.0
         version: 8.23.0
     devDependencies:
       '@types/pg':
@@ -359,7 +359,7 @@ importers:
         specifier: 8.23.0
         version: 8.23.0
       zod:
-        specifier: ^4.0.0
+        specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
       '@types/pg':
@@ -375,7 +375,7 @@ importers:
   packages/shared:
     dependencies:
       zod:
-        specifier: ^4.0.0
+        specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
       typescript:
@@ -1598,7 +1598,7 @@ packages:
     resolution: {integrity: sha512-zTCVGpyFsGWBhllOyKlTw/vnr6D9qxsfSDyfbyZmTyjHw5N/VuvzHpHoQjm2ZJzn4RJgx5w4r7V0er69CmLgPQ==}
 
   '@workloom/ui@https://github.com/geniusdapeng-collab/workloom-im/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz':
-    resolution: {integrity: sha512-cJu1SHORmQy/N0Tv3sJ37Ad7HjCOcOt3nreQFeMN2MaPnb/Q7GzNF6uSYmvrOUdTu2XprGCOfYLFgMUrlxo/pg==, tarball: https://github.com/geniusdapeng-collab/workloom-im/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz}
+    resolution: {tarball: https://github.com/geniusdapeng-collab/workloom-im/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz}
     version: 0.1.1
     peerDependencies:
       react: '>=19.0.0'
