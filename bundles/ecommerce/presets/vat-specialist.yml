@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 谷时窗口跑税金重算批任务
 high_risk: false
 fence_bindings: [R15, R22, R30]   # VAT关税变更触发售价重算 / 数据导出脱敏 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.vat-specialist.", label: "VAT税务师职责" }
 skills: [vat-duty-calc, us-sales-tax, tax-invoice]
 tools:
   - { name: tax.rate.read,         access: read,  desc: 读取 9 国税率表 }

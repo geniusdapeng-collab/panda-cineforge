@@ -10,6 +10,8 @@ readonly: false
 night_shift: false         # 内容创意类对齐日间工作节奏
 high_risk: false
 fence_bindings: [R11, R24]   # 虚假宣传物理阻断 / 侵权图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.creative-studio.", label: "素材工场长职责" }
 skills: [detail-page-studio, short-video-script, video-batch-produce, brand-asset-lib, image-standards]
 tools:
   - { name: creative.brief.read,       access: read,  desc: 读取素材需求单 }

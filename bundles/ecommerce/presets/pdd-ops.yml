@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 秒杀场次值守纳入夜班候选清单
 high_risk: false
 fence_bindings: [R8, R16, R29]   # 新平台首发必审 / 夜班白名单 / 绩效越限联动
+coverage:
+  - { eventPrefix: "ecommerce.pdd-ops.", label: "拼多多活动运营职责" }
 skills: [activity-enroll, platform-rule-track, shop-health-check]
 tools:
   - { name: pdd.activity.read, access: read,  desc: 读取百亿补贴/秒杀活动日历与门槛 }

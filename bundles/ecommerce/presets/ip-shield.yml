@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 欧美盘跟卖突袭高发于夜班窗口
 high_risk: false
 fence_bindings: [R11, R19, R24]   # 侵权词阻断 / 跟卖取证驱赶请示 / 侵权图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.ip-shield.", label: "知识产权护盾职责" }
 skills: [ip-shield, listing-ip-scan, hijack-watch, appeal-kit]
 tools:
   - { name: ip.registry.read,       access: read,  desc: 读取自有商标/专利库 }

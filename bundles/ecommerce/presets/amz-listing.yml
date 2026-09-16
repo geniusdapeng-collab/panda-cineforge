@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 跨境军统一夜班班组主场（R16 白名单自治）
 high_risk: false
 fence_bindings: [R8, R11, R16, R24]   # 新店首发刊登必审 / 违规词阻断 / 夜班白名单 / 侵权词图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.amz-listing.", label: "亚马逊Listing优化师职责" }
 skills: [listing-translate, keyword-seo, listing-compliance, a-plus-content]
 tools:
   - { name: amz.listing.read, access: read,  desc: 读取三站 listing 详情与转化数据 }

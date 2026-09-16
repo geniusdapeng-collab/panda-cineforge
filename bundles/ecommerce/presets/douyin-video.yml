@@ -11,6 +11,8 @@ readonly: false
 night_shift: false          # 内容创意类白班作业，发布排期进内容日历
 high_risk: false
 fence_bindings: [R11, R21, R24]   # 虚假宣传阻断 / 涉费话术必审 / 侵权词图阻断
+coverage:
+  - { eventPrefix: "ecommerce.douyin-video.", label: "抖音短视频编导职责" }
 skills: [short-video-script, video-batch-produce, content-calendar]
 tools:
   - { name: douyin.video.read, access: read,  desc: 读取短视频完播/转化/跑量数据 }

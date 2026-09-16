@@ -1,18 +1,19 @@
 /**
  * RadarAlertCard 雷达推送卡（设计规范 §5.8；巡检告警 F9.2）
- * 结构：云白卡 + 语义四色描边（P0 草莓红 / P1 蜜桃橙 / P2 葡萄紫）+ 雷达扫动动画（4s/圈）
- *      + 严重度 pill（P0/P1/P2）+ #E 编号 + 「一键派单」金按钮
+ * 结构：红/琥珀描边 + 雷达扫动动画（4s/圈）+ 严重度 pill（P0/P1/P2）+ #E 编号 + 「一键派单」金按钮
  * 铁律：同事件幂等去重（L9.3，服务端保证）；无异常时该区域显示「昨夜一切正常」，
  *      禁止消失导致布局跳动（§5.8）
  */
 import { EventIdChip } from "./EventIdChip";
+import { Icon } from "@workloom/ui";
 
-export type RadarSeverity = "p0" | "p1" | "p2";
+export type RadarSeverity = "p0" | "p1" | "p2" | "attention";
 
-const SEV_META: Record<RadarSeverity, { pill: string; border: string; bg: string; sweep: string }> = {
-  p0: { pill: "bg-alert/15 text-alert border-alert/55", border: "border-alert/40", bg: "rgba(255,77,109,.07)", sweep: "rgba(255,77,109,.16)" },
-  p1: { pill: "bg-warn/15 text-warn border-warn/50", border: "border-warn/40", bg: "rgba(255,170,51,.07)", sweep: "rgba(255,170,51,.16)" },
-  p2: { pill: "bg-need/10 text-need border-need/40", border: "border-need/30", bg: "rgba(182,120,255,.06)", sweep: "rgba(182,120,255,.14)" },
+const SEV_META: Record<RadarSeverity, { label: string; pill: string; border: string; bg: string }> = {
+  p0: { label: "最高优先级", pill: "bg-alert/15 text-alert border-alert/55", border: "border-alert/40", bg: "rgba(255,77,109,.06)" },
+  p1: { label: "高优先级", pill: "bg-warn/15 text-warn border-warn/50", border: "border-warn/40", bg: "rgba(255,170,51,.05)" },
+  p2: { label: "关注", pill: "bg-holo/10 text-holo border-holo/40", border: "border-holo/30", bg: "rgba(77,150,255,.04)" },
+  attention: { label: "需人工介入", pill: "bg-alert/15 text-alert border-alert/55", border: "border-alert/40", bg: "rgba(255,77,109,.06)" },
 };
 
 export function RadarAlertCard({
@@ -21,38 +22,44 @@ export function RadarAlertCard({
   title,
   source,
   onDispatch,
+  busy = false,
 }: {
   severity: RadarSeverity;
   eventId: string;
   title: string;
   source: string;
   onDispatch?: () => void;
+  busy?: boolean;
 }) {
   const m = SEV_META[severity];
   return (
     <div
       className={`relative overflow-hidden rounded-msg border ${m.border} px-4 py-3.5`}
-      style={{ background: `linear-gradient(150deg, ${m.bg}, #15181c 70%)` }}
+      style={{ background: `linear-gradient(150deg, ${m.bg}, rgba(13,22,52,.7))` }}
     >
       {/* 雷达扫动（4s/圈；reduced-motion 降级静态——tokens.css 全局纪律） */}
       <div
         className="pointer-events-none absolute -top-8 -right-8 h-[150px] w-[150px] animate-sweep rounded-full"
-        style={{ background: `conic-gradient(from 0deg, ${m.sweep}, transparent 60deg)` }}
+        style={{ background: "conic-gradient(from 0deg, rgba(77,150,255,.16), transparent 60deg)" }}
       />
       <div className="relative flex items-center gap-2.5">
-        <span className={`rounded border px-2 py-0.5 font-orb text-caption font-black ${m.pill}`}>
-          {severity.toUpperCase()}
+        <span className={`rounded border px-2 py-0.5 font-orb text-body font-black ${m.pill}`}>
+          {m.label}
         </span>
         <EventIdChip id={eventId} />
-        <span className="text-caption text-ink3">雷达源：{source}</span>
+        <span className="text-body text-ink3">雷达源：{source}</span>
         <span className="flex-1" />
-        <button
-          type="button"
-          onClick={onDispatch}
-          className="cursor-pointer rounded-md gold-grad px-3 py-1 text-caption font-black text-ongold shadow-[0_0_12px_rgba(255,160,60,.35)]"
-        >
-          一键派单 ▶
-        </button>
+        {onDispatch && (
+          <button
+            type="button"
+            disabled={busy}
+            aria-busy={busy || undefined}
+            onClick={onDispatch}
+            className="cursor-pointer rounded-md gold-grad px-3 py-1 text-body font-black text-ongold shadow-[0_0_12px_rgba(255,160,60,.35)] disabled:cursor-wait disabled:opacity-50"
+          >
+            {busy ? "正在派单…" : <>派发处理任务 <Icon name="send" size={13} className="inline" /></>}
+          </button>
+        )}
       </div>
       <div className="relative mt-1.5 text-body font-semibold text-ink">{title}</div>
     </div>
@@ -63,7 +70,7 @@ export function RadarAlertCard({
 export function RadarAllClear() {
   return (
     <div className="rounded-msg border border-go/25 bg-go/4 px-4 py-3.5 text-center">
-      <span className="text-body text-go">🛰 昨夜一切正常，雷达全域清净</span>
+      <span className="inline-flex items-center gap-1.5 text-body text-go"><Icon name="radar" size={15} />昨夜一切正常，雷达全域清净</span>
     </div>
   );
 }

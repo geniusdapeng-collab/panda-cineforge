@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "workloom.product/v1",
+  "productId": "panda-cineforge",
+  "role": "industry",
+  "displayName": "WorkLoom 熊猫电商运营系统",
+  "packageName": "panda-ecom",
+  "repository": "geniusdapeng-collab/panda-cineforge",
+  "defaultBundle": "ecommerce",
+  "demoWorkspaceSlug": "panda-group",
+  "demoMemberNo": "MEM-001",
+  "release": {
+    "appId": "com.geniusdapeng.pandacineforge",
+    "channel": "stable",
+    "artifactPrefix": "熊猫电商运营系统",
+    "website": "apps/site"
+  },
+  "desktop": {
+    "portOffset": 510
+  },
+  "clients": {
+    "bPc": { "enabled": true, "entry": "apps/web" },
+    "bMobile": { "enabled": true, "entry": "apps/webb" },
+    "cMobile": { "enabled": true, "entry": "apps/webc" }
+  }
+}

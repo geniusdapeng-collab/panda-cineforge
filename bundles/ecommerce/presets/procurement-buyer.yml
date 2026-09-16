@@ -10,6 +10,8 @@ readonly: false
 night_shift: false         # 采购动作对齐供应商工作时间
 high_risk: false
 fence_bindings: [R7, R20, R25]   # 紧急采购请示 / 采购分级人审 / 新品首单测款上限
+coverage:
+  - { eventPrefix: "ecommerce.procurement-buyer.", label: "采购执行员职责" }
 skills: [purchase-order-auto, supplier-scorecard, payment-terms, quick-return-supply]
 tools:
   - { name: purchase.order.read,     access: read,  desc: 读取采购单状态 }

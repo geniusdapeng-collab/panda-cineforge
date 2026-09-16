@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 夜班窗口执行预算熔断与欧美盘预算节奏看护
 high_risk: false
 fence_bindings: [R3, R4, R20]   # ACoS保险丝降预算 / 预算上调>30%人审 / 采购分级人审
+coverage:
+  - { eventPrefix: "ecommerce.budget-controller.", label: "预算管控官职责" }
 skills: [budget-watch, ads-budget-pacing, anomaly-attribution]
 tools:
   - { name: budget.overview.read,   access: read,  desc: 读取三大预算大盘与执行进度 }

@@ -4,6 +4,7 @@
  * 页面本身即走查工具——对照 PRD 状态规格表逐屏对账时逐格核验。
  */
 import type { ReactNode } from "react";
+import { Icon } from "@workloom/ui";
 import {
   AchievementBadge,
   AgentActionMessage,
@@ -21,7 +22,7 @@ import {
   QuestCard,
   RadarAlertCard,
   RadarAllClear,
-  SkeletonBlock,
+  Skeleton,
   SquadRing,
   SubCallMessage,
   SystemDivider,
@@ -52,7 +53,10 @@ function Section({ name, spec, children }: { name: string; spec: string; childre
 
 export default function DevMatrix() {
   return (
-    <div className="space-y-2">
+    <div data-wl-authorized-diagnostics="ui-component-matrix" className="space-y-2">
+      <p className="rounded border border-line bg-bg800 px-3 py-2 text-body text-ink2">
+        仅限本地开发环境并显式开启诊断开关后使用；本页术语仅用于组件验收。
+      </p>
       <div className="mb-4 flex items-baseline gap-3">
         <h2 className="text-h1 font-black tracking-wider">HUD 组件状态矩阵</h2>
         <span className="text-caption tracking-[.2em] text-ink3">/dev · DEV MATRIX · F2</span>
@@ -60,13 +64,13 @@ export default function DevMatrix() {
 
       <Section name="DispatchBar 航线设定台" spec="§5.1 · 空文本/输入中/路由识别中">
         <Cell label="empty 空文本置灰"><DispatchBar state="empty" /></Cell>
-        <Cell label="typing 输入中"><DispatchBar state="typing" value="黑五前把爆款 SKU 价格对标竞对" /></Cell>
+        <Cell label="typing 输入中"><DispatchBar state="typing" value="周五前把大床房价格对标竞对" /></Cell>
         <Cell label="routing 路由识别中（可取消）"><DispatchBar state="routing" /></Cell>
       </Section>
 
       <Section name="QuestCard 主线任务卡" spec="§5.2 · 六态 + 断线重连">
         <Cell label="running 执行中（青脉冲）">
-          <QuestCard eventId="E-8842" title="黑五旺季调价" action="竞对采集中" done={2} total={3} status="running" />
+          <QuestCard eventId="E-8842" title="周五旺季调价" action="竞对采集中" done={2} total={3} status="running" />
         </Cell>
         <Cell label="review 待审查（琥珀呼吸）">
           <QuestCard eventId="E-8843" title="差评应急回复" action="回复草稿待审批" done={2} total={3} status="review" />
@@ -77,13 +81,13 @@ export default function DevMatrix() {
           </div>
         </Cell>
         <Cell label="failed 失败（红框）/ reconnecting 重连中">
-          <QuestCard eventId="E-8845" title="亚马逊主图发布" action="平台超时" done={1} total={3} status="failed" reconnecting />
+          <QuestCard eventId="E-8845" title="飞猪首图发布" action="渠道超时" done={1} total={3} status="failed" reconnecting />
         </Cell>
       </Section>
 
       <Section name="HandoffCard 昨夜日报卡" spec="§5.3 · 默认/空态（禁显 0）">
         <Cell label="默认（三栏大数字强一致 F4.4）">
-          <HandoffCard data={{ deliveredAt: "08:30", fenceSnapshot: "ecom-baseline/v1", done: 12, pending: 2, needHuman: 1, credits: 46 }} />
+          <HandoffCard data={{ deliveredAt: "08:30", fenceSnapshot: "hotel-baseline/v1", done: 12, pending: 2, needHuman: 1, credits: 46 }} />
         </Cell>
         <Cell label="空态（夜班未启用 → 整卡空态）">
           <HandoffCard nightEnabled={false} />
@@ -107,8 +111,8 @@ export default function DevMatrix() {
         </Cell>
         <Cell label="block 红（0.8s 急促）/ need 紫（需介入）">
           <div className="space-y-2">
-            <FenceLight level="block" name="R2 毛利红线熔断" baseline />
-            <FenceLight level="need" name="R5 账单差异需介入" />
+            <FenceLight level="block" name="R2 保底价熔断" baseline />
+            <FenceLight level="need" name="R5 担保异常需介入" />
           </div>
         </Cell>
       </Section>
@@ -116,31 +120,31 @@ export default function DevMatrix() {
       <Section name="消息族" spec="§5.6 · 人类/Agent 行动/子调用/系统分隔线">
         <Cell label="HumanBubble + AgentActionMessage（回执三态）">
           <div className="space-y-2.5">
-            <HumanBubble time="21:14">把黑五的定价策略跑一遍</HumanBubble>
-            <AgentActionMessage sender="竞对雷达" version="v2.0" action="price.adjust" eventId="E-8842" receipt="synced" rules={["R1 v1", "R2 v1"]} credits={6} memoryRefs={["mem-acos-friday"]}>
-              磁吸充电宝 ¥89 → ¥85（-4.5%，未超 R1 上限）
+            <HumanBubble time="21:14">把周五的房价策略跑一遍</HumanBubble>
+            <AgentActionMessage sender="调价 Agent" version="v2.0" action="price.adjust" eventId="E-8842" receipt="synced" rules={["R1 v1", "R2 v1"]} credits={6} memoryRefs={["mem-occ-friday"]}>
+              大床房 ¥480 → ¥499（+4.0%，未超 R1 上限）
             </AgentActionMessage>
-            <AgentActionMessage sender="竞对雷达" version="v2.0" action="listing.publish" eventId="E-8843" receipt="unverified">
-              已推送平台，回执未到（E3.7：无回执标未核实）
+            <AgentActionMessage sender="调价 Agent" version="v2.0" action="channel.push" eventId="E-8843" receipt="unverified">
+              已推送渠道，回执未到（E3.7：无回执标未核实）
             </AgentActionMessage>
           </div>
         </Cell>
         <Cell label="SubCallMessage + SystemDivider">
           <div className="space-y-2.5">
-            <SubCallMessage target="竞对采集" version="v1.3" receipt="synced">同价格带 3 家竞对均价 ¥86</SubCallMessage>
+            <SubCallMessage target="竞对采集" version="v1.3" receipt="synced">同商圈 3 家竞对均价 ¥512</SubCallMessage>
             <SystemDivider time="22:00" summary="夜班中心出征（night.run.start 已落库）" />
           </div>
         </Cell>
       </Section>
 
       <Section name="KpiGauge KPI 全息仪表" spec="§5.7 · 默认/延迟置灰">
-        <Cell label="默认（截至 HH:MM 必显）"><KpiGauge name="月 GMV" value="¥9.2亿" delta={1.6} asOf="21:30" /></Cell>
-        <Cell label="stale 延迟置灰（禁伪装实时）"><KpiGauge name="ACoS" value="24%" delta={-0.8} asOf="18:00" stale /></Cell>
+        <Cell label="默认（截至 HH:MM 必显）"><KpiGauge name="REVPAR" value="¥412" delta={1.6} asOf="21:30" /></Cell>
+        <Cell label="stale 延迟置灰（禁伪装实时）"><KpiGauge name="OCC 入住率" value="87%" delta={-0.8} asOf="18:00" stale /></Cell>
       </Section>
 
       <Section name="RadarAlertCard 雷达推送卡" spec="§5.8 · P0/P1/P2 + 无异常态（禁消失）">
         <Cell label="P0 红（雷达扫动 4s/圈）">
-          <RadarAlertCard severity="p0" eventId="E-8850" title="平台「拼多多」价格倒挂 15.7%（低于天猫基准）" source="channel_price" />
+          <RadarAlertCard severity="p0" eventId="E-8850" title="渠道「飞猪」状态 offline（非 online）" source="channel_price" />
         </Cell>
         <Cell label="P1 琥珀 / 无异常态">
           <div className="space-y-2">
@@ -166,10 +170,10 @@ export default function DevMatrix() {
       </Section>
 
       <Section name="空态 / 骨架屏 / 告警条" spec="§5.10">
-        <Cell label="EmptyState（星云晕染+副官语气）+ SkeletonBlock（流光 1.4s）">
+        <Cell label="EmptyState + Skeleton（共享基座状态）">
           <div className="space-y-2">
-            <EmptyState icon="🌌" title="一切平静" hint="派遣第一条主线任务，团队即刻开工" actionLabel="开始第一个任务 ▶" />
-            <SkeletonBlock lines={3} />
+            <EmptyState icon={<Icon name="star" size={24} />} title="一切平静" hint="派遣第一条主线任务，团队即刻开工" actionLabel="开始第一个任务" />
+            <Skeleton count={3} label="组件内容正在加载" />
           </div>
         </Cell>
         <Cell label="BannerAlert 三级（红/琥珀/青）">
@@ -182,7 +186,7 @@ export default function DevMatrix() {
       </Section>
 
       <Section name="游戏化组件" spec="§6 · 等级/成就/战队环/装配槽/装备稀有度">
-        <Cell label="LevelBadge（CEO 圆金边 / 成员方形+版本角标）+ AchievementBadge">
+        <Cell label="LevelBadge（主理人圆金边 / 船员方形+版本角标）+ AchievementBadge">
           <div className="space-y-3">
             <LevelBadge level={12} rank="黄金" captain name="王店长" />
             <LevelBadge level={7} rank="白银" name="调价 Agent" version="v2.0" />

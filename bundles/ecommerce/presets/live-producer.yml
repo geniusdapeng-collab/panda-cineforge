@@ -10,6 +10,8 @@ readonly: false
 night_shift: false         # 国内直播高峰在晚间，非 22:00-08:00 夜班窗口
 high_risk: false
 fence_bindings: [R11, R21, R27]   # 虚假宣传阻断 / 直播涉费承诺人审 / 大促战备切换
+coverage:
+  - { eventPrefix: "ecommerce.live-producer.", label: "直播中控长职责" }
 skills: [live-schedule, live-copilot, live-review, clip-distribute]
 tools:
   - { name: live.schedule.read,   access: read,  desc: 读取两军直播排期 }

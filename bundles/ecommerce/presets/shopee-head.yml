@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 东南亚晚间购物高峰衔接北京夜班前段，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R8, R16, R17, R29]   # 新店/新平台首发必审 / 夜班白名单 / 夜班调价≤3% / 绩效越限整改
+coverage:
+  - { eventPrefix: "ecommerce.shopee-head.", label: "Shopee/Lazada店长职责" }
 skills: [shop-health-check, platform-rule-track, activity-enroll]
 tools:
   - { name: shopee.order.read, access: read,  desc: 读取 Shopee 各站点订单与履约状态 }

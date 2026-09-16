@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 欧美白天=中国深夜，调拨作业窗口在夜班
 high_risk: false
 fence_bindings: [R6, R7, R20]   # 周转/库龄处置请示 / 断货风险预警 / 调拨金额分级人审
+coverage:
+  - { eventPrefix: "ecommerce.overseas-warehouse.", label: "海外仓调拨官职责" }
 skills: [overseas-wh-balancer, fba-replenish, warehouse-age-watch, wh-map]
 tools:
   - { name: overseas_stock.read,      access: read,  desc: 读取 7 海外仓+FBA 库存 }

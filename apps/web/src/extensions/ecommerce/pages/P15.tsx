@@ -1,0 +1,89 @@
+/**
+ * P15 评价与差评防御（D1/D2：差评 2h SLA + 处置留痕 + 好评挖矿反哺）
+ * 关联来源：twin.events（review.reply / review.detect / review.asset.boost）
+ */
+import { useEffect, useMemo, useState } from "react";
+import { ensureDemoLogin, trpc } from "../../../lib/trpc";
+import { Bridge } from "../../../shell/Bridge";
+import { EmptyState, SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../Twin";
+import { AIFeedback } from "../../../components/AIFeedback";
+import { clientIdentifierText, clientNodeText, clientValueText } from "../display";
+
+const rightPanel = (
+  <>
+    <div className="mb-2 px-1 text-sm tracking-[.2em] text-ink3">评价防线</div>
+    <div className="rounded-lg border border-gline bg-card p-3 text-sm leading-relaxed text-ink3">差评防御窗口前移到签收后 2 小时；处置案例沉淀组织记忆，同类问题越来越少是工程结果。</div>
+  </>
+);
+
+export default function P15() {
+  const [ready, setReady] = useState(false);
+  const [evs, setEvs] = useState<Ev[]>([]);
+
+  useEffect(() => {
+    let stop = false;
+    const load = async () => {
+      await ensureDemoLogin();
+      const r = (await trpc.twin.events.query({ actions: ["review.reply", "review.detect", "review.asset.boost"], limit: 100 })) as unknown as Ev[];
+      if (stop) return;
+      setEvs(r); setReady(true);
+    };
+    void load();
+    const t = setInterval(() => void load(), 15_000);
+    return () => { stop = true; clearInterval(t); };
+  }, []);
+
+  const replies = useMemo(() => evs.filter((e) => e.decision.action === "review.reply"), [evs]);
+  const sla = useMemo(() => evs.filter((e) => e.decision.action === "review.detect"), [evs]);
+  const bad = replies.filter((e) => Number(e.decision.params?.rating ?? 5) <= 3);
+  const good = replies.length - bad.length;
+
+  return (
+    <Bridge right={rightPanel}>
+      <PageHead title="评价与差评防御" tag="口碑防御" extra={<Tag tone="warn">差评 · 两小时内响应</Tag>} />
+      {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat label="评价回复（窗口）" value={replies.length} />
+            <Stat label="好评自动回复" value={good} tone="text-go" hint="自动放行留痕" />
+            <Stat label="差评回复需审核" value={bad.length} tone="text-warn" hint="三手势审批后发布" />
+            <Stat label="SLA 防御窗口" value={sla.length} tone="text-warn" hint="2h 内响应，超时升级" />
+          </div>
+          <HBar label="好评率" pct={replies.length ? Math.round((good / replies.length) * 100) : 100} tone="bg-go" />
+
+          <SystemDivider time="SLA 告警" summary="差评侦测即开 2h 防御窗口 → 超时自动升级店长（差评响应慢是流失主因）" />
+          {sla.length === 0 ? <div className="rounded-lg border border-line bg-card p-3 text-sm text-go">✓ 当前无超时差评</div> : sla.map((ev) => (
+            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone="warn">已升级店长</Tag>}>
+              <b className="text-ink2">{clientIdentifierText(ev.object.id)}</b>
+              <span className="break-words text-ink3"> · {clientNodeText(ev.context.channel, "销售平台")} · 响应时限 {String(ev.decision.after?.sla_hours ?? 2)} 小时 · {String(ev.decision.after?.rating ?? ev.decision.params?.rating ?? "")} 分 · {clientValueText(ev.decision.after?.topic, "评价主题待归类")}</span>
+            </Row>
+          ))}
+
+          <SystemDivider time="评价处置流" summary="AI 起草 → 三手势审批 → 发布 → 案例沉淀组织记忆" />
+          {replies.slice(0, 20).map((ev) => {
+            const rating = Number(ev.decision.params?.rating ?? 5);
+            const isBad = rating <= 3;
+            return (
+              <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone={isBad ? "warn" : "go"}>{rating} 分 · {isBad ? "已审核" : "自动放行"}</Tag>}>
+                <b className="text-ink2">{clientIdentifierText(ev.object.id)}</b>
+                <span className="break-words text-ink3"> · {clientNodeText(ev.context.channel, "销售平台")} · {isBad ? clientValueText(ev.decision.after?.draft, "致歉草稿已生成").slice(0, 30) + "…" : "感谢回复已发布"}</span>
+                {isBad && (
+                  <AIFeedback
+                    scene="review-reply"
+                    action="review.reply"
+                    prompt={`客人差评（${rating} 分，渠道 ${ev.context.channel}）：${String(ev.decision.params?.review_text ?? ev.decision.before?.content ?? "（原文见事件 " + ev.event_id + "）")}`}
+                    originalText={String(ev.decision.after?.draft ?? "致歉草稿")}
+                    fromTier="L2"
+                  />
+                )}
+              </Row>
+            );
+          })}
+          {replies.length === 0 ? <EmptyState icon="⭐" title="暂无评价事件" hint="各平台评价将在此汇聚处置。" /> : null}
+          <Note>好评卖点挖掘：13 平台好评聚类卖点 高频榜，一键反哺小红书/抖音选题——买家夸什么，内容就放大什么。</Note>
+        </div>
+      )}
+    </Bridge>
+  );
+}

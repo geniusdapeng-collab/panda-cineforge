@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 夜班窗口抓取欧美盘竞对动态
 high_risk: false
 fence_bindings: [R18, R19, R22]   # 价格倒挂>15%告警 / 跟卖取证驱赶请示 / 数据导出脱敏
+coverage:
+  - { eventPrefix: "ecommerce.competitor-radar.", label: "竞对雷达职责" }
 skills: [competitor-product-track, trend-radar, blue-ocean-mining]
 tools:
   - { name: competitor.fetch,    access: read,  desc: 抓取竞店竞品公开数据 }

@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 夜班班组主场：白名单应答自治
 high_risk: false
 fence_bindings: [R5, R10, R12, R26]   # 大额退款 / 赔偿承诺 / 升级关键词 / 退换承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.jd-cs.", label: "京东客服职责" }
 skills: [service-front-copilot, multimodal-service, refund-flow, logistics-query]
 tools:
   - { name: jd.chat.read, access: read,  desc: 读取咚咚会话与买家消息 }

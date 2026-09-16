@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 夜班窗口预算降档白名单自治
 high_risk: false
 fence_bindings: [R3, R4, R16]   # ROI 保险丝 / 日预算上调>30% 必审 / 夜班白名单
+coverage:
+  - { eventPrefix: "ecommerce.kuaishou-ads.", label: "磁力金牛投手职责" }
 skills: [jn-campaign, acos-fuse, ads-budget-pacing]
 tools:
   - { name: jinniu.campaign.read, access: read,  desc: 读取磁力金牛计划/单元/创意数据 }

@@ -145,11 +145,11 @@ async function seedCollection(db: FakeDb, name = "客服知识库"): Promise<str
 
 describe("A1 切块 · 标题层级与段落语义", () => {
   it("多级标题生成「 / 」连接的标题路径", () => {
-    const md = `# 售后政策\n\n总述内容一段，长度需要超过六十个字符才能独立成块不被合并，继续补充一些文字。\n\n## 退货时间\n\n退货为签收后七天内。\n`;
+    const md = `# 服务政策\n\n总述内容一段，长度需要超过六十个字符才能独立成块不被合并，继续补充一些文字。\n\n## 退换时间\n\n退换为签收后七天。\n`;
     const chunks = chunkMarkdown(md);
-    const aftersale = chunks.find((c) => c.heading === "售后政策 / 退货时间");
-    expect(aftersale).toBeDefined();
-    expect(aftersale!.content).toContain("退货为签收后七天内");
+    const checkout = chunks.find((c) => c.heading === "服务政策 / 退换时间");
+    expect(checkout).toBeDefined();
+    expect(checkout!.content).toContain("退换为签收后七天");
   });
 
   it("同级标题重置路径（不串层级）", () => {
@@ -167,9 +167,9 @@ describe("A1 切块 · 标题层级与段落语义", () => {
   });
 
   it("表格行作为段落内容原样保留", () => {
-    const md = `## 价目表\n\n| 规格 | 价格 |\n| --- | --- |\n| 标准装 | 588 |\n| 礼盒装 | 688 |\n`;
+    const md = `## 价目表\n\n| 品类 | 价格 |\n| --- | --- |\n| 标准款 | 588 |\n| 豪华款 | 688 |\n`;
     const chunks = chunkMarkdown(md);
-    expect(chunks[0]!.content).toContain("| 标准装 | 588 |");
+    expect(chunks[0]!.content).toContain("| 标准款 | 588 |");
     expect(chunks[0]!.heading).toBe("价目表");
   });
 
@@ -207,8 +207,8 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
     const r = await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "买家须知", sourceKind: "upload",
-      contentMd: `## 退货\n\n退货时限为签收后七天内，超过时限需要加收手续费，请知悉并提前安排处理。\n`,
+      workspaceId: WS, collectionId: colId, title: "顾客须知", sourceKind: "upload",
+      contentMd: `## 退换\n\n退换时限为签收后七天，超过时间需要客服审核，请知悉并提前安排。\n`,
     });
     expect(r.document.version).toBe(1);
     expect(r.firstVersion).toBe(true);
@@ -220,9 +220,9 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
   it("同 hash 重复上传 → 幂等返回（deduped，不建版不重切）", async () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
-    const md = `## WiFi\n\n无线网络名 Panda-Shop，密码为会员号后四位，覆盖办公区与公共区域，免费使用。\n`;
-    const a = await upsertDocument(db, { workspaceId: WS, collectionId: colId, title: "网络说明", sourceKind: "upload", contentMd: md });
-    const b = await upsertDocument(db, { workspaceId: WS, collectionId: colId, title: "网络说明", sourceKind: "upload", contentMd: md });
+    const md = `## 会员\n\n会员码为手机号后四位，覆盖全部门店与线上商城，免费办理使用。\n`;
+    const a = await upsertDocument(db, { workspaceId: WS, collectionId: colId, title: "会员说明", sourceKind: "upload", contentMd: md });
+    const b = await upsertDocument(db, { workspaceId: WS, collectionId: colId, title: "会员说明", sourceKind: "upload", contentMd: md });
     expect(b.deduped).toBe(true);
     expect(b.document.id).toBe(a.document.id);
     expect(b.chunks).toHaveLength(0);
@@ -233,12 +233,12 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
     const v1 = await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "发货政策", sourceKind: "upload",
-      contentMd: `## 发货\n\n发货揽收时间为七点到十点，华东一仓当日截单前下单当日发，内容需要足够长一点。\n`,
+      workspaceId: WS, collectionId: colId, title: "会员政策", sourceKind: "upload",
+      contentMd: `## 会员\n\n会员积分每消费一元计一分自动到账，线上商城与门店通用，内容需要足够长一点。\n`,
     });
     const v2 = await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "发货政策", sourceKind: "upload",
-      contentMd: `## 发货\n\n发货揽收时间调整为六点半到十点半，华东一仓当日截单前下单当日发，内容足够长一点。\n`,
+      workspaceId: WS, collectionId: colId, title: "会员政策", sourceKind: "upload",
+      contentMd: `## 会员\n\n会员积分活动期每消费一元计两分，线上商城与门店通用，内容足够长一点。\n`,
     });
     expect(v2.document.version).toBe(2);
     expect(v2.firstVersion).toBe(false);
@@ -252,7 +252,7 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
     const colId = await seedCollection(db);
     const doc = await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "官网政策", sourceKind: "official_site",
-      contentMd: `## 运费\n\n会员订单满九十九元免运费，偏远地区另行计费，具体内容需要足够长一些。\n`,
+      contentMd: `## 配送\n\n会员免费配送，签收前请与客服确认地址，具体内容需要足够长一些。\n`,
       status: "pending_review",
     });
     const pending = await listDocuments(db, { workspaceId: WS, status: "pending_review" });
@@ -287,8 +287,8 @@ describe("A2 版本链 · 激活/幂等/状态可见性", () => {
 describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
   it("registerSiteSource 同 URL 重复注册幂等（返回同一源）", async () => {
     const db = wireKbDb(new FakeDb());
-    const a = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/faq" });
-    const b = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/faq" });
+    const a = await registerSiteSource(db, { workspaceId: WS, url: "https://www.example/faq" });
+    const b = await registerSiteSource(db, { workspaceId: WS, url: "https://www.example/faq" });
     expect(b.id).toBe(a.id);
     expect(db.table("kb_sources")).toHaveLength(1);
   });
@@ -296,8 +296,8 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
   it("crawlAndStructure 无 LLM → degraded:true + pending_review 文档 + 回写指纹", async () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
-    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/faq" });
-    const html = `<html><body><p>退货时限为签收后七天内。加急退货视库存安排。</p><p>发货每日十七点前截止。</p></body></html>`;
+    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://www.example/faq" });
+    const html = `<html><body><p>退换时限为签收后七天。超过时限需客服审核。</p><p>营业九点到二十一点。</p></body></html>`;
     const r = await crawlAndStructure(db, { workspaceId: WS, sourceId: src.id, collectionId: colId }, undefined, async () => html);
     expect(r.degraded).toBe(true);
     expect(r.document.status).toBe("pending_review");
@@ -310,12 +310,12 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
   it("crawlAndStructure 有 LLM → 条目化结构 + degraded:false", async () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
-    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/policy" });
+    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://www.example/policy" });
     const llm: StructuringLlm = {
       async extractKnowledge() {
         return [
-          { title: "退货时限", content: "签收后七天内可退。" },
-          { title: "发货时间", content: "每日十七点前截单。" },
+          { title: "退换时间", content: "签收后七天内退换。" },
+          { title: "营业时间", content: "每日九点到二十一点。" },
         ];
       },
     };
@@ -323,13 +323,13 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
     expect(r.degraded).toBe(false);
     expect(r.items).toBe(2);
     const docRow = db.table("kb_documents").find((x) => x["id"] === r.document.id)!;
-    expect(String(docRow["content_md"])).toContain("## 退货时限");
+    expect(String(docRow["content_md"])).toContain("## 退换时间");
   });
 
   it("diffScan 指纹未变 → changed:false 仅回写 last_crawled_at", async () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
-    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/same" });
+    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://www.example/same" });
     const html = "<p>内容固定不变的一段页面文本。</p>";
     await crawlAndStructure(db, { workspaceId: WS, sourceId: src.id, collectionId: colId }, undefined, async () => html);
     const before = db.table("kb_documents").length;
@@ -343,7 +343,7 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
   it("diffScan 内容变化 → changed:true + 新版本 pending_review + diffSummary 指纹前后比对", async () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedCollection(db);
-    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://ecommerce.example/changing" });
+    const src = await registerSiteSource(db, { workspaceId: WS, url: "https://www.example/changing" });
     await crawlAndStructure(db, { workspaceId: WS, sourceId: src.id, collectionId: colId }, undefined, async () => "<p>旧版页面内容。</p>");
     const r = await diffScan(db, { workspaceId: WS, sourceId: src.id, collectionId: colId }, undefined, async () => "<p>新版页面内容，有更新。</p>");
     expect(r.changed).toBe(true);
@@ -364,10 +364,10 @@ describe("A3 官网源 · 注册/抓取结构化/diffScan", () => {
   });
 
   it("htmlToText 去 script/style/标签并解码实体", () => {
-    const text = htmlToText(`<html><head><style>body{color:red}</style><script>alert(1)</script></head><body><p>Wi-Fi &amp; 售后</p><br><p>第二条</p></body></html>`);
+    const text = htmlToText(`<html><head><style>body{color:red}</style><script>alert(1)</script></head><body><p>Wi-Fi &amp; 会员</p><br><p>第二条</p></body></html>`);
     expect(text).not.toContain("alert");
     expect(text).not.toContain("color");
-    expect(text).toContain("Wi-Fi & 售后");
+    expect(text).toContain("Wi-Fi & 会员");
     expect(text).toContain("第二条");
   });
 });
@@ -430,7 +430,13 @@ describe("A4 SSRF 守卫 · assertPublicHttpUrl / isPrivateAddress / 读取上�
 
 describe("A5 检索 · 2-gram 切词与确定性打分（纯函数）", () => {
   it("中文按 2-gram 切分（防单字噪声）", () => {
-    expect(tokenizeQuery("退货时间")).toEqual(["退货", "货时", "时间"]);
+    expect(tokenizeQuery("退换时间")).toEqual(["退换", "换时", "时间"]);
+  });
+
+  it("默认不理解行业同义词，只有显式词表才能扩展", () => {
+    expect(tokenizeQuery("退换时间")).not.toContain("售后");
+    expect(tokenizeQuery("退换时间", { synonyms: [["退换", "售后"]] })).toContain("售后");
+    expect(tokenizeQuery("送两瓶水")).not.toContain("矿泉水");
   });
 
   it("单字中文保留单字", () => {
@@ -450,30 +456,37 @@ describe("A5 检索 · 2-gram 切词与确定性打分（纯函数）", () => {
   });
 
   it("标点与空白剔除", () => {
-    expect(tokenizeQuery("退货，时间？！")).toEqual(["退货", "货时", "时间"]);
+    expect(tokenizeQuery("退换，时间？！")).toEqual(["退换", "换时", "时间"]);
     expect(tokenizeQuery("！！！")).toEqual([]);
   });
 
+  it("弱词只能显式注入，不由基座给业务词降权", () => {
+    const chunk = { heading: "订单", content: "订单" };
+    const generic = scoreChunkFallback("订单", chunk);
+    const configured = scoreChunkFallback("订单", chunk, { weakTokens: ["订单"] });
+    expect(generic).toBeGreaterThan(configured);
+  });
+
   it("scoreChunkFallback：无命中 0 分", () => {
-    expect(scoreChunkFallback("说明书", { heading: "发货", content: "每日十七点前下单当日发" })).toBe(0);
+    expect(scoreChunkFallback("门店", { heading: "会员", content: "积分每日到账" })).toBe(0);
   });
 
   it("scoreChunkFallback：命中越多分越高", () => {
-    const chunk = { heading: "退货政策", content: "退货时间为签收后七天内，加急退货视库存安排" };
-    const full = scoreChunkFallback("退货时间", chunk);
-    const half = scoreChunkFallback("退货加购", chunk);
+    const chunk = { heading: "退换政策", content: "退换时间为签收后七天，超过时间需客服审核" };
+    const full = scoreChunkFallback("退换时间", chunk);
+    const half = scoreChunkFallback("退换门店", chunk);
     expect(full).toBeGreaterThan(half);
     expect(half).toBeGreaterThan(0);
   });
 
   it("scoreChunkFallback：标题命中加权", () => {
-    const inHead = scoreChunkFallback("退货", { heading: "退货政策", content: "内容无关词" });
-    const inBody = scoreChunkFallback("退货", { heading: "其他", content: "退货相关说明" });
+    const inHead = scoreChunkFallback("退换", { heading: "退换政策", content: "内容无关词" });
+    const inBody = scoreChunkFallback("退换", { heading: "其他", content: "退换相关说明" });
     expect(inHead).toBeGreaterThan(inBody);
   });
 
   it("scoreChunkFallback：封顶 0.98 且空查询 0 分", () => {
-    const s = scoreChunkFallback("退货", { heading: "退货", content: "退货 退货 退货" });
+    const s = scoreChunkFallback("退换", { heading: "退换", content: "退换 退换 退换" });
     expect(s).toBeLessThanOrEqual(0.98);
     expect(scoreChunkFallback("", { heading: "x", content: "y" })).toBe(0);
   });
@@ -490,10 +503,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
   async function seedSearchable(db: FakeDb) {
     const colId = await seedCollection(db);
     await upsertDocument(db, {
-      workspaceId: WS, collectionId: colId, title: "买家须知", sourceKind: "manual",
+      workspaceId: WS, collectionId: colId, title: "顾客须知", sourceKind: "manual",
       contentMd: [
-        `## 退货时间\n\n本店标准退货时间为签收后 7 天内，加急退货最晚次日 12:00 前处理，视库存免费安排，超过按手续费计。\n`,
-        `## 发货时间\n\n订单发货时间为每日 7:00 至 17:00，当天十六点前下单当天发出，买家凭单号查询物流。\n`,
+        `## 退换时间\n\n本店标准退换时间为签收后 7 天内，特殊最晚至 15 天，需客服审核，超过按服务费计。\n`,
+        `## 营业时间\n\n门店营业时间为每日 9:00 至 21:00，会员凭会员码入场，线上商城全天可用。\n`,
       ].join("\n"),
     });
     return colId;
@@ -502,11 +515,11 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
   it("无 embedder → 关键词兜底命中且 degraded:true", async () => {
     const db = wireKbDb(new FakeDb());
     await seedSearchable(db);
-    const r = await searchKB(db, "退货时间是几点", { workspaceId: WS });
+    const r = await searchKB(db, "退换时间是多久", { workspaceId: WS });
     expect(r.degraded).toBe(true);
     expect(r.hits.length).toBeGreaterThan(0);
-    expect(r.hits[0]!.content).toContain("12:00");
-    expect(r.hits[0]!.documentTitle).toBe("买家须知");
+    expect(r.hits[0]!.content).toContain("7 天");
+    expect(r.hits[0]!.documentTitle).toBe("顾客须知");
   });
 
   it("无命中 → hits 为空", async () => {
@@ -527,8 +540,8 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
   it("特殊字符注入（引号/分号/百分号/注释符）不报错且不影响语义", async () => {
     const db = wireKbDb(new FakeDb());
     await seedSearchable(db);
-    const r = await searchKB(db, `退货'; DROP TABLE kb_chunks; -- %`, { workspaceId: WS });
-    expect(r.hits.length).toBeGreaterThan(0); // 2-gram「退货」仍命中，注入片段被切词剔除
+    const r = await searchKB(db, `退换'; DROP TABLE kb_chunks; -- %`, { workspaceId: WS });
+    expect(r.hits.length).toBeGreaterThan(0); // 2-gram「退换」仍命中，注入片段被切词剔除
     expect(db.table("kb_chunks").length).toBeGreaterThan(0);
   });
 
@@ -536,10 +549,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const db = wireKbDb(new FakeDb());
     const colId = await seedSearchable(db);
     const doc = (await listDocuments(db, { workspaceId: WS, collectionId: colId }))[0]!;
-    const hitBefore = await searchKB(db, "退货时间", { workspaceId: WS });
+    const hitBefore = await searchKB(db, "退换时间", { workspaceId: WS });
     expect(hitBefore.hits.length).toBeGreaterThan(0);
     await setDocumentStatus(db, { workspaceId: WS, documentId: doc.id, status: "disabled" });
-    const hitAfter = await searchKB(db, "退货时间", { workspaceId: WS });
+    const hitAfter = await searchKB(db, "退换时间", { workspaceId: WS });
     expect(hitAfter.hits).toHaveLength(0);
   });
 
@@ -548,10 +561,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const colId = await seedCollection(db);
     await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "待审政策", sourceKind: "official_site",
-      contentMd: `## 样品\n\n样品申领时间为每日十点到二十一点，买家免费申领，需要足够的正文长度。\n`,
+      contentMd: `## 会员中心\n\n会员中心开放时间为每日十点到二十一点，会员免费使用，需要足够的正文长度。\n`,
       status: "pending_review",
     });
-    const r = await searchKB(db, "样品申领时间", { workspaceId: WS });
+    const r = await searchKB(db, "会员中心开放时间", { workspaceId: WS });
     expect(r.hits).toHaveLength(0);
   });
 
@@ -561,9 +574,9 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const embedder = { async embed() { return [0.1, 0.2, 0.3]; } };
     await upsertDocument(db, {
       workspaceId: WS, collectionId: colId, title: "向量文档", sourceKind: "manual",
-      contentMd: `## 发货时效\n\n工作日十六点前付款当日发货，顺丰四十八小时送达，正文需要足够长度。\n`,
+      contentMd: `## 门店\n\n门店二十四小时营业，位于三层，刷会员码进入，正文需要足够长度。\n`,
     }, embedder);
-    const r = await searchKB(db, "发货时效多久", { workspaceId: WS }, { embedder });
+    const r = await searchKB(db, "门店营业吗", { workspaceId: WS }, { embedder });
     expect(r.degraded).toBe(false);
     expect(r.hits.length).toBeGreaterThan(0);
     expect(r.hits[0]!.score).toBeGreaterThan(0);
@@ -573,10 +586,10 @@ describe("A5 检索 · searchKB 混合链路（FakeDb）", () => {
     const db = wireKbDb(new FakeDb());
     await seedSearchable(db); // 无 embedder 切块 → embedding 为 NULL
     const embedder = { async embed() { return [0.1, 0.2]; } };
-    const r = await searchKB(db, "发货几点", { workspaceId: WS }, { embedder });
+    const r = await searchKB(db, "营业几点", { workspaceId: WS }, { embedder });
     expect(r.degraded).toBe(false); // embedder 在场，走兜底但不算 degraded
     expect(r.hits.length).toBeGreaterThan(0);
-    expect(r.hits[0]!.content).toContain("7:00");
+    expect(r.hits[0]!.content).toContain("9:00");
   });
 
   it("limit 截断生效", async () => {

@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 谷时窗口跑归一化与质量巡检批任务
 high_risk: false
 fence_bindings: [R16, R22, R30]   # 夜班白名单 / 数据导出脱敏 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.data-warehouse.", label: "数据口径官职责" }
 skills: [biz-dashboard, anomaly-attribution, weekly-ops-report]
 tools:
   - { name: data.pipeline.read, access: read,  desc: 读取各平台数据流水线状态 }

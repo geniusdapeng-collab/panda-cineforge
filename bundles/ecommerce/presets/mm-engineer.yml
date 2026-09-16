@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 跨境多模态消息高峰在夜班窗口（欧美白天=中国深夜）
 high_risk: false
 fence_bindings: [R12, R22, R26]   # 升级关键词人工接管 / 图片PII脱敏 / 承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.mm-engineer.", label: "多模态理解工程师职责" }
 skills: [multimodal-service, service-front-copilot, sentiment-alert]
 tools:
   - { name: mm.image.read,     access: read,  desc: 读取图片/截图消息理解结果 }

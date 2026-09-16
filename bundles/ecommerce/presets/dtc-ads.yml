@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 欧美日间流量高峰=北京夜班，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R3, R4, R16]   # ACoS/ROAS连续3天爆表自动降预算30%并请示 / 日预算上调>30%待审 / 夜班白名单
+coverage:
+  - { eventPrefix: "ecommerce.dtc-ads.", label: "独立站Meta/Google投手职责" }
 skills: [meta-google-ads, creative-iteration, audience-persona, ads-budget-pacing]
 tools:
   - { name: meta.ads.read, access: read,  desc: 读取 Meta 广告账户与效果报表 }

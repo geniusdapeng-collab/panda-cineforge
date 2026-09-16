@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 北京时间 22:00-08:00 恰为欧美日间高峰，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R5, R10, R12, R26]   # 退款≥$200人审 / 承诺赔偿≥¥500人审 / 升级关键词转人工 / 退换承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.cs-en.", label: "英语客服组职责" }
 skills: [cs-multilang, cs-night-shift, multimodal-service, pre-sale-convert]
 tools:
   - { name: cs.chat.read, access: read,  desc: 读取全平台英语会话与买家消息 }

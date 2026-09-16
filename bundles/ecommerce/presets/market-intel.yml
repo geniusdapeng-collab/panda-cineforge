@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 夜班窗口采集欧美政策与盘外动态
 high_risk: false
 fence_bindings: [R14, R15, R22]   # 汇率波动>2% / VAT关税变更触发售价重算 / 数据导出脱敏
+coverage:
+  - { eventPrefix: "ecommerce.market-intel.", label: "市场情报员职责" }
 skills: [trend-radar, seasonal-switch, blue-ocean-mining]
 tools:
   - { name: market.intel.fetch, access: read,  desc: 采集类目趋势与大盘数据 }

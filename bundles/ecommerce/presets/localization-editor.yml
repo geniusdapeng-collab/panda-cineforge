@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R8, R11, R24]   # 首发人审 / 违规词物理阻断 / 侵权词图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.localization-editor.", label: "本地化主编职责" }
 skills: [listing-translate, keyword-seo, listing-compliance]
 tools:
   - { name: listing.read,              access: read,  desc: 读取源语言 Listing 文案 }

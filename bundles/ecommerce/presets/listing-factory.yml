@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R8, R11, R24]   # 新店首发刊登人审 / 违规动作物理阻断 / 侵权词图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.listing-factory.", label: "刊登工厂长职责" }
 skills: [listing-factory, listing-compliance, keyword-seo, image-standards]
 tools:
   - { name: listing.read,                access: read,  desc: 读取各平台 Listing 状态 }

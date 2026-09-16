@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 大促期活动值守纳入夜班候选清单
 high_risk: false
 fence_bindings: [R8, R16, R29]   # 新平台首发必审 / 夜班白名单 / 绩效越限联动
+coverage:
+  - { eventPrefix: "ecommerce.tmall-ops.", label: "天猫活动运营职责" }
 skills: [activity-enroll, platform-rule-track, shop-health-check]
 tools:
   - { name: tmall.activity.read, access: read,  desc: 读取淘系活动日历与报名窗口 }

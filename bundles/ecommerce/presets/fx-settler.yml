@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 覆盖欧美外汇交易时段
 high_risk: false
 fence_bindings: [R14, R23, R30]   # 汇率波动>2%重定价 / 资金提现物理熔断 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.fx-settler.", label: "多币种结算师职责" }
 skills: [multi-currency-settle, fx-hedge-advisor, settlement-track]
 tools:
   - { name: fx.rate.read,            access: read,  desc: 读取实时汇率与波动 }

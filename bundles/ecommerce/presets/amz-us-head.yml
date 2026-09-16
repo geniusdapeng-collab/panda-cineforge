@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 美区日间=北京夜班，夜班班组主场（R16 白名单自治）
 high_risk: false
 fence_bindings: [R8, R16, R17, R29]   # 新店/新平台首发必审 / 夜班白名单 / 夜班调价≤3% / 账号绩效越限整改
+coverage:
+  - { eventPrefix: "ecommerce.amz-us-head.", label: "亚马逊美区店长职责" }
 skills: [shop-health-check, platform-rule-track, multi-shop-matrix]
 tools:
   - { name: amz.order.read, access: read,  desc: 读取美区订单与配送状态 }

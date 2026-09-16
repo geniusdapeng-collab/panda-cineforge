@@ -1,13 +1,13 @@
-# @workloom/webc · AI 买家服务前台（C 端）
+# @workloom/webc · AI 服务前台（C 端）
 
-面向电商买家的 H5「AI 买家服务前台」：AI 对话（含截图/图片/视频三类多模态消息演示）、售后服务大厅（建工单）、工单进度、消息通知、会员中心（积分/优惠券/复购）。
+面向住客/客户的 H5「AI 服务前台」：AI 对话、服务大厅（建工单）、工单进度、消息通知、会员中心。
 React 19 + Vite + Tailwind v4（令牌制）+ TS strict。后端契约 `baseURL=/c`（见 `src/lib/types.ts`）。
 
 ## 企业接入：只填内容，零改前端
 
 **接入只需两步，均不涉及代码：**
 
-1. **替换配置** `public/service-front.config.json`（品牌、主题、入口、文案）；
+1. **由行业 Bundle 生成投影** `public/industry/service-front.config.json`（品牌、主题、入口、文案）；根级 `public/service-front.config.json` 是基座受管加载壳，行业仓不得修改；
 2. **替换知识库内容**（服务端知识文档，决定 AI 回答与引用来源）。
 
 配置文件加载失败或字段缺失时自动落内置默认值，永不白屏。配置项一览：

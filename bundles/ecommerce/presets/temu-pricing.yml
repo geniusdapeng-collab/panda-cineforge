@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 平台核价窗口以美区时区为主，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R2, R14, R16, R18]   # 毛利红线熔断 / 汇率重定价 / 夜班白名单 / 多平台价格倒挂
+coverage:
+  - { eventPrefix: "ecommerce.temu-pricing.", label: "Temu核价运营职责" }
 skills: [temu-pricing, margin-guard, fx-reprice]
 tools:
   - { name: temu.price.read, access: read,  desc: 读取平台核价结果与比价要求 }

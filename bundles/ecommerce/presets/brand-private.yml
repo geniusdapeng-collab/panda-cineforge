@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R10, R22, R26]   # 对外赔偿承诺人审 / 会员PII导出脱敏 / 承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.brand-private.", label: "品牌私域运营职责" }
 skills: [member-ops, edm-automation, vip-care, ugc-mining]
 tools:
   - { name: member.read,           access: read,  desc: 读取会员档案与分层 }

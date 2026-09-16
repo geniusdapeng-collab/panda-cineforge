@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 谷时窗口跑沙盘推演批任务
 high_risk: false
 fence_bindings: [R20, R23, R30]   # 大额支出分级人审 / 资金提现物理熔断 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.cash-forecaster.", label: "资金沙盘师职责" }
 skills: [cash-sandbox, profit-warn, cost-structure-audit]
 tools:
   - { name: cash.balance.read,       access: read,  desc: 读取各账户资金余额 }

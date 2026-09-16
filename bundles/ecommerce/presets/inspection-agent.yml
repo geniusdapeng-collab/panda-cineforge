@@ -10,6 +10,7 @@ readonly: true            # L9.1：只读由工具集裁剪保证，非提示词
 night_shift: false
 high_risk: false
 fence_bindings: []        # 只读巡检不发起写类动作，无需围栏声明（F2.10 写类才强制）
+coverage: []
 skills: [price-parity-watch, stockout-guard, review-defense-window, listing-ip-scan]
 tools:
   - { name: platform.price.read, access: read, desc: 读取各平台在售价格采样 }

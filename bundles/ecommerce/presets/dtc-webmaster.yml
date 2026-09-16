@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 欧美日间=北京夜班，夜班班组主场（R16 白名单自治）
 high_risk: false
 fence_bindings: [R8, R16, R17, R23]   # 新店/新平台首发必审 / 夜班白名单 / 夜班调价≤3% / 安全禁区熔断
+coverage:
+  - { eventPrefix: "ecommerce.dtc-webmaster.", label: "独立站站长职责" }
 skills: [shop-health-check, shop-authority, member-ops]
 tools:
   - { name: shopify.order.read, access: read,  desc: 读取独立站订单与履约状态 }

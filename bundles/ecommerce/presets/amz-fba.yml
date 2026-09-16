@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 跨境军统一夜班班组主场，补货测算在谷时窗口执行（R16）
 high_risk: false
 fence_bindings: [R6, R7, R20]   # 周转>60天清仓请示 / 断货风险<7天紧急采购请示 / 采购金额分级人审
+coverage:
+  - { eventPrefix: "ecommerce.amz-fba.", label: "亚马逊FBA补货协同职责" }
 skills: [fba-replenish, replenishment-model, stockout-guard]
 tools:
   - { name: fba.stock.read, access: read,  desc: 读取三站 FBA 库存与在途 }

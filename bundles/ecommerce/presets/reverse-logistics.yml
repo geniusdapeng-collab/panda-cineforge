@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R5, R6, R10]   # 大额退款复核 / 积压处置请示 / 对外赔偿承诺人审
+coverage:
+  - { eventPrefix: "ecommerce.reverse-logistics.", label: "逆向物流专员职责" }
 skills: [reverse-logistics, overstock-clearance, quality-feedback]
 tools:
   - { name: return.order.read,      access: read,  desc: 读取退货/退款单 }

@@ -11,6 +11,8 @@ readonly: false
 night_shift: false          # 邮件流按收件人时区自动调度，排班按北京日间
 high_risk: false
 fence_bindings: [R10, R22, R26]   # 对外承诺赔偿人审 / 数据导出脱敏 / 承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.dtc-edm.", label: "独立站EDM私域职责" }
 skills: [edm-automation, member-ops, coupon-strategy]
 tools:
   - { name: edm.flow.write, access: write, desc: 创建/调整 EDM 自动化流（弃购/唤醒） }

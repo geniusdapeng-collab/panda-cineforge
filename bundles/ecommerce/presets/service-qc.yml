@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R9, R12, R26]   # 差评响应SLA / 升级关键词审计 / 承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.service-qc.", label: "客服质检官职责" }
 skills: [service-qc, sentiment-alert, reputation-report]
 tools:
   - { name: conversation.read,    access: read,  desc: 读取客服会话记录 }

@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 谷时窗口跑全量 SKU 损益核算
 high_risk: false
 fence_bindings: [R2, R6, R22]   # 毛利红线熔断 / 周转>60天清仓请示 / 数据导出脱敏
+coverage:
+  - { eventPrefix: "ecommerce.sku-pl-accountant.", label: "SKU损益核算师职责" }
 skills: [sku-pl, sku-lifecycle, slow-mover-alert]
 tools:
   - { name: order.read,          access: read,  desc: 读取订单流水（含退款） }

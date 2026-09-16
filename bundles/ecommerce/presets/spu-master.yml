@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R8, R22, R24]   # 新店首发关联复核 / 数据导出脱敏 / 侵权图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.spu-master.", label: "全球商品库官职责" }
 skills: [spu-master-data, sku-lifecycle, bundle-design]
 tools:
   - { name: spu.master.read,        access: read,  desc: 读取 SPU 主数据 }

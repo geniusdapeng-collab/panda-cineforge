@@ -11,6 +11,8 @@ readonly: false
 night_shift: true          # 夜班窗口汇总欧美盘战报，08:30 前交付集团决策包
 high_risk: true            # 涉两军资源调度与 L4/L5 级重大事项，默认高危岗
 fence_bindings: [R20, R23, R27, R30]   # 采购分级升 L4 / 安全禁区物理熔断 / 大促战备切换 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.group-ceo.", label: "集团数字CEO职责" }
 skills: [morning-briefing, decision-brief, target-breakdown, board-report, staff-performance]
 tools:
   - { name: analytics.dashboard.read, access: read,  desc: 读取集团经营仪表盘（两军×13平台） }

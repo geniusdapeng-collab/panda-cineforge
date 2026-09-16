@@ -11,6 +11,8 @@ readonly: false
 night_shift: false          # 内容创意类白班作业，发布排期进内容日历
 high_risk: false
 fence_bindings: [R11, R21, R24]   # 虚假宣传阻断 / 涉费话术必审 / 侵权词图阻断
+coverage:
+  - { eventPrefix: "ecommerce.xhs-content.", label: "小红书笔记内容职责" }
 skills: [xhs-seeding, keyword-seo, content-calendar]
 tools:
   - { name: xhs.note.read, access: read,  desc: 读取笔记曝光/收藏/引流转化数据 }

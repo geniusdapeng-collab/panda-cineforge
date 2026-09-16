@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R11, R22, R26]   # 虚假宣传阻断 / 会话数据脱敏 / 承诺超政策
+coverage:
+  - { eventPrefix: "ecommerce.kb-trainer.", label: "客服知识训练师职责" }
 skills: [kb-trainer, ugc-mining, qa-zone-ops]
 tools:
   - { name: kb.read,               access: read,  desc: 读取客服知识库 }

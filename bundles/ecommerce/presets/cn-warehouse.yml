@@ -10,6 +10,8 @@ readonly: false
 night_shift: false
 high_risk: false
 fence_bindings: [R6, R7]   # 周转>60天清仓请示 / 断货风险预警
+coverage:
+  - { eventPrefix: "ecommerce.cn-warehouse.", label: "国内仓网管家职责" }
 skills: [inventory-cashline, stockout-guard, overstock-clearance, safety-stock-calc]
 tools:
   - { name: stock.read,               access: read,  desc: 读取 4 仓库存水位与库龄 }

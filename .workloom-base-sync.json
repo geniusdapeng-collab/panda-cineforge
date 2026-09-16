@@ -1,8 +1,8 @@
 {
   "baseRepo": "geniusdapeng-collab/workloom-im",
-  "lastSyncedBaseSha": "c69914d38ec45bde3e2a8df2f391a0a9003a37f6",
-  "lastSyncAt": "2026-09-14T15:26:49.429Z",
-  "filesTouched": 3,
+  "lastSyncedBaseSha": "a96ac33c8c17f93f4d15c73679c1026c5e6198f0",
+  "lastSyncAt": "2026-09-16T04:47:19.868Z",
+  "filesTouched": 129,
   "extraExclude": [
     "apps/server/src/service/contract.test.ts",
     "apps/server/src/service/dialog.test.ts",
@@ -10,29 +10,25 @@
     "packages/base/im-channels/im-channels.test.ts",
     "packages/base/model-router/model-router.test.ts",
     "packages/base/review-console/approvals.test.ts",
-    "packages/base/service-dialog/**",
-    "packages/base/service-kb/**",
     "packages/base/service-ticket/scenarios.test.ts",
     "packages/base/service-ticket/service-ticket.test.ts",
     "packages/base/tenancy/tenancy.test.ts",
     "packages/base/workdata/atomicity.test.ts",
     "packages/base/workdata/memory.test.ts",
     "packages/base/workdata/recall.test.ts",
-    "packages/base/workdata/recall.ts",
     "packages/base/workdata/security-audit.test.ts",
     "packages/base/workdata/workdata.test.ts",
-    "packages/shared/src/constants.ts",
     "packages/shared/src/event-schema.test.ts",
     "scripts/agent-tour.sh",
     "scripts/e2e-service-c.mjs",
     "scripts/release-gate.ts"
   ],
-  "lastRequiredAssetsBaseSha": "fc0f825808adea2a1edb4144a3eb9cf6360be531",
-  "lastSyncMode": "required-only",
+  "lastRequiredAssetsBaseSha": "a96ac33c8c17f93f4d15c73679c1026c5e6198f0",
+  "lastSyncMode": "full",
   "pathPrefix": ".",
   "requiredRootAssetsSha256": {
-    "WORKLOOM_PRODUCT_CONTEXT.md": "0868b38de30424cfbfbb7fc7a872c54051d2a71f6adee44e1abc690c2508a099",
-    ".github/workflows/base-sync-heartbeat.yml": "b08f921a4021bc9b2523022c4cdb36546b315d42ab7190f897cf1068e874ac52",
+    "WORKLOOM_PRODUCT_CONTEXT.md": "3ce009c102452183028f5302df0295facd20b538b1b75d645461c870ef719404",
+    ".github/workflows/base-sync-heartbeat.yml": "0991f8cefa51655e0fa672d57131fd1403d662b1c16261b0bb1000ab7b4f0988",
     "AGENTS.md#managed-section": "d63adfbd349ac87c8af33b96cd13aad1a2ed29909f226e8fbb97ee9d4a1ecacf"
   }
 }

@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 晚间直播场次值守自治（白名单内）
 high_risk: false
 fence_bindings: [R11, R16, R21, R24]   # 虚假宣传阻断 / 夜班白名单 / 直播涉费承诺必审 / 侵权素材阻断
+coverage:
+  - { eventPrefix: "ecommerce.douyin-live.", label: "抖音直播运营职责" }
 skills: [live-copilot, live-schedule, live-compliance, live-review]
 tools:
   - { name: douyin.live.read, access: read,  desc: 读取直播间在线/转化/GPM 实时数据 }

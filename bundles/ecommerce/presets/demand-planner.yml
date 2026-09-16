@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 谷时窗口跑全量预测与补货模型批任务
 high_risk: false
 fence_bindings: [R7, R20, R27]   # 断货风险紧急采购请示 / 采购分级人审 / 大促战备切换
+coverage:
+  - { eventPrefix: "ecommerce.demand-planner.", label: "需求预测师职责" }
 skills: [demand-forecast, replenishment-model, promo-stockup, safety-stock-calc]
 tools:
   - { name: sales.history.read,  access: read,  desc: 读取分店铺分 SKU 销量流水 }

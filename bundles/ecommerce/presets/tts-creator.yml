@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 美区达人活跃时段=北京夜班，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R10, R11, R16, R21]   # 对外承诺赔偿≥¥500人审 / 违规阻断 / 夜班白名单 / 直播涉费承诺
+coverage:
+  - { eventPrefix: "ecommerce.tts-creator.", label: "TikTok达人建联职责" }
 skills: [creator-outreach, live-traffic-boost, ugc-mining]
 tools:
   - { name: tts.creator.read, access: read,  desc: 读取达人库、画像与带货数据 }

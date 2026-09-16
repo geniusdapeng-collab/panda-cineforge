@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 谷时窗口跑批生成报表与归因分析
 high_risk: false
 fence_bindings: [R16, R22, R30]   # 夜班白名单 / 数据导出脱敏 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.biz-analyst.", label: "经营分析参谋职责" }
 skills: [biz-dashboard, weekly-ops-report, anomaly-attribution, budget-watch]
 tools:
   - { name: analytics.dashboard.read, access: read,  desc: 读取集团经营指标大盘 }

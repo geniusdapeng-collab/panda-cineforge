@@ -11,6 +11,8 @@ readonly: false
 night_shift: false          # 内容生产与SEO巡检按北京日间排班
 high_risk: false
 fence_bindings: [R11, R24]   # 违规词阻断 / 侵权词图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.dtc-seo.", label: "独立站SEO/内容职责" }
 skills: [dtc-seo, keyword-seo, content-calendar]
 tools:
   - { name: seo.rank.read, access: read,  desc: 读取关键词排名与自然流量 }

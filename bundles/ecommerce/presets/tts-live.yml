@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 美区直播黄金时段=北京夜班，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R11, R16, R21, R29]   # 违规阻断 / 夜班白名单 / 直播涉费承诺人审 / 绩效越限整改
+coverage:
+  - { eventPrefix: "ecommerce.tts-live.", label: "TikTok直播运营职责" }
 skills: [live-copilot, tiktok-ads, live-review, live-compliance]
 tools:
   - { name: tts.live.read, access: read,  desc: 读取直播间实时数据与货盘 }

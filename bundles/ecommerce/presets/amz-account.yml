@@ -11,6 +11,8 @@ readonly: false
 night_shift: true           # 绩效通知与 Case 窗口以欧美时区为主，夜班班组主场（R16）
 high_risk: false
 fence_bindings: [R12, R19, R23, R29]   # 升级关键词自动转人工 / 跟卖取证驱赶请示 / 安全禁区熔断 / 绩效越限整改
+coverage:
+  - { eventPrefix: "ecommerce.amz-account.", label: "亚马逊账号绩效专员职责" }
 skills: [account-health, appeal-kit, hijack-watch, risk-radar]
 tools:
   - { name: amz.health.read, access: read,  desc: 读取 ODR/迟发率/IPI 等绩效指标 }

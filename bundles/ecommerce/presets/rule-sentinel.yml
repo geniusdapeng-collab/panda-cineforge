@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 违规阻断 7×24 不间断
 high_risk: false
 fence_bindings: [R11, R23, R24]   # 违规动作物理阻断 / 安全禁区熔断 / 侵权词图上新阻断
+coverage:
+  - { eventPrefix: "ecommerce.rule-sentinel.", label: "平台规则哨兵职责" }
 skills: [compliance-sentinel, anti-violation, policy-change-impact]
 tools:
   - { name: platform.rule.read,    access: read,  desc: 读取各平台规则库 }

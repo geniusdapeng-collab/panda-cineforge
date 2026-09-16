@@ -156,8 +156,18 @@ export async function runQueueBeat(
       approvalId: row.approval_id, eventId: row.event_id,
       action: String(snap.action ?? ""), params,
       ruleIds: Array.isArray(snap.rule_ids) ? (snap.rule_ids as string[]) : [],
-      priceCtx: { afterPrice: Number(params.price ?? NaN) || undefined, basePrice: Number(snap.base_price ?? 458) || undefined },
-      amountCtx: { amount: Number(params.amount ?? NaN) || undefined },
+      rangeCtx: {
+        key: typeof snap.autonomy_range_key === "string" ? snap.autonomy_range_key : undefined,
+        value: Number.isFinite(Number(snap.autonomy_range_value)) ? Number(snap.autonomy_range_value) : undefined,
+      },
+      amountCtx: {
+        amount: Number.isFinite(Number(snap.autonomy_amount)) ? Number(snap.autonomy_amount) : undefined,
+        capKey: typeof snap.autonomy_cap_key === "string" ? snap.autonomy_cap_key : undefined,
+      },
+      irreversible: snap.irreversible === true,
+      affectedDomains: Array.isArray(snap.affected_domains)
+        ? snap.affected_domains.filter((value): value is string => typeof value === "string")
+        : [],
       title: String(snap.title ?? row.event_id),
     };
     // D22 三级分流：微决策规则直通 / 常规单模型推理 / 重大六步深度管线
@@ -280,7 +290,7 @@ export async function runDeviationBeat(
       params: { trigger: "goal_deviation", deviation_pt: deviation, threshold, mode: charter.mode },
       after: {
         title: `偏差专项：目标落后 ${Math.abs(deviation)}pt`,
-        plan: deviation < 0 ? "启动补救举措池（调价建议/渠道加投/内容补强），逐路过围栏与宪章" : "超目标运行，固化打法入组织记忆",
+        plan: deviation < 0 ? "启动补救举措池；每项候选动作逐一经过围栏与宪章裁决" : "超目标运行，固化有效做法到组织记忆",
       },
       basis: [`goal.tracking 最新偏差 ${deviation}pt，阈值 ±${threshold}pt（方案 §五 偏差触发器）`],
     }, { dryRun });
@@ -303,10 +313,7 @@ export async function runBreakerBeat(
       [scope.workspaceId],
     );
     const after = ((r.rows[0]?.payload?.decision as Record<string, unknown> | undefined)?.after ?? {}) as Record<string, unknown>;
-    // 行业中性口径：按宪章 kpi_floor 声明的指标键提取（电商=margin_rate/acos，其他行业自定义），缺失记 NaN 不熔断
-    const out: Record<string, number> = {};
-    for (const metric of Object.keys(charter.circuit_breaker.kpi_floor)) out[metric] = Number(after[metric] ?? NaN);
-    return out;
+    return { occ: Number(after.occ ?? NaN), adr: Number(after.adr ?? NaN) };
   });
   const verdict = evalCircuitBreaker(charter, kpi as Record<string, number>);
   if (!verdict.tripped || verdict.alreadyTightened) {

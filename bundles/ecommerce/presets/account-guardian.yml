@@ -10,6 +10,8 @@ readonly: false
 night_shift: true          # 跨境店铺绩效考核覆盖欧美时段
 high_risk: false
 fence_bindings: [R23, R29, R30]   # 关停店铺物理熔断 / 绩效越限整改请示 / 高危审批超时升级
+coverage:
+  - { eventPrefix: "ecommerce.account-guardian.", label: "账号健康官职责" }
 skills: [account-health, appeal-kit, risk-radar]
 tools:
   - { name: account.metrics.read,  access: read,  desc: 读取店铺绩效指标（ODR/迟发率/IPI） }
