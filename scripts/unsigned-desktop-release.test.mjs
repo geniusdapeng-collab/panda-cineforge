@@ -67,9 +67,10 @@ test("signed 与 unsigned 平台校验边界清晰", () => {
   assert.match(workflow, /codesign --verify --deep --strict/u);
   assert.match(workflow, /xcrun stapler validate/u);
   assert.match(workflow, /Get-AuthenticodeSignature/u);
-  assert.match(workflow, /CSC_IDENTITY_AUTO_DISCOVERY=false/u);
-  assert.match(workflow, /CSC_LINK= CSC_KEY_PASSWORD=/u);
-  assert.match(workflow, /WIN_CSC_LINK= WIN_CSC_KEY_PASSWORD=/u);
+  assert.equal(workflow.match(/CSC_IDENTITY_AUTO_DISCOVERY: "false"/gu)?.length, 3);
+  assert.equal(workflow.match(/if: needs\.preflight\.outputs\.platform-signing == 'signed'/gu)?.length, 3);
+  assert.equal(workflow.match(/if: needs\.preflight\.outputs\.platform-signing == 'unsigned'/gu)?.length, 3);
+  assert.doesNotMatch(workflow, /(?:CSC_LINK|CSC_KEY_PASSWORD|APPLE_ID|APPLE_APP_SPECIFIC_PASSWORD|APPLE_TEAM_ID|WIN_CSC_LINK|WIN_CSC_KEY_PASSWORD)=\s/u);
   assert.match(workflow, /-c\.mac\.notarize=false/u);
 });
 
