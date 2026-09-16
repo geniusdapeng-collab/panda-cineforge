@@ -32,7 +32,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "72486fc3b8cfee4acd17bfdcf259b09533a55b6794f8444440aa7da492b21faa"
+      "sha256": "56ec6f555743be1db4b3e131799f14b282f0adc949d1ecc629ee933984177213"
     },
     {
       "path": "packages/audit-engine/package.json",
@@ -68,11 +68,11 @@
     },
     {
       "path": "product.manifest.json",
-      "sha256": "e95695f3d761058aa8ae650e777b0530ae3be74377bcaec1e5cb760e2906b93f"
+      "sha256": "44fd689df231a7da9db043d90c8c40bfe3ec5eb701aa1d3fd0d6b758c3462188"
     },
     {
       "path": "scripts/pack-nm-merge.mjs",
-      "sha256": "23609ede98cd64b55f8c530b5193507fc49ad6da5c12fb8876d63748ada9933c"
+      "sha256": "8e7aa9c1e7fe10e13165802f27c6162bbda9d45ae95c97841e9484e2560856ce"
     },
     {
       "path": "scripts/payload-policy.mjs",
@@ -84,9 +84,9 @@
     },
     {
       "path": "scripts/runtime-deps-lock.mjs",
-      "sha256": "b7152636ea4542a086027afbbbc42c918c3d3f70c39fce1c4aebccaed70df9a4"
+      "sha256": "38d5eba21ae509aec4de97000bda055ca632f0216473e1d1000eeba6b5e0a475"
     }
   ],
   "manifestSha256": "bae08a229cce26438b95966696c66e9e7e285b3dcf6885dc475ecb490faebefb",
-  "packageLockSha256": "2e8be7118145e59d9c13e7fbf5397f4bdf3705ed97c49acf671f3138b877507f"
+  "packageLockSha256": "97f96e83cb4a3b8e034e5322fcca40ac753c68195206032024afd97f75197fbc"
 }

@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { EmptyState, SkeletonBlock } from "../../../components/hud";
+import { EmptyState, Skeleton } from "../../../components/hud";
 import { Note, PageHead, Tag } from "../Twin";
 import { clientValueText, fieldText } from "../display";
 
@@ -71,7 +71,7 @@ export default function P20() {
   return (
     <Bridge right={rightPanel}>
       <PageHead title="店铺档案" tag="店铺档案" extra={<Tag tone="gold">一店一档 ×14</Tag>} />
-      {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : !archive ? (
+      {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : !archive ? (
         <EmptyState icon="🗂️" title="档案未建立" hint="店铺档案是 数字员工生成内容前的必读三要素之一。" />
       ) : (
         <div className="space-y-3">

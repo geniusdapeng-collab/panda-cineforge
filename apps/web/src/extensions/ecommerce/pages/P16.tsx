@@ -5,10 +5,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { EmptyState, SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
 import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../Twin";
-import { CS_INTENT_TEXT, LANG_TEXT, dictText } from "../../../lib/display";
-import { clientNodeText, clientValueText } from "../display";
+import { dictText } from "../../../lib/display";
+import { CS_INTENT_TEXT, LANG_TEXT, clientNodeText, clientValueText } from "../display";
 
 interface FaqKb {
   top_questions?: Array<{ q: string; a: string; confirmed: boolean }>;
@@ -57,7 +57,7 @@ export default function P16() {
   return (
     <Bridge right={rightPanel}>
       <PageHead title="客服监控墙" tag="客服监控" extra={<Tag tone="go">8 语种 · 24h 在线</Tag>} />
-      {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
+      {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat label="会话（窗口）" value={calls.length} />

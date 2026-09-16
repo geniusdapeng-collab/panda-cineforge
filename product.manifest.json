@@ -11,7 +11,7 @@
   "release": {
     "appId": "com.geniusdapeng.pandacineforge",
     "channel": "stable",
-    "artifactPrefix": "熊猫电商运营系统",
+    "artifactPrefix": "WorkLoom 熊猫电商运营系统",
     "website": "apps/site"
   },
   "desktop": {

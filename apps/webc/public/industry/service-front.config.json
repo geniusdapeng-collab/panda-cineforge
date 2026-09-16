@@ -1,0 +1,100 @@
+{
+  "workspaceKey": "panda-group",
+  "brandName": "熊猫优选集团",
+  "agentName": "小优",
+  "logoText": "优",
+  "theme": {
+    "primary": "#B45309",
+    "secondary": "#0E7490"
+  },
+  "welcomeText": "您好，欢迎来到{brand}。我是 AI 买家服务助手{agent}，可以帮您查询订单与物流、处理退换保修并跟进服务进度。",
+  "quickReplies": [
+    {
+      "label": "查询订单",
+      "sendText": "帮我查一下我的订单"
+    },
+    {
+      "label": "查询物流",
+      "sendText": "我的订单发货了吗？到哪了？"
+    },
+    {
+      "label": "退换与保修",
+      "serviceKind": "repair"
+    },
+    {
+      "label": "价保退差",
+      "serviceKind": "other"
+    }
+  ],
+  "serviceEntries": [
+    {
+      "kind": "delivery",
+      "title": "补发与催发货",
+      "desc": "漏发补发、催发货或修改地址",
+      "icon": "发",
+      "sla": "24 小时内响应",
+      "titlePlaceholder": "请填写订单号和需要处理的问题"
+    },
+    {
+      "kind": "repair",
+      "title": "退换与保修",
+      "desc": "无理由退换、质量问题或保修换新",
+      "icon": "换",
+      "sla": "售后审核 4 小时内",
+      "titlePlaceholder": "请描述商品及退换或保修需求"
+    },
+    {
+      "kind": "complaint",
+      "title": "投诉与纠纷",
+      "desc": "物流超时、服务态度或纠纷升级",
+      "icon": "诉",
+      "sla": "客服专家 2 小时内回复",
+      "titlePlaceholder": "请描述需要升级处理的问题"
+    },
+    {
+      "kind": "other",
+      "title": "其他需求",
+      "desc": "发票、价保或企业采购",
+      "icon": "他",
+      "sla": "服务专员 30 分钟内响应",
+      "titlePlaceholder": "请描述您的服务需求"
+    }
+  ],
+  "profile": {
+    "identityBinding": false,
+    "membership": false,
+    "orders": false,
+    "labels": {
+      "identity": "买家身份",
+      "membership": "会员权益",
+      "points": "积分",
+      "orders": "近期订单",
+      "emptyOrders": "暂无订单记录"
+    }
+  },
+  "enableTabs": [
+    "chat",
+    "service",
+    "tickets",
+    "messages",
+    "me"
+  ],
+  "supportPhone": "",
+  "demoHistory": [
+    {
+      "role": "user",
+      "text": "我的订单发货了吗？到哪了？"
+    },
+    {
+      "role": "ai",
+      "text": "请提供订单号。我会查询真实物流节点；需要催发货或补发时，会在您确认后提交服务工单。"
+    }
+  ],
+  "projection": {
+    "bundleId": "ecommerce",
+    "bundleVersion": "1.0.0",
+    "contractVersion": "2.0.0",
+    "uiVersion": "0.1.1",
+    "manifestDigest": "59c45e5e7d105fc88a1eacb2d885b274ee257756d41a5b0ebc900dfaf6cf291e"
+  }
+}
