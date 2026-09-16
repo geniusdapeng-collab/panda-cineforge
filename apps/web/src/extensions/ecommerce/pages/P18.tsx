@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { Skeleton, SystemDivider } from "../../../components/hud";
 import { HBar, Note, PageHead, Tag } from "../Twin";
 import { clientIdentifierText, clientNodeText } from "../display";
 
@@ -35,7 +35,7 @@ export default function P18() {
   return (
     <Bridge>
       <PageHead title="多店驾驶舱" tag="多店驾驶舱" extra={<Tag tone="gold">一人管 14 店</Tag>} />
-      {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
+      {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <SystemDivider time="全店经营快照" summary="各店最新日报（成交总额、订单量与毛利率）+ 昨夜决策包三栏 + 事件规模" />
           {stores.map((s) => {

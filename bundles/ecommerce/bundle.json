@@ -278,6 +278,7 @@
         "ui/cases.json"
       ],
       "serviceFront": [
+        "service-front/client.json",
         "service-front/delivery-catalog.json",
         "service-front/faq.json",
         "service-front/service-catalog.json"
@@ -536,7 +537,7 @@
   },
   "integrity": {
     "algorithm": "sha256",
-    "digest": "403a426da1db181fba3c557c3028b82065ab213b14223c982761f38224340850",
+    "digest": "59c45e5e7d105fc88a1eacb2d885b274ee257756d41a5b0ebc900dfaf6cf291e",
     "assets": {
       "feedback-enums.yml": "d84a41cae9c29e2ac1b7242a445bc38b2769eef528f1a89935377a363321105f",
       "fences/ecom-baseline.yml": "b9e1fa5bbd5204a395f29ace2fba0782e060d91837603abb8eae2104dca6252a",
@@ -632,6 +633,7 @@
       "schemas/objects.json": "11eae1f0685d64cea9f64d50092563bd0ccd7dfe37214620cee8f8404e26b823",
       "schemas/stages.json": "8aa104ec1a5e43cd051e4b92159791f3f6fb039ba3f6d4c7060fe546bb077dbf",
       "segment-defaults.yml": "d3043db7e6f11c7979df881be1a10fc568179b02e229ccae155dec83e7d6d565",
+      "service-front/client.json": "a32b1a939ff0471dd17fdbd9404d0de903ecc898ed8c2ce79f4bedb872b0ae63",
       "service-front/delivery-catalog.json": "b5b032cfca83e8aa51ff32789b37efc60f7f63ffe6b7ec610fbe76d86958bed6",
       "service-front/faq.json": "37080f32635c6577822995070ee5b02ac5ea214989faaca585e7ca33a20784c2",
       "service-front/service-catalog.json": "1e0faaaad492cab3d004d1bce1ab88e12fe717ffa1e54acf3369e96cc22145f6",

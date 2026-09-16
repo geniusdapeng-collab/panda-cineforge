@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { Skeleton, SystemDivider } from "../../../components/hud";
 import { Ev, fmtTime, HBar, Note, PageHead, Row, Tag } from "../Twin";
 import { clientNodeText, clientStatusLabel, clientValueText } from "../display";
 
@@ -52,7 +52,7 @@ export default function P14() {
   return (
     <Bridge right={rightPanel}>
       <PageHead title="平台运营" tag="平台经营视图" extra={<Tag tone="holo">每 30 分钟自动巡检</Tag>} />
-      {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
+      {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <SystemDivider time="平台巡检快照" summary="价格一致性 / 库存同步 / 在线状态（店铺档案 巡检数据输入）" />
           {snap.length === 0 ? (

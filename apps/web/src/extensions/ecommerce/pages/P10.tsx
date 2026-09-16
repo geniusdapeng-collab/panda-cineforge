@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { EmptyState, SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
 import { clientNodeText, clientValueText } from "../display";
 
 interface Ev {
@@ -96,7 +96,7 @@ export default function P10() {
       </div>
 
       {!ready ? (
-        <><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>
+        <><Skeleton count={2} height={44} /><Skeleton count={4} /></>
       ) : incidents.length === 0 ? (
         <EmptyState icon="🎉" title="零断点周期" hint="本周期无断点记录。断点发生后将在此形成根因闭环时间线。" />
       ) : (

@@ -23,6 +23,25 @@ const NODE_TEXT: Record<string, string> = {
   system: "系统",
 };
 
+export const CS_INTENT_TEXT: Record<string, string> = {
+  pre_sale: "售前",
+  aftersale: "售后",
+  logistics: "物流",
+  complaint: "投诉",
+  consult: "咨询",
+};
+
+export const LANG_TEXT: Record<string, string> = {
+  zh: "中文",
+  en: "英语",
+  ja: "日语",
+  es: "西班牙语",
+  de: "德语",
+  fr: "法语",
+  pt: "葡萄牙语",
+  ko: "韩语",
+};
+
 export const FIELD_TEXT: Record<string, string> = {
   property: "店铺主体",
   brand_guideline: "品牌规范",

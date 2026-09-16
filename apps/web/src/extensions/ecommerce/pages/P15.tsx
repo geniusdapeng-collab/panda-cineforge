@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { EmptyState, SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
 import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../Twin";
 import { AIFeedback } from "../../../components/AIFeedback";
 import { clientIdentifierText, clientNodeText, clientValueText } from "../display";
@@ -42,7 +42,7 @@ export default function P15() {
   return (
     <Bridge right={rightPanel}>
       <PageHead title="评价与差评防御" tag="口碑防御" extra={<Tag tone="warn">差评 · 两小时内响应</Tag>} />
-      {!ready ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
+      {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat label="评价回复（窗口）" value={replies.length} />

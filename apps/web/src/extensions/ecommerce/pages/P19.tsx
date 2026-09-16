@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
-import { SkeletonBlock, SystemDivider } from "../../../components/hud";
+import { Skeleton, SystemDivider } from "../../../components/hud";
 import { HBar, Note, PageHead, Tag } from "../Twin";
 import { clientNodeText, clientValueText } from "../display";
 
@@ -57,7 +57,7 @@ export default function P19() {
           </button>
         ))}
       </div>
-      {!ready || !result ? (<><SkeletonBlock lines={2} h={44} /><SkeletonBlock lines={4} /></>) : (
+      {!ready || !result ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           {q === "channel_revenue" && (
             <>
