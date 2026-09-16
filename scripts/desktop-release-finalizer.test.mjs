@@ -119,4 +119,3 @@ test("public verification rejects extra or missing assets", () => {
   writeFileSync(join(paths.output, "unexpected.txt"), "no\n");
   assert.throws(() => verifyRelease({ directory: paths.output, ...identity }), /精确包含/u);
 });
-
