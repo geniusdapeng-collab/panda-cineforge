@@ -3,7 +3,7 @@
   "product": {
     "productId": "panda-cineforge",
     "role": "industry",
-    "repository": "geniusdapeng-collab/panda-cineforge",
+    "repository": "workloom-ai/panda-cineforge",
     "includePlatformOps": false
   },
   "npmVersion": "11.17.0",

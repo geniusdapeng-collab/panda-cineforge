@@ -4,7 +4,7 @@
   "role": "industry",
   "displayName": "WorkLoom 熊猫电商运营系统",
   "packageName": "panda-ecom",
-  "repository": "geniusdapeng-collab/panda-cineforge",
+  "repository": "workloom-ai/panda-cineforge",
   "defaultBundle": "ecommerce",
   "demoWorkspaceSlug": "panda-group",
   "demoMemberNo": "MEM-001",

@@ -214,7 +214,7 @@ WorkLoom 熊猫电商运营系统就是为这件事来的：**把过去只有超
 ### 一键跑起来（推荐）
 
 ```bash
-git clone https://github.com/geniusdapeng-collab/panda-cineforge.git
+git clone https://github.com/workloom-ai/panda-cineforge.git
 cd panda-cineforge
 pnpm setup && pnpm preview:all
 ```

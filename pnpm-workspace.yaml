@@ -2,7 +2,7 @@ packages:
   - "apps/*"
   - "packages/*"
 overrides:
-  "@workloom/ui@0.1.1": "https://github.com/geniusdapeng-collab/workloom-im/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz"
+  "@workloom/ui@0.1.1": "https://cnb.cool/workloom-ai/workloom-im/-/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz"
 onlyBuiltDependencies:
   - electron-winstaller
   - esbuild
