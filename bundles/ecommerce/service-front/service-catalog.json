@@ -1,0 +1,40 @@
+{
+  "version": "2.0",
+  "ecommerce": "熊猫优选集团",
+  "description": "电商买家服务目录：退换货政策 / 保修 / 安装指导 / 故障自检（AI 买家服务前台自助服务结构化知识）",
+  "categories": [
+    {"key": "return-exchange", "name": "退换货政策"},
+    {"key": "warranty", "name": "保修服务"},
+    {"key": "install-guide", "name": "安装指导"},
+    {"key": "self-diagnosis", "name": "故障自检"}
+  ],
+  "items": [
+    {"name": "7 天无理由退货（国内店）", "category": "return-exchange", "symptoms": "商品完好、不影响二次销售", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "「我的订单-申请售后」自助提交，运费险赔付首重"},
+    {"name": "30 天无理由退货（跨境店）", "category": "return-exchange", "symptoms": "跨境订单商品完好", "urgency": "normal", "slaMinutes": 2880, "dept": "售后组", "tip": "退回本地海外仓即可，无需寄回国内"},
+    {"name": "质量问题退换", "category": "return-exchange", "symptoms": "功能故障/破损/与描述不符", "urgency": "high", "slaMinutes": 240, "dept": "售后组", "tip": "签收 48 小时内提供照片/视频凭证，来回运费我方承担"},
+    {"name": "尺码/颜色换货", "category": "return-exchange", "symptoms": "尺码不合/颜色选错", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "同 SKU 免费换一次，换出前仓库先质检"},
+    {"name": "发错货处理", "category": "return-exchange", "symptoms": "收到非下单商品", "urgency": "high", "slaMinutes": 240, "dept": "售后组", "tip": "提供商品与面单照片，免费换回，错发件上门取回"},
+    {"name": "少发/漏发补发", "category": "return-exchange", "symptoms": "开箱数量与订单不符", "urgency": "high", "slaMinutes": 240, "dept": "售后组", "tip": "提供开箱照片/视频，核实后 24 小时内补发"},
+    {"name": "退款进度查询", "category": "return-exchange", "symptoms": "退款未到账", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "验收通过后 24 小时内打款，原路 1-3 个工作日到账"},
+    {"name": "价保补差申请", "category": "return-exchange", "symptoms": "价保期内页面价下降", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "订单详情页自助申请，系统自动比对秒级补差"},
+    {"name": "3C 整机保修", "category": "warranty", "symptoms": "12 个月内非人为功能故障", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "提供订单号与故障照片/视频，免费换新或维修"},
+    {"name": "易耗品保修", "category": "warranty", "symptoms": "数据线等 6 个月内故障", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "外观无进液/弯折即按非人为处理"},
+    {"name": "过保付费维修", "category": "warranty", "symptoms": "超出保修期的故障", "urgency": "normal", "slaMinutes": 2880, "dept": "售后组", "tip": "仅收配件成本费，报价经您确认后维修"},
+    {"name": "人为损坏鉴定", "category": "warranty", "symptoms": "保修责任存争议", "urgency": "normal", "slaMinutes": 2880, "dept": "售后组", "tip": "可寄回检测中心免费鉴定，争议件我方承担运费"},
+    {"name": "批次问题召回", "category": "warranty", "symptoms": "官方公告的批次缺陷", "urgency": "high", "slaMinutes": 240, "dept": "售后组", "tip": "短信/站内信通知召回，免费换新并承担全部运费"},
+    {"name": "海外买家保修", "category": "warranty", "symptoms": "跨境订单保修期内故障", "urgency": "normal", "slaMinutes": 2880, "dept": "售后组", "tip": "寄回本地海外仓即可，流程与国内一致"},
+    {"name": "延保服务购买", "category": "warranty", "symptoms": "希望延长保修期", "urgency": "normal", "slaMinutes": 1440, "dept": "售后组", "tip": "3C 商品可加购 1-2 年延保，下单页或售后入口购买"},
+    {"name": "大家电/家具预约安装", "category": "install-guide", "symptoms": "大件送装需求", "urgency": "normal", "slaMinutes": 2880, "dept": "安装组", "tip": "送装一体覆盖 200 城，下单页选择安装时段"},
+    {"name": "置物架组装指导", "category": "install-guide", "symptoms": "板材/五金组装", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "附工具与视频教程（约 15 分钟），也可发安装视频给 AI 客服诊断卡点"},
+    {"name": "智能设备联网配置", "category": "install-guide", "symptoms": "WiFi 配网/APP 绑定失败", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "确认 2.4GHz 网络、密码无特殊字符；失败可发报错截图识别错误码"},
+    {"name": "充电器/数据线适配确认", "category": "install-guide", "symptoms": "协议兼容/功率不匹配", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "发手机/设备型号给客服，AI 匹配兼容列表"},
+    {"name": "儿童用品安全安装", "category": "install-guide", "symptoms": "安全座椅/护栏类安装", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "提供 ISOFIX/固定点图文步骤，建议双人安装后做晃动检查"},
+    {"name": "视频安装诊断", "category": "install-guide", "symptoms": "按说明书仍装不好", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "直接发安装视频给客服，AI 关键帧比对标准步骤并给出分步纠正"},
+    {"name": "无法开机", "category": "self-diagnosis", "symptoms": "按电源键无反应", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "先充电 30 分钟再长按电源 10 秒强制重启；无效走保修"},
+    {"name": "充电慢/不充电", "category": "self-diagnosis", "symptoms": "充电功率低/无充电指示", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "更换原装线材与充电头交叉测试，排查线材老化"},
+    {"name": "连接不稳定", "category": "self-diagnosis", "symptoms": "蓝牙/WiFi 频繁断连", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "删除配对记录重新绑定，远离 2.4GHz 干扰源"},
+    {"name": "异响/过热", "category": "self-diagnosis", "symptoms": "运行噪音大/外壳烫手", "urgency": "high", "slaMinutes": 240, "dept": "售后组", "tip": "立即停用并断电，发视频给客服诊断，勿自行拆机"},
+    {"name": "屏幕/显示异常", "category": "self-diagnosis", "symptoms": "花屏/亮点/触控失灵", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "先重启并升级固件；仍异常拍照走保修通道"},
+    {"name": "报错代码识别", "category": "self-diagnosis", "symptoms": "设备显示 E 开头错误码", "urgency": "normal", "slaMinutes": 60, "dept": "客服组", "tip": "发报错截图给客服，AI 截图识别解析错误码并给出处理步骤"}
+  ]
+}

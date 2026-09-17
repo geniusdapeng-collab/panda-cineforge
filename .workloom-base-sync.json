@@ -1,0 +1,34 @@
+{
+  "baseRepo": "geniusdapeng-collab/workloom-im",
+  "lastSyncedBaseSha": "4f2296f39dbc7ebd43bdaefe14a4e11d2772850b",
+  "lastSyncAt": "2026-09-16T14:50:23.031Z",
+  "filesTouched": 33,
+  "extraExclude": [
+    "apps/server/src/service/contract.test.ts",
+    "apps/server/src/service/dialog.test.ts",
+    "apps/server/src/service/e2e.test.ts",
+    "packages/base/im-channels/im-channels.test.ts",
+    "packages/base/model-router/model-router.test.ts",
+    "packages/base/review-console/approvals.test.ts",
+    "packages/base/service-ticket/scenarios.test.ts",
+    "packages/base/service-ticket/service-ticket.test.ts",
+    "packages/base/tenancy/tenancy.test.ts",
+    "packages/base/workdata/atomicity.test.ts",
+    "packages/base/workdata/memory.test.ts",
+    "packages/base/workdata/recall.test.ts",
+    "packages/base/workdata/security-audit.test.ts",
+    "packages/base/workdata/workdata.test.ts",
+    "packages/shared/src/event-schema.test.ts",
+    "scripts/agent-tour.sh",
+    "scripts/e2e-service-c.mjs",
+    "scripts/release-gate.ts"
+  ],
+  "lastRequiredAssetsBaseSha": "4f2296f39dbc7ebd43bdaefe14a4e11d2772850b",
+  "lastSyncMode": "full",
+  "pathPrefix": ".",
+  "requiredRootAssetsSha256": {
+    "WORKLOOM_PRODUCT_CONTEXT.md": "3ce009c102452183028f5302df0295facd20b538b1b75d645461c870ef719404",
+    ".github/workflows/base-sync-heartbeat.yml": "1ca270ea0121c54dfde3e4752b6651702283600cbff10c7e1a8e7de8e1b245d0",
+    "AGENTS.md#managed-section": "d63adfbd349ac87c8af33b96cd13aad1a2ed29909f226e8fbb97ee9d4a1ecacf"
+  }
+}

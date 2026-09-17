@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "ecommerce": "熊猫优选集团",
+  "description": "电商配送与增值服务目录：配送方式 / 增值服务 / 包装赠品 / 企业采购",
+  "categories": [
+    {"key": "shipping", "name": "配送方式"},
+    {"key": "value-added", "name": "增值服务"},
+    {"key": "gift-pack", "name": "包装与赠品"},
+    {"key": "b2b", "name": "企业采购"}
+  ],
+  "items": [
+    {"name": "标准快递", "category": "shipping", "price": 0, "unit": "单", "note": "满 99 元包邮，顺丰/中通智能分配，48-72 小时送达", "robot": false},
+    {"name": "顺丰指定", "category": "shipping", "price": 5, "unit": "单", "note": "下单页备注指定顺丰，补差额运费", "robot": false},
+    {"name": "大件送装一体", "category": "shipping", "price": 0, "unit": "单", "note": "设计家居类大件免费送装（覆盖 200 城），可预约时段", "robot": false},
+    {"name": "加急发货", "category": "shipping", "price": 0, "unit": "单", "note": "现货商品当日 16:00 前优先出库，联系客服备注", "robot": false},
+    {"name": "跨境标准线", "category": "shipping", "price": 0, "unit": "单", "note": "7-15 天，DDP 关税全包，满额免邮", "robot": false},
+    {"name": "跨境快线", "category": "shipping", "price": 39, "unit": "单", "note": "5-8 天，全程可追踪，清关优先", "robot": false},
+    {"name": "海外仓本地配送", "category": "shipping", "price": 0, "unit": "单", "note": "美/欧/日站点爆款本地仓发货，2-5 天送达", "robot": false},
+    {"name": "上门取件退货", "category": "value-added", "price": 0, "unit": "次", "note": "售后审核通过后免费上门取件（质量问题）或运费险抵扣", "robot": false},
+    {"name": "延保 1 年", "category": "value-added", "price": 29, "unit": "份", "note": "3C 商品整机延保 12 个月，与原保修无缝衔接", "robot": false},
+    {"name": "延保 2 年", "category": "value-added", "price": 49, "unit": "份", "note": "3C 商品整机延保 24 个月，含一次免费换新", "robot": false},
+    {"name": "预约安装服务", "category": "value-added", "price": 0, "unit": "次", "note": "送装一体城市免费安装，师傅上门前电话确认", "robot": false},
+    {"name": "视频安装指导", "category": "value-added", "price": 0, "unit": "次", "note": "发安装视频给 AI 客服，关键帧比对标准步骤实时纠正", "robot": false},
+    {"name": "以旧换新评估", "category": "value-added", "price": 0, "unit": "次", "note": "3C 旧机在线估价，折抵新机货款，上门取旧", "robot": false},
+    {"name": "价保自助补差", "category": "value-added", "price": 0, "unit": "次", "note": "订单详情页一键申请，差额 24 小时内原路退回", "robot": false},
+    {"name": "礼品包装", "category": "gift-pack", "price": 9, "unit": "份", "note": "礼盒+丝带+贺卡，可备注祝福语", "robot": false},
+    {"name": "手写贺卡", "category": "gift-pack", "price": 0, "unit": "张", "note": "随礼品包装免费提供，30 字以内代写", "robot": false},
+    {"name": "隐私包装", "category": "gift-pack", "price": 0, "unit": "单", "note": "面单不体现商品信息，下单页勾选", "robot": false},
+    {"name": "开箱器/工具包", "category": "gift-pack", "price": 0, "unit": "份", "note": "组装类商品随箱附赠安装工具", "robot": false},
+    {"name": "晒单好礼", "category": "gift-pack", "price": 0, "unit": "次", "note": "评价晒图返 20 积分，优质晒单送 5 元券", "robot": false},
+    {"name": "企业批量采购", "category": "b2b", "price": 0, "unit": "单", "note": "同款满 10 件享批量价，对公转账+13% 专票", "robot": false},
+    {"name": "企业定制 LOGO", "category": "b2b", "price": 0, "unit": "批", "note": "部分商品支持企业 LOGO 定制，50 件起订，联系客服询价", "robot": false},
+    {"name": "员工福利集采", "category": "b2b", "price": 0, "unit": "批", "note": "节日福利方案定制，支持多地址分发与统一结算", "robot": false}
+  ]
+}

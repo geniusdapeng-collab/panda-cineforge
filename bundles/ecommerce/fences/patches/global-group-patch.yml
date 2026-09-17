@@ -1,0 +1,45 @@
+# 客群级 Patch：跨境多平台超级大卖集团（围栏松紧=最紧，多币种 USD 口径，VAT/汇率规则激活）
+# 叠加于 ecom-baseline/v1 之上，只可收紧不可放宽（F2.3 单调守卫）
+version: ecommerce-patch-global-group/v1
+applies_to: global_group
+base: ecom-baseline/v1
+patches:
+  - rule_id: R5
+    tighten:
+      when: "params.amount_usd >= 100 || params.amount_cny >= 1000"
+    note: 退款必审切换 USD 口径并收紧 $200→$100（跨境客单价高、拒付风险大）
+
+  - rule_id: R14
+    tighten:
+      when: "abs(after.rate - before.rate) / before.rate > 0.01"
+    note: 汇率波动重定价触发 2%→1% 收紧并常态激活（多币种结算集团，汇损是隐性毛利杀手）
+
+  - rule_id: R15
+    tighten:
+      when: "params.vat_changed == true || params.duty_changed == true || params.epr_changed == true"
+    note: VAT/关税重算范围扩展到 EPR 合规变更（欧洲站合规硬约束，vat-specialist 常驻激活）
+
+  - rule_id: R16
+    tighten:
+      when: "context.night_shift == true && params.whitelisted == false"
+    note: 维持基线并反用——欧美白天=中国深夜，夜班班组是跨境主场，白名单外一律挂起
+
+  - rule_id: R19
+    tighten:
+      when: "params.hijack_detected == true || params.brand_infringement_suspected == true"
+    note: 跟卖预警扩展到疑似品牌侵权（跨境知识产权风险敞口大，取证先行）
+
+  - rule_id: R20
+    tighten:
+      when: "params.amount_usd >= 30000 || params.amount_cny >= 50000"
+    note: 采购必审切换 USD 口径 $3 万即审；单笔 ≥$10 万升 L4 集团人批（对应基线 ¥50 万档，集团一档 budget 同源）
+
+  - rule_id: R22
+    tighten:
+      when: "params.contains_pii == true || params.cross_border_transfer == true"
+    note: 数据出境传输与 PII 导出同等必审（GDPR/个保法双合规，脱敏网关强制）
+
+  - rule_id: R29
+    tighten:
+      when: "params.odr > 0.008 || params.perf_over_limit == true"
+    note: ODR 阈值 1%→0.8% 收紧（亚马逊账号即资产，绩效缓冲带前置）

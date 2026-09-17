@@ -1,0 +1,35 @@
+# 客群级 Patch：国内多平台大卖（围栏松紧=标准，八大平台一盘棋）
+# 叠加于 ecom-baseline/v1 之上，只可收紧不可放宽（F2.3 单调守卫）
+version: ecommerce-patch-cn-multi/v1
+applies_to: cn_multi
+base: ecom-baseline/v1
+patches:
+  - rule_id: R1
+    tighten:
+      when: "abs(after.price - before.price) / before.price <= 0.10"
+    note: 维持基线 10%（多平台价格联动频繁，保留标准自治半径）
+
+  - rule_id: R8
+    tighten:
+      when: "context.shop_new == true || context.platform_new == true || params.first_activity_enroll == true"
+    note: 新店/新平台首发必审扩大到「首次活动报名」（活动报名制平台，错报=资源位浪费）
+
+  - rule_id: R13
+    tighten:
+      when: "context.price_protect_period == true || params.platform_promo_lock == true"
+    note: 价保熔断扩展到平台大促锁价期（淘天/京东/拼多多大促锁价窗口物理熔断）
+
+  - rule_id: R18
+    tighten:
+      when: "params.channel_price < params.other_platform_min * 0.90"
+    note: 跨平台价差告警 15%→10% 收紧（八大平台一盘棋，倒挂是大卖最大漏钱点之一）
+
+  - rule_id: R20
+    tighten:
+      when: "params.amount_cny >= 50000"
+    note: 维持基线（国内大卖有完整采购岗与中台审批流，标准阈值即可）
+
+  - rule_id: R29
+    tighten:
+      when: "params.odr > 0.01 || params.perf_over_limit == true || params.activity_qualification_at_risk == true"
+    note: 绩效越限范围扩大到「活动报名资格受损」（多平台大卖生命线是活动资源位）

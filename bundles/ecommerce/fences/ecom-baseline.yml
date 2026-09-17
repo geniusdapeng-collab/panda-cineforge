@@ -1,0 +1,316 @@
+# 电商行业版基线围栏包 v1（L2.6：行业阈值默认值由行业 Bundle 提供，底座不内置）
+# 单调守卫（F2.3）：is_baseline=true 的规则，任何上层 patch 只可收紧不可放宽
+# DSL 求值语义（阶段二 B4 实现）：match 命中后求值 when 表达式（沙箱，禁任意代码 L2.5）；
+#   命中 → 按 level 判定；block 优先于 review 优先于 auto（deny 优先并集求值 E2.2）；
+#   写类动作无任何规则命中 → 按 default_level 处理；求值异常 → 按 block（宁可错杀 E2.1）
+# v1 说明：R1–R30 完整实现，rule_id/name/level/when 严格对齐《技能体系设计方案》5.1 围栏主数据表（唯一准绳）；
+#   金额阈值与一店一档 approval_matrix / business.margin_floor / 集团一档 budget 同源；
+#   跨境口径：人民币阈值记 params.amount_cny，美元阈值记 params.amount_usd，客群 patch 只可收紧（下调阈值/扩大范围）。
+version: ecom-baseline/v1
+default_level: review
+rules:
+  # ========== R1–R5：价格 / 毛利 / 广告利润保险丝 / 退款 ==========
+  - rule_id: R1
+    name: 单品单日降价自动上限
+    level: auto
+    is_baseline: true
+    match:
+      object_types: [price, listing]
+      actions: [price.adjust]
+    when: "abs(after.price - before.price) / before.price <= 0.10"
+    note: 单品单日降价 ≤10% 自动执行；超过挂起待审，由 default_level 接管
+
+  - rule_id: R2
+    name: 毛利红线熔断
+    level: block
+    is_baseline: true
+    match:
+      object_types: [price, listing]
+      actions: [price.adjust, listing.publish]
+    when: "after.price < params.cost * 1.15"
+    note: 售价 < 货品成本×1.15 物理不可执行（毛利红线，与一店一档 margin_floor 同源）；命中即熔断+告警
+
+  - rule_id: R3
+    name: 广告 ACoS 连续越限降预算
+    level: review
+    is_baseline: true
+    match:
+      object_types: [ad_campaign, ad_group]
+      actions: [ads.budget.adjust]
+    when: "params.acos_3d_avg > params.acos_breakeven"
+    note: ACoS 连续 3 天 > 盈亏平衡点 → 自动降预算 30% 并请示（利润保险丝；盈亏线由 sku-pl 档案同源供给）
+
+  - rule_id: R4
+    name: 广告日预算大幅上调必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [ad_campaign, ad_group]
+      actions: [ads.budget.adjust]
+    when: "(after.daily_budget - before.daily_budget) / before.daily_budget > 0.30"
+    note: 广告日预算上调 >30% 必审；下调不受限（收紧方向永不禁）
+
+  - rule_id: R5
+    name: 大额退款必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [order, aftersale]
+      actions: [order.refund, aftersale.refund]
+    when: "params.amount_cny >= 1000 || params.amount_usd >= 200"
+    note: 退款 ≥¥1000 / ≥$200 必审（国内/跨境双口径；客群 patch 只可下调阈值）
+
+  # ========== R6–R10：库存 / 新店首发 / 差评 / 赔偿承诺 ==========
+  - rule_id: R6
+    name: 库存周转超标清仓请示
+    level: review
+    is_baseline: true
+    match:
+      object_types: [stock, warehouse]
+      actions: [stock.plan, clearance.plan]
+    when: "params.turnover_days > 60"
+    note: 库存周转 >60 天 → 触发清仓预案请示（clearance-pricing/overstock-clearance 技能同源）
+
+  - rule_id: R7
+    name: 断货风险紧急补货请示
+    level: review
+    is_baseline: true
+    match:
+      object_types: [stock, purchase_order]
+      actions: [purchase.order.create]
+    when: "params.stockout_days < 7 && params.inbound_qty == 0"
+    note: 断货风险 <7 天且补货在途为 0 → 自动下紧急采购单请示（stockout-guard 供数）
+
+  - rule_id: R8
+    name: 新店/新平台首发必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [listing, price, shop]
+      actions: [listing.publish, price.adjust]
+    when: "context.shop_new == true || context.platform_new == true"
+    note: 新店/新平台首发刊登与改价必审（new-shop-launch 同源；与 R21 直播首发并集，deny 优先）
+
+  - rule_id: R9
+    name: 差评 2 小时响应 SLA
+    level: review
+    is_baseline: true
+    match:
+      object_types: [review]
+      actions: [review.reply]
+    when: "params.rating <= 3 && params.age_hours >= 2 && params.replied == false"
+    note: 差评 2 小时响应 SLA：AI 起草 + 人审后发出；超时自动升级店长（review-defense-window 供数）
+
+  - rule_id: R10
+    name: 对外承诺赔偿必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [aftersale, order]
+      actions: [service.commit, aftersale.compensate]
+    when: "params.compensation == true && params.amount_cny >= 500"
+    note: 对外承诺赔偿 ≥¥500 必审（补偿口径与一店一档 compensation_policy 同源）
+
+  # ========== R11–R15：合规硬阻断 / 客服升级 / 价保 / 汇率与税 ==========
+  - rule_id: R11
+    name: 违规动作物理阻断
+    level: block
+    is_baseline: true
+    match:
+      object_types: [listing, content, review, order, ad_campaign]
+      actions: [listing.publish, content.publish, review.delete, order.fake, ads.launch]
+    when: "params.violation_type in ['fake_order', 'review_delete', 'false_claim', 'ip_term']"
+    note: 刷单/删差评/虚假宣传/侵权词一律物理阻断（anti-violation/listing-compliance 供数）
+
+  - rule_id: R12
+    name: 客服升级关键词自动转人工
+    level: review
+    is_baseline: true
+    match:
+      object_types: [aftersale, order]
+      actions: [cs.reply, service.reply]
+    when: "params.escalation_keyword == true"
+    note: 投诉工商/律师/曝光等升级关键词命中 → 自动升级人工，转人工带完整上下文摘要
+
+  - rule_id: R13
+    name: 大促价保期改价熔断
+    level: block
+    is_baseline: true
+    match:
+      object_types: [price, listing]
+      actions: [price.adjust]
+    when: "context.price_protect_period == true"
+    note: 大促价保期内改价物理熔断（价保窗口由 promo-planner 与平台活动日历同源供给）
+
+  - rule_id: R14
+    name: 汇率波动触发重定价
+    level: review
+    is_baseline: true
+    match:
+      object_types: [fx_rate, price]
+      actions: [price.reprice, price.adjust]
+    when: "abs(after.rate - before.rate) / before.rate > 0.02"
+    note: 汇率波动 >2% 触发重定价请示（fx-reprice/fx-hedge-advisor 供数；跨境客群 patch 激活加强）
+
+  - rule_id: R15
+    name: VAT/关税变更触发售价重算
+    level: review
+    is_baseline: true
+    match:
+      object_types: [tax_vat, price]
+      actions: [price.recalc, price.adjust]
+    when: "params.vat_changed == true || params.duty_changed == true"
+    note: VAT/关税变更触发售价重算请示（vat-duty-calc/vat-specialist 供数；跨境客群 patch 激活加强）
+
+  # ========== R16–R20：夜班自治 / 价格倒挂 / 跟卖 / 采购分级 ==========
+  - rule_id: R16
+    name: 夜班自治白名单
+    level: review
+    is_baseline: true
+    match:
+      object_types: [price, listing, order, stock, ad_campaign, aftersale, settlement]
+      actions: [night.action]
+    when: "context.night_shift == true && params.whitelisted == false"
+    note: 22:00–08:00 夜班窗口仅白名单动作 auto，其余一律挂起待审，转清晨决策包「需介入」栏
+
+  - rule_id: R17
+    name: 夜班调价微调自动上限
+    level: auto
+    is_baseline: true
+    match:
+      object_types: [price]
+      actions: [price.adjust]
+    when: "context.night_shift == true && abs(after.price - before.price) / before.price <= 0.03"
+    note: 夜班窗口调价 ≤3% 自动执行（白名单内），越线挂起待审（deny 优先压制 R1 的 auto）
+
+  - rule_id: R18
+    name: 多平台价格倒挂告警
+    level: review
+    is_baseline: true
+    match:
+      object_types: [price, listing, platform]
+      actions: [price.publish, price.adjust]
+    when: "params.channel_price < params.other_platform_min * 0.85"
+    note: 同 SKU 跨平台价差 >15% 即倒挂告警（price-parity-watch 巡检供数；发布前预检+巡检双入口）
+
+  - rule_id: R19
+    name: 跟卖预警处置请示
+    level: review
+    is_baseline: true
+    match:
+      object_types: [listing, competitor]
+      actions: [competitor.hijack_handle]
+    when: "params.hijack_detected == true"
+    note: 检测跟卖 → 自动取证留证 → 驱赶方案请示（hijack-watch 供数；不自动发起投诉动作）
+
+  - rule_id: R20
+    name: 大额采购分级人审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [purchase_order, supplier]
+      actions: [purchase.order.create]
+    when: "params.amount_cny >= 50000"
+    note: 单笔采购 ≥¥5 万必审；≥¥50 万升 L4 人批（审批权限矩阵 approval_matrix 同源，逐级升级不放行）
+
+  # ========== R21–R25：直播承诺 / 数据导出 / 安全禁区 / 侵权上新 / 测款上限 ==========
+  - rule_id: R21
+    name: 直播涉费承诺必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [live_session, content]
+      actions: [live.commit, live.stream.publish]
+    when: "params.live == true && params.involves_fee_claim == true"
+    note: 直播中「全网最低价」等涉费承诺必审（live-compliance 供数；与新渠道首发并集，deny 优先）
+
+  - rule_id: R22
+    name: PII 数据导出脱敏必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [order, member]
+      actions: [data.export]
+    when: "params.contains_pii == true"
+    note: 订单/会员 PII 数据导出必经脱敏网关 + 人审（data-compliance 供数）
+
+  - rule_id: R23
+    name: 安全禁区物理熔断
+    level: block
+    is_baseline: true
+    match:
+      object_types: [shop, settlement, platform]
+      actions: [settlement.withdraw, shop.transfer, shop.close, account.change]
+    when: "params.action_risk == 'critical'"
+    note: 资金提现/账户主体变更/关停店铺物理熔断，AI 只告警+升级，绝不自行处置（最高禁区）
+
+  - rule_id: R24
+    name: 侵权词/侵权图上新阻断
+    level: block
+    is_baseline: true
+    match:
+      object_types: [listing, creative, content]
+      actions: [listing.publish, creative.publish]
+    when: "params.ip_infringement == true"
+    note: 侵权词/侵权图上新物理阻断（listing-ip-scan/ip-shield 供数；与 R11 并集，deny 优先）
+
+  - rule_id: R25
+    name: 新品首单采购量上限
+    level: review
+    is_baseline: true
+    match:
+      object_types: [purchase_order, sku]
+      actions: [purchase.order.create]
+    when: "params.new_product == true && params.quantity > params.test_order_cap"
+    note: 新品首单采购 ≤测款上限 auto，超上限请示（测款上限由 product-test-launch 档案学习沉淀）
+
+  # ========== R26–R30：承诺边界 / 战备切换 / 回复边界 / 绩效 / 审批超时 ==========
+  - rule_id: R26
+    name: 客服退换承诺超政策必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [aftersale, order]
+      actions: [service.commit, aftersale.promise]
+    when: "params.beyond_policy == true"
+    note: 退换承诺超店铺政策边界必审（政策口径与一店一档 refund_policy 同源）
+
+  - rule_id: R27
+    name: 大促战备模式切换必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [ad_campaign, shop, stock, task]
+      actions: [ops.mode_switch]
+    when: "params.target_mode == 'promo_war'"
+    note: 大促战备模式切换必审（promo-war-room 同源；切换后广告/库存/客服阈值整体进入战备档）
+
+  - rule_id: R28
+    name: 评价回复涉质量缺陷承认必审
+    level: review
+    is_baseline: true
+    match:
+      object_types: [review]
+      actions: [review.reply]
+    when: "params.admits_defect == true"
+    note: 评价回复涉承认质量缺陷必审（法诉风险口径；review-reply 起草禁自行承认缺陷）
+
+  - rule_id: R29
+    name: 账号绩效越限整改请示
+    level: review
+    is_baseline: true
+    match:
+      object_types: [shop, platform]
+      actions: [account.health_handle]
+    when: "params.odr > 0.01 || params.perf_over_limit == true"
+    note: ODR>1% 等账号绩效越限 → 自动生成整改计划请示（account-health/shop-authority 供数）
+
+  - rule_id: R30
+    name: 高危审批超时升级
+    level: block
+    is_baseline: true
+    match:
+      object_types: [task, alert]
+      actions: [approval.expire]
+    when: "params.approval_timeout == true && params.risk_level == 'high'"
+    note: 高危审批不过期自动放行——超时升级而非放行（继承底座纪律 L4.2；不确定不执行）

@@ -1,0 +1,42 @@
+# 电商行业 · 模型路由策略（bundle 第⑦装配槽，v3.0 通用模型路由系统）
+# 档位：L1 轻量 0.2× / L2 中坚 1× / L3 旗舰 3×；谷时 22:00–08:00 非实时任务再 ×0.2
+# 行业特点：客服极高频秒级（8 语种）+ 内容生产谷时批量 + 生成→合规审核双模型串联
+version: "v3.0"
+scenes:
+  # —— 极高频轻量（日万级会话，秒级延迟红线） ——
+  intent-classify:   { tier: L1, fallback: rule-template }
+  cs-answer:         { tier: L1, escalateOn: [low-confidence, thumbs-down] }  # 8 语种客服组答
+  cs-voice:          { tier: L1, escalateOn: [low-confidence] }               # 语音客服（契约层接线后生效）
+  nl-translate:      { tier: L1, fallback: rule-template }
+  comment-classify:  { tier: L1, window: off-peak-only }                      # 评价情感/舆情批量分类
+  price-parity:      { tier: L1 }                                             # 跟价守护/比价判定
+  # —— 中频中等（主力中坚档） ——
+  ask-synthesize:    { tier: L2, escalateOn: [thumbs-down] }
+  quest-plan:        { tier: L2 }
+  review-reply:      { tier: L2, escalateOn: [thumbs-down, redteam-fail] }    # 差评回复（多语种）
+  content-generate:  { tier: L2, escalateOn: [redteam-fail, thumbs-down] }    # listing/详情页/短视频脚本
+  compliance-review: { tier: L2 }                                             # 生成→合规审核串联（R11/R24）
+  ads-analyze:       { tier: L2, window: off-peak-only }                      # 广告 ACoS 分析（谷时批量）
+  reconcile-analyze: { tier: L2, window: off-peak-only }                      # 13 平台对账分析（谷时）
+  briefing:          { tier: L2 }
+  ceo-decision:      { tier: L2 }
+  kb-extract:        { tier: L2, window: off-peak-only }
+  # —— 低频重度（旗舰档，质量红线） ——
+  listing-factory:   { tier: L3, noDowngrade: true }                          # 批量刊登（单 token 最贵环节之一）
+  ceo-deep-analysis: { tier: L3, noDowngrade: true }
+  hr-replacement:    { tier: L3, noDowngrade: true }
+  selection-research:{ tier: L3, noDowngrade: true }                          # 选品深度研究/蓝海挖掘
+  incident-rootcause:{ tier: L3, noDowngrade: true }
+  fast-scan-report:  { tier: L3, noDowngrade: true, billTo: platform }        # 店铺体检报告：售前获客，平台成本
+plans:
+  lite:     { defaultShift: -1 }   # 智享版：整体压一档
+  standard: { defaultShift: 0 }    # 标准版：标准混合（主推）
+  smart:                           # 智能版：简单任务保底 L2，裁决/合规走 L3
+    defaultShift: 1
+    tierOverrides:
+      intent-classify: L1
+      nl-translate: L1
+      cs-voice: L1
+      price-parity: L1
+      ceo-decision: L3
+      compliance-review: L3

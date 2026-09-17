@@ -1,0 +1,62 @@
+{
+  "$id": "workloom://bundles/ecommerce/schemas/stages",
+  "description": "电商行业版经营阶段枚举 v1（§2.2 槽②：阶段枚举由行业包定义，阶段判定走确定性代码框架）。8 个经营阶段覆盖单品/店铺全生命周期与大促节奏——阶段决定经营策略重心（上新重测款、爆款重产能、衰退重利润、大促重备战），stage 字段在 Context 中，行业可扩展。sku-lifecycle/promo-planner 等技能的阶段感知输入。",
+  "stages": [
+    {
+      "id": "launch",
+      "label": "上新期",
+      "layer": "product",
+      "hint": "新品上架 0-30 天，以测款与冷启动为重：小批量首单（受 R25 测款上限约束）、listing 优化、关键词卡位、首批评价积累；判定信号：上架天数/累计订单量",
+      "typical_actions": ["product-test-launch", "new-product-launch", "listing-factory", "keyword-seo", "ppc-keyword-mining"]
+    },
+    {
+      "id": "growth",
+      "label": "成长期",
+      "layer": "product",
+      "hint": "测款通过进入放量，单量与排名爬升：加大广告预算（受 R4 约束）、扩关键词词包、补货模型跟进、价格带卡位；判定信号：周环比增速/类目排名曲线",
+      "typical_actions": ["ads-autopilot", "ads-budget-pacing", "demand-forecast", "replenishment-model", "price-band-position"]
+    },
+    {
+      "id": "burst",
+      "label": "爆款期",
+      "layer": "product",
+      "hint": "类目头部流量爆发，以保供与利润并重：断货防护（R7）、产能与采购追单、跟卖监控（R19）、ACoS 保险丝（R3）；判定信号：BSR 排名/日销阈值",
+      "typical_actions": ["hero-product-guard", "stockout-guard", "hijack-watch", "margin-guard", "quick-return-supply"]
+    },
+    {
+      "id": "stable",
+      "label": "稳定期",
+      "layer": "product",
+      "hint": "单量与利润平稳，以精细化运营为重：广告结构优化、评价资产维护、成本结构审计、组合装与关联销售提客单；判定信号：增速回落至阈值内且毛利稳定",
+      "typical_actions": ["ads-audit", "review-asset-mining", "cost-structure-audit", "bundle-design", "sku-profit-ledger"]
+    },
+    {
+      "id": "decline",
+      "label": "衰退期",
+      "layer": "product",
+      "hint": "需求回落或竞品替代，以保利润与迭代决策为重：广告收缩、产品迭代评估、替代品孵化衔接；判定信号：连续 N 周负增长/份额流失归因",
+      "typical_actions": ["sku-lifecycle", "product-iteration", "profit-warn", "competitor-product-track", "trend-radar"]
+    },
+    {
+      "id": "clearance",
+      "label": "清仓期",
+      "layer": "product",
+      "hint": "尾货出清回款，以现金流与库龄为重：清仓定价（周转 >60 天触发 R6 请示）、站内外清仓渠道、仓租止损；判定信号：库龄/周转天数越线",
+      "typical_actions": ["clearance-pricing", "overstock-clearance", "slow-mover-alert", "warehouse-age-watch", "inventory-cashline"]
+    },
+    {
+      "id": "promo_prep",
+      "label": "大促备战",
+      "layer": "shop",
+      "hint": "大促前 2-6 周，以备货与资源位为重：活动报名（新平台首报受 R8 约束）、促销备货模型、价保窗口预置（R13）、战备模式切换请示（R27）；判定信号：平台大促日历倒计时",
+      "typical_actions": ["promo-planner", "promo-stockup", "activity-enroll", "coupon-strategy", "cs-peak-mode"]
+    },
+    {
+      "id": "promo_peak",
+      "label": "大促峰值",
+      "layer": "shop",
+      "hint": "大促进行中，以实时作战为重：战情室实时监控、广告预算动态调配、库存预警与改价熔断（价保期 R13 block）、客服峰值模式；判定信号：大促窗口内",
+      "typical_actions": ["promo-war-room", "ads-budget-pacing", "night-ops-suite", "live-traffic-boost", "anomaly-attribution"]
+    }
+  ]
+}

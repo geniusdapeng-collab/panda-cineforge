@@ -1,0 +1,35 @@
+# 客群级 Patch：单平台多店腰部卖家（围栏松紧=紧，一个人管 3 家店，审批带宽最小）
+# 叠加于 ecom-baseline/v1 之上，只可收紧不可放宽（F2.3 单调守卫）
+version: ecommerce-patch-waist-seller/v1
+applies_to: waist_single
+base: ecom-baseline/v1
+patches:
+  - rule_id: R1
+    tighten:
+      when: "abs(after.price - before.price) / before.price <= 0.08"
+    note: 降价自动上限 10%→8% 收紧（多店分身乏术，收窄 AI 自治半径）
+
+  - rule_id: R4
+    tighten:
+      when: "(after.daily_budget - before.daily_budget) / before.daily_budget > 0.30 || after.daily_budget >= 5000"
+    note: 广告日预算 ≥¥5000 即审（腰部卖家现金流红线，预算上量必须老板点头）
+
+  - rule_id: R5
+    tighten:
+      when: "params.amount_cny >= 500 || params.amount_usd >= 200"
+    note: 退款必审阈值 ¥1000→¥500 收紧（腰部卖家单笔利润薄，涉钱必确认）
+
+  - rule_id: R10
+    tighten:
+      when: "params.compensation == true && params.amount_cny >= 200"
+    note: 对外赔偿承诺阈值 ¥500→¥200 收紧
+
+  - rule_id: R16
+    tighten:
+      when: "context.night_shift == true"
+    note: 维持基线（夜班高危仍挂起转清晨决策包，「一个人管 3 家店」靠夜班自治扩半径）
+
+  - rule_id: R20
+    tighten:
+      when: "params.amount_cny >= 20000"
+    note: 采购必审阈值 ¥5 万→¥2 万收紧（腰部卖家备货资金敏感，大单必人批）
