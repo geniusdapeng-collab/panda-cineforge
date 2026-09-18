@@ -18,6 +18,7 @@ import { searchKB, type KbHit } from "./kb.js";
 import { llmCall } from "./llm.js";
 import { serviceTx, svcQuery } from "./events.js";
 import type { Channel } from "./channels.js";
+import type { ServiceFrontBusinessAdapter } from "./adapters/business.js";
 
 export type Intent = "chat" | "kb_qa" | "biz_query" | "service_request" | "complaint";
 export type BizToolName = "query_order" | "query_member" | "query_catalog" | "query_ticket";
@@ -51,7 +52,13 @@ const RE_CATALOG = /服务目录|售后政策|退换货政策|退货政策|保�
 /** 售后动作指令（规则表未命中时兜底建单；疑问句已在规则表分流 kb_qa，不会走到这里） */
 const RE_AFTERSALE_ACTION = /退款|退货|换货|换新|价保|补差|纠纷/;
 
-export function classify(text: string): { intent: Intent; tool?: BizToolName } {
+export function classify(
+  text: string,
+  /** HP-31：基座 eval.ts（同步文件）会传入行业适配器；本仓仍以内联行业规则为准，
+   *  适配器接入（projectBusinessDialogMatch 等）属行业语义工作，另行评估。 */
+  businessAdapter?: ServiceFrontBusinessAdapter | null,
+): { intent: Intent; tool?: BizToolName } {
+  void businessAdapter;
   if (RE_TICKET_STATUS.test(text)) return { intent: "biz_query", tool: "query_ticket" };
   if (RE_CATALOG.test(text)) return { intent: "biz_query", tool: "query_catalog" };
   const ruled = ruleBasedIntent(text);
@@ -154,6 +161,7 @@ function citationsOf(hits: KbHit[]): Array<{ documentTitle: string; heading: str
 
 export async function handleMessage(input: {
   workspaceId: string; cUserId: string; channel: Channel; text: string; conversationId?: string;
+  businessAdapter?: ServiceFrontBusinessAdapter | null;
 }): Promise<DialogResult> {
   await ensureServiceSchema();
   const t0 = Date.now();
@@ -162,7 +170,7 @@ export async function handleMessage(input: {
   const conversationId = await ensureConversation(input);
   await logMessage({ workspaceId: input.workspaceId, conversationId, role: "user", content: input.text });
 
-  const cls = classify(input.text);
+  const cls = classify(input.text, input.businessAdapter);
   let result: Omit<DialogResult, "conversationId" | "latencyMs" | "mock">;
 
   if (cls.intent === "biz_query") {

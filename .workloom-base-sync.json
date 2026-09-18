@@ -1,8 +1,8 @@
 {
   "baseRepo": "workloom-ai/workloom-im",
-  "lastSyncedBaseSha": "2e3d77f6cc357a9cf1577c4f583e586c9924977e",
-  "lastSyncAt": "2026-09-18T12:27:43.090Z",
-  "filesTouched": 11,
+  "lastSyncedBaseSha": "b36f88b9acb4ed0bb2c7e45630fa3d37c097cf0e",
+  "lastSyncAt": "2026-09-18T13:36:10.797Z",
+  "filesTouched": 4,
   "extraExclude": [
     "apps/server/src/service/contract.test.ts",
     "apps/server/src/service/dialog.test.ts",
@@ -23,7 +23,7 @@
     "scripts/e2e-service-c.mjs",
     "scripts/release-gate.ts"
   ],
-  "lastRequiredAssetsBaseSha": "2e3d77f6cc357a9cf1577c4f583e586c9924977e",
+  "lastRequiredAssetsBaseSha": "b36f88b9acb4ed0bb2c7e45630fa3d37c097cf0e",
   "lastSyncMode": "full",
   "pathPrefix": ".",
   "requiredRootAssetsSha256": {
