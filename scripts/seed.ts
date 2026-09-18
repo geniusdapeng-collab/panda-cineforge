@@ -252,7 +252,15 @@ function pandaArchive(): Record<string, unknown> {
       version: 1,
       mode: "trial",
       identity: { name: "公司CEO", persona: "稳健经营型" },
-      autonomy: { price_band: [0.85, 1.15], procurement_cap: 100_000, campaign_cap: 50_000 },
+      autonomy: {
+        ranges: {
+          "price-change-ratio": { label: "房价调整比例", lower: 0.85, upper: 1.15, anchor: 1 },
+        },
+        caps: {
+          procurement: { label: "采购金额上限", limit: 100_000 },
+          campaign: { label: "营销支出上限", limit: 50_000 },
+        },
+      },
       escalate: ["修改毛利红线/安全禁区相关", "单月累计让利超上限", "围栏规则放宽（任何放宽）", "新平台/新站点上线", "对外公开承诺（赔偿/召回/声明）", "采购 ≥$10 万（R20 升 L4）", "宪章变更"],
       briefing: { daily: "08:30", weekly: "Mon 09:00", monthly: "1st 10:00", channel: "both" },
       circuit_breaker: { window_days: 14, kpi_floor: { margin_rate: 0.13, acos: 0.28 }, tightened: false },
