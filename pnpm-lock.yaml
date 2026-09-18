@@ -1598,7 +1598,7 @@ packages:
     resolution: {integrity: sha512-zTCVGpyFsGWBhllOyKlTw/vnr6D9qxsfSDyfbyZmTyjHw5N/VuvzHpHoQjm2ZJzn4RJgx5w4r7V0er69CmLgPQ==}
 
   '@workloom/ui@https://cnb.cool/workloom-ai/workloom-im/-/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz':
-    resolution: {tarball: https://cnb.cool/workloom-ai/workloom-im/-/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz}
+    resolution: {integrity: sha512-7OXEtRNRknpkd5VTb6SX4j7SZQ1cE1QGHqay7EDNpW40EXuyvJiC5wI6YLTZ4GleFP6lKKItbCLTjoc1SeTrAw==, tarball: https://cnb.cool/workloom-ai/workloom-im/-/releases/download/ui-v0.1.1/workloom-ui-0.1.1.tgz}
     version: 0.1.1
     peerDependencies:
       react: '>=19.0.0'
