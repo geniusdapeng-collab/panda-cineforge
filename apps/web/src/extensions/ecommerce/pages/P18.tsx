@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { Skeleton, SystemDivider } from "../../../components/hud";
-import { HBar, Note, PageHead, Tag } from "../Twin";
+import { HBar, Note, PageHead, EcomTag } from "../Twin";
 import { clientIdentifierText, clientNodeText } from "../display";
 
 interface StoreRow {
@@ -34,7 +34,7 @@ export default function P18() {
 
   return (
     <Bridge>
-      <PageHead title="多店驾驶舱" tag="多店驾驶舱" extra={<Tag tone="gold">一人管 14 店</Tag>} />
+      <PageHead title="多店驾驶舱" tag="多店驾驶舱" extra={<EcomTag tone="gold">一人管 14 店</EcomTag>} />
       {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <SystemDivider time="全店经营快照" summary="各店最新日报（成交总额、订单量与毛利率）+ 昨夜决策包三栏 + 事件规模" />
@@ -47,7 +47,7 @@ export default function P18() {
                   <b className="min-w-0 break-words text-body text-ink2">{clientNodeText(s.name, "未命名店铺")}</b>
                   <span className="shrink-0 font-mono text-sm text-ink3">{clientIdentifierText(s.workspaceId)}</span>
                   <span className="flex-1" />
-                  <Tag tone="holo">事件 {s.eventCount.toLocaleString()} 条</Tag>
+                  <EcomTag tone="holo">事件 {s.eventCount.toLocaleString()} 条</EcomTag>
                 </div>
                 <div className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   <HBar label="成交总额达成" pct={Math.min(100, Math.round(Number(a.gmv ?? 0) / 1e6))} value={a.gmv ? `¥${(Number(a.gmv) / 10000).toFixed(0)}万` : "—"} tone="bg-holo" />
@@ -56,9 +56,9 @@ export default function P18() {
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-sm">
                   <span className="text-ink3">昨夜决策包：</span>
-                  <Tag tone="go">✓ 已完成 {pkg.done ?? "—"}</Tag>
-                  <Tag tone={pkg.pending ? "warn" : "ink"}>◆ 待审批 {pkg.pending ?? 0}</Tag>
-                  <Tag tone={pkg.escalate ? "warn" : "ink"}>▲ 需介入 {pkg.escalate ?? 0}</Tag>
+                  <EcomTag tone="go">✓ 已完成 {pkg.done ?? "—"}</EcomTag>
+                  <EcomTag tone={pkg.pending ? "warn" : "ink"}>◆ 待审批 {pkg.pending ?? 0}</EcomTag>
+                  <EcomTag tone={pkg.escalate ? "warn" : "ink"}>▲ 需介入 {pkg.escalate ?? 0}</EcomTag>
                   <span className="flex-1" />
                   <span className="font-mono text-sm text-ink3">快照 {pkg.fence_snapshot ?? "—"}</span>
                 </div>

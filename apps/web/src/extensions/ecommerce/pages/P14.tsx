@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { Skeleton, SystemDivider } from "../../../components/hud";
-import { Ev, fmtTime, HBar, Note, PageHead, Row, Tag } from "../Twin";
+import { Ev, fmtTime, HBar, Note, PageHead, Row, EcomTag } from "../Twin";
 import { clientNodeText, clientStatusLabel, clientValueText } from "../display";
 
 interface ArchiveShape {
@@ -51,7 +51,7 @@ export default function P14() {
 
   return (
     <Bridge right={rightPanel}>
-      <PageHead title="平台运营" tag="平台经营视图" extra={<Tag tone="holo">每 30 分钟自动巡检</Tag>} />
+      <PageHead title="平台运营" tag="平台经营视图" extra={<EcomTag tone="holo">每 30 分钟自动巡检</EcomTag>} />
       {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <SystemDivider time="平台巡检快照" summary="价格一致性 / 库存同步 / 在线状态（店铺档案 巡检数据输入）" />
@@ -59,8 +59,8 @@ export default function P14() {
             <div className="rounded-lg border border-line bg-card p-3 text-sm text-ink3">暂无巡检快照（档案 巡检配置未配置）。</div>
           ) : snap.map((c) => (
             <Row key={c.channel} right={<>
-              <Tag tone={c.parity ? "go" : "warn"}>{c.parity ? "价格一致" : "价差异常"}</Tag>
-              <Tag tone={c.status === "online" ? "holo" : "warn"}>{clientStatusLabel(c.status)}</Tag>
+              <EcomTag tone={c.parity ? "go" : "warn"}>{c.parity ? "价格一致" : "价差异常"}</EcomTag>
+              <EcomTag tone={c.status === "online" ? "holo" : "warn"}>{clientStatusLabel(c.status)}</EcomTag>
             </>}>
               <b className="min-w-0 break-words text-ink2">{clientNodeText(c.channel, "销售平台")}</b>
               <span className="ml-2 font-mono text-gold">¥{c.price}</span>
@@ -75,14 +75,14 @@ export default function P14() {
                 <b className="min-w-0 break-words text-ink2">{clientNodeText(c.name, "销售平台")}</b>
                 <span className="break-words text-ink3">{clientValueText(c.kind, "平台渠道")}</span>
                 <span className="flex-1" />
-                {c.channel_new ? <Tag tone="gold">新平台 · 首次发布需审核</Tag> : <Tag tone="ink">成熟平台</Tag>}
+                {c.channel_new ? <EcomTag tone="gold">新平台 · 首次发布需审核</EcomTag> : <EcomTag tone="ink">成熟平台</EcomTag>}
               </div>
             ))}
           </div>
 
           <SystemDivider time="内容营销" summary="小红书/抖音发布留痕（新平台与直播首次发布均需审核）" />
           {contents.slice(0, 8).map((ev) => (
-            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone="go">已发布</Tag>}>
+            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone="go">已发布</EcomTag>}>
               <b className="min-w-0 break-words text-ink2">{clientValueText(ev.decision.after?.title, "内容发布")}</b>
               <span className="break-words text-ink3"> · {clientNodeText(ev.context.channel ?? ev.decision.params?.platform, "销售平台")}</span>
             </Row>

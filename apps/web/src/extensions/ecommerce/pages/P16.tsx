@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
-import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../Twin";
+import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, EcomTag } from "../Twin";
 import { dictText } from "../../../lib/display";
 import { CS_INTENT_TEXT, LANG_TEXT, clientNodeText, clientValueText } from "../display";
 
@@ -56,7 +56,7 @@ export default function P16() {
 
   return (
     <Bridge right={rightPanel}>
-      <PageHead title="客服监控墙" tag="客服监控" extra={<Tag tone="go">8 语种 · 24h 在线</Tag>} />
+      <PageHead title="客服监控墙" tag="客服监控" extra={<EcomTag tone="go">8 语种 · 24h 在线</EcomTag>} />
       {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -71,14 +71,14 @@ export default function P16() {
           {calls.slice(0, 15).map((ev) => {
             const ok = ev.decision.after?.resolved === true;
             return (
-              <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone={ok ? "go" : "holo"}>{ok ? "已解决" : "跟进中"}</Tag>}>
+              <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone={ok ? "go" : "holo"}>{ok ? "已解决" : "跟进中"}</EcomTag>}>
                 <b className="text-ink2">「{ev.decision.after?.intent ? dictText(CS_INTENT_TEXT, String(ev.decision.after.intent)) : "咨询"}」</b>
                 <span className="break-words text-ink3"> · {ev.decision.after?.lang ? dictText(LANG_TEXT, String(ev.decision.after.lang)) : "中文"} · 首响 {String(ev.decision.after?.first_response_sec ?? "—")} 秒{ev.decision.after?.multimodal ? ` · ${clientValueText(ev.decision.after.multimodal, "多模态消息")}` : ""}</span>
               </Row>
             );
           })}
           {escalations.slice(0, 5).map((ev) => (
-            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone="warn">已转人工</Tag>}>
+            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone="warn">已转人工</EcomTag>}>
               <b className="break-words text-warn">「{clientValueText(ev.decision.after?.keyword, "需要人工处理")}」</b>
               <span className="break-words text-ink3"> · 路由 {clientNodeText(ev.decision.after?.routed_to, "人工专家席")} · {clientValueText(ev.decision.after?.context_summary, "上下文摘要已生成")}</span>
             </Row>
@@ -87,14 +87,14 @@ export default function P16() {
 
           <SystemDivider time="FAQ 知识库自生长" summary="未命中问题周问 ≥3 次自动成候选 · 店长确认入库 · 全平台应答口径一致" />
           {(kb?.top_questions ?? []).map((f) => (
-            <Row key={f.q} right={<Tag tone="go">已入库 · 首响 ≤3s</Tag>}>
+            <Row key={f.q} right={<EcomTag tone="go">已入库 · 首响 ≤3s</EcomTag>}>
               <b className="text-ink2">「{f.q}」</b><span className="text-ink3"> → {f.a}</span>
             </Row>
           ))}
           {(kb?.pending_candidates ?? []).map((f) => (
             <Row key={f.q} right={
               confirmed.has(f.q)
-                ? <Tag tone="go">已入库 ✓</Tag>
+                ? <EcomTag tone="go">已入库 ✓</EcomTag>
                 : <button type="button" onClick={() => setConfirmed((s) => new Set(s).add(f.q))} className="rounded border border-gline px-2 py-0.5 font-mono text-sm text-gold">确认入库</button>
             }>
               <b className="text-warn">「{f.q}」</b>
@@ -102,7 +102,7 @@ export default function P16() {
             </Row>
           ))}
           {mines.slice(0, 4).map((ev) => (
-            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone="gold">萃取记录</Tag>}>
+            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone="gold">萃取记录</EcomTag>}>
               <span className="text-ink3">{String(ev.decision.basis?.[0] ?? "FAQ 萃取")}</span>
             </Row>
           ))}

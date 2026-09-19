@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
-import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../Twin";
+import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, EcomTag } from "../Twin";
 import { clientIdentifierText, clientNodeText, clientValueText } from "../display";
 
 interface Warehouses {
@@ -53,7 +53,7 @@ export default function P17() {
 
   return (
     <Bridge right={rightPanel}>
-      <PageHead title="海外仓地图" tag="仓网管理" extra={<Tag tone="holo">在库货值 {warehouses?.stock_value_cny ? `¥${(warehouses.stock_value_cny / 1e8).toFixed(1)}亿` : "—"}</Tag>} />
+      <PageHead title="海外仓地图" tag="仓网管理" extra={<EcomTag tone="holo">在库货值 {warehouses?.stock_value_cny ? `¥${(warehouses.stock_value_cny / 1e8).toFixed(1)}亿` : "—"}</EcomTag>} />
       {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -67,19 +67,19 @@ export default function P17() {
           <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
             {(warehouses?.cn ?? []).map((w, i) => (
               <div key={w} className="rounded-lg border border-line bg-card px-3 py-2.5">
-                <div className="flex items-center gap-2 text-sm"><b className="text-ink2">{w}</b><Tag tone="go">在营</Tag><span className="flex-1" /><span className="font-mono text-sm text-ink3">国内仓 {i + 1}</span></div>
+                <div className="flex items-center gap-2 text-sm"><b className="text-ink2">{w}</b><EcomTag tone="go">在营</EcomTag><span className="flex-1" /><span className="font-mono text-sm text-ink3">国内仓 {i + 1}</span></div>
                 <HBar label="库存健康" pct={88 - i * 6} tone="bg-go" />
               </div>
             ))}
             {(warehouses?.overseas ?? []).map((w, i) => (
               <div key={w} className="rounded-lg border border-line bg-card px-3 py-2.5">
-                <div className="flex items-center gap-2 text-sm"><b className="text-ink2">海外仓 · {w}</b><Tag tone="holo">跨境</Tag><span className="flex-1" /><span className="font-mono text-sm text-ink3">海外仓 {i + 1}</span></div>
+                <div className="flex items-center gap-2 text-sm"><b className="text-ink2">海外仓 · {w}</b><EcomTag tone="holo">跨境</EcomTag><span className="flex-1" /><span className="font-mono text-sm text-ink3">海外仓 {i + 1}</span></div>
                 <HBar label="库存健康" pct={82 - i * 5} tone="bg-holo" />
               </div>
             ))}
             {warehouses?.fba ? (
               <div className="rounded-lg border border-gline bg-card px-3 py-2.5">
-                <div className="flex items-center gap-2 text-sm"><b className="text-gold">平台仓网</b><Tag tone="gold">亚马逊</Tag></div>
+                <div className="flex items-center gap-2 text-sm"><b className="text-gold">平台仓网</b><EcomTag tone="gold">亚马逊</EcomTag></div>
                 <HBar label="库存绩效健康" pct={76} tone="bg-gold" />
               </div>
             ) : null}
@@ -97,7 +97,7 @@ export default function P17() {
                   ? `${clientNodeText(a.from, "调出仓")} → ${clientNodeText(a.to, "调入仓")} · ${clientValueText(a.qty)} 件`
                   : `${act === "fba.replenish" ? "平台仓补货" : "入库"} ${clientValueText(a.qty)} 件 · ${clientNodeText(a.warehouse, "相关仓库")}`;
               return (
-                <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone={act === "stock.outbound" ? "go" : "holo"}>{act === "stock.outbound" ? "出库履约" : act === "stock.transfer" ? "调拨" : act === "fba.replenish" ? "平台仓补货" : "入库"}</Tag>}>
+                <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone={act === "stock.outbound" ? "go" : "holo"}>{act === "stock.outbound" ? "出库履约" : act === "stock.transfer" ? "调拨" : act === "fba.replenish" ? "平台仓补货" : "入库"}</EcomTag>}>
                   <b className="min-w-0 break-words text-ink2">{clientNodeText(ev.object.label, "相关商品")}</b>
                   <span className="break-words text-ink3"> · {desc}</span>
                 </Row>
@@ -107,7 +107,7 @@ export default function P17() {
 
           <SystemDivider time="断货预警" summary="可售天数 <7 且补货在途为 0 → 预警并联动紧急采购请示" />
           {alerts.length === 0 ? <div className="rounded-lg border border-line bg-card p-3 text-sm text-go">✓ 当前无断货风险商品</div> : alerts.map((ev) => (
-            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone="warn">断货预警</Tag>}>
+            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone="warn">断货预警</EcomTag>}>
               <b className="min-w-0 break-words text-ink2">{clientNodeText(ev.object.label, "相关商品")}</b>
               <span className="break-words text-ink3"> · 可售 {clientValueText(ev.decision.after?.days_cover)} 天 · 日销 {clientValueText(ev.decision.after?.daily_sales)} · {clientNodeText(ev.decision.after?.warehouse, "相关仓库")}</span>
             </Row>

@@ -46,7 +46,7 @@ export function Stat({ label, value, tone = "text-gold", hint }: { label: string
   );
 }
 
-export function Card({ title, children }: { title?: string; children: ReactNode }) {
+export function EcomCard({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <div className="rounded-lg border border-line bg-card p-3">
       {title ? <div className="mb-2 text-sm tracking-[.15em] text-ink3">{title}</div> : null}
@@ -65,7 +65,7 @@ export function Row({ time, children, right }: { time?: string; children: ReactN
   );
 }
 
-export function Tag({ tone, children }: { tone: "go" | "warn" | "holo" | "gold" | "ink"; children: ReactNode }) {
+export function EcomTag({ tone, children }: { tone: "go" | "warn" | "holo" | "gold" | "ink"; children: ReactNode }) {
   const cls = { go: "border-go/40 text-go", warn: "border-warn/40 text-warn", holo: "border-holo/40 text-holo", gold: "border-gline text-gold", ink: "border-line text-ink3" }[tone];
   return <span className={`inline-block max-w-full whitespace-normal break-words rounded border px-1.5 py-0.5 text-center font-mono text-sm ${cls}`}>{children}</span>;
 }

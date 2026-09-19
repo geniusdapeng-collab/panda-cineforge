@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { Skeleton, SystemDivider } from "../../../components/hud";
-import { HBar, Note, PageHead, Tag } from "../Twin";
+import { HBar, Note, PageHead, EcomTag } from "../Twin";
 import { clientNodeText, clientValueText } from "../display";
 
 type Q = "channel_revenue" | "occ_trend" | "price_attribution";
@@ -48,7 +48,7 @@ export default function P19() {
 
   return (
     <Bridge right={rightPanel}>
-      <PageHead title="经营问数" tag="经营问数" extra={<Tag tone="holo">问数即答</Tag>} />
+      <PageHead title="经营问数" tag="经营问数" extra={<EcomTag tone="holo">问数即答</EcomTag>} />
       <div className="mb-3 flex flex-wrap gap-2">
         {QUESTIONS.map((x) => (
           <button key={x.key} type="button" onClick={() => setQ(x.key)}
@@ -86,7 +86,7 @@ export default function P19() {
                   <span className="font-mono text-sm text-ink3">{String(r.time).slice(5, 16)}</span>
                   <span className="min-w-0 break-words text-ink2">{clientNodeText(r.object, "相关商品")}</span>
                   <span className="font-mono text-ink3">¥{String(r.before)} → <b className="text-gold">¥{String(r.after)}</b></span>
-                  <Tag tone="holo">围栏已校验</Tag>
+                  <EcomTag tone="holo">围栏已校验</EcomTag>
                   <span className="min-w-0 flex-1 break-words text-right text-sm text-ink3">{Array.isArray(r.basis) ? clientValueText((r.basis as string[])[0], "依据已记录") : ""}</span>
                 </div>
               ))}
