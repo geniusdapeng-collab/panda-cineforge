@@ -9,8 +9,9 @@
 
 [![Bundle](https://img.shields.io/badge/ecommerce%20bundle-panda-1B2A4E)](bundles/ecommerce/bundle.json)
 [![Fence](https://img.shields.io/badge/围栏基线-R1--R30-9A7B2D)](bundles/ecommerce/fences/ecom-baseline.yml)
+[![Staff](https://img.shields.io/badge/数字员工-82%20个岗位-C9A227)](bundles/ecommerce/presets)
 [![Skills](https://img.shields.io/badge/官方技能-161%20个%20·%20★门道固化%2048-4C6FFF)](bundles/ecommerce/skills)
-[![Tests](https://img.shields.io/badge/门禁-suite%20392%2F392%20%C2%B7%20demo%2043%2F43-green)](docs/DEMO-TWIN.md)
+[![Tests](https://img.shields.io/badge/%E9%97%A8%E7%A6%81-suite%20356%2F459%20%28%E6%9C%AC%E6%9C%BA%E5%AE%9E%E6%B5%8B%20%C2%B7%20%E5%BE%85%E4%BF%AE%20103%29-yellow)](docs/DEMO-TWIN.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-lightgrey)](LICENSE)
 
 </div>
@@ -65,16 +66,17 @@ WorkLoom 熊猫电商运营系统就是为这件事来的：**把过去只有超
 > 中性测算年化价值 **112–347 万**；最保守情景仍数倍于订阅成本。（示例测算，可按您店铺实际情况替换）
 
 <!-- CAPABILITIES:BEGIN -->
-<!-- 本区块由 scripts/generate-capabilities.mjs 自动生成（2026-09-02），请勿手改；重跑 pnpm capabilities 更新 -->
+<!-- 本区块由 scripts/generate-capabilities.mjs 自动生成（2026-09-19），请勿手改；重跑 pnpm capabilities 更新 -->
 
 ## 🧩 系统能力速览（自动生成 · 与代码同步）
 
 - 🖥 **三端应用（开箱即看）**：PC 端 · B 端工作台 · 移动端 · B 端高保真 · 移动端 · C 端 AI 服务前台
-- 🐼 **行业 Bundle（垂直能力包）**：bundles/ecommerce/
+- 🏨 **行业 Bundle（垂直能力包）**：bundles/ecommerce/
+- 🧑‍💼 **数字员工与数字人（本仓自带）**：数字员工中心（`/agents`） · 织伴数字人（Live2D 常驻浮层） · 语音与口型引擎
 - 🖐 **操作电脑能力（本仓自带 · 可装生产工作站）**：computer-use 三层感知（65 动作） · HTTP 远程驱动 + MCP server
-- 🤖 **AI 自动化引擎（系统内置能力）**：围栏 DSL 引擎 · L2 编排（ASK/QUEST） · 夜班自动运行 · 模型路由 · 五元事件 + RLS 隔离 · IM 渠道 等 9 项
+- 🤖 **AI 自动化引擎（系统内置能力）**：围栏 DSL 引擎 · 技能保鲜环（下行分发） · L2 编排（ASK/QUEST） · 夜班自动运行 · 模型路由 · 五元事件 + RLS 隔离 等 10 项
 - ✅ **验证与质量（工程纪律）**：一键安装（bootstrap） · 主测试套件 · 发布门禁 · 五元事件验链 · Agent 能力巡游 · 环境自检
-- 🎁 **演示与交付资产**：高保真演示页 ×6 · 官网静态站 · 自带技能 ×4 · 能力导览 PPT · Mock 数据体系
+- 🎁 **演示与交付资产**：高保真演示页 ×6 · 官网静态站 · 自带技能 ×5 · 能力导览 PPT · Mock 数据体系
 
 > 📖 完整能力导览（含截图与体验路径）：[docs/capabilities.auto.md](docs/capabilities.auto.md) ｜ 🤖 AI Agent 入口：[AGENTS.md](AGENTS.md) ｜ 🎯 首启必跑：`pnpm preview:all`
 <!-- CAPABILITIES:END -->
@@ -92,6 +94,8 @@ WorkLoom 熊猫电商运营系统就是为这件事来的：**把过去只有超
 - **5 个共享中台（27 人）**：数据 / 商品 / 供应链 / 财务 / 合规风控与内容客服——选品方法论、一盘货、财务口径、素材产能两军共享，不重复建设
 - **技能市场**：161 个官方技能（含 48 个 ★ 门道固化）是可见、可装、可迭代的资产，每项技能都带验收用例，使用采纳率回流驱动迭代
 - **意识系统**：高频重复工作被自动检测，每周产出「固化建议」——您一键确认，系统就把这件事变成自动触发器
+- **编制是可查的（`/agents`）**：82 个岗位与人类员工同一本通讯录，每个岗位都有平台档案——来源 Bundle、**围栏授权逐条对账**（悬空标红）、绑定技能包、运行约束、**30 天战绩**（动作数 / 采纳率 / 被驳回 / 积分与谷时占比）与等级段位；点「派遣」当场建任务线程，夜班岗位 22:00–08:00 自动上线、只读岗位标绿（无写工具）
+- **数字人织伴（LoomMate）**：PC 端全页面常驻的 Live2D 秘书——语音 + 口型播报「昨夜战报 / 今日待拍板 / 差评与倒挂告警」，三态（小角落 / 大形象 / 屏保）可切；您离开电脑时她聚合非 P0 事项、屏保守着全场，点她就能问经营、派活、看记忆
 
 ### 夜班班组：把夜晚还给卖家
 
@@ -137,31 +141,57 @@ WorkLoom 熊猫电商运营系统就是为这件事来的：**把过去只有超
 
 ## 系统截图（模拟运行态实拍）
 
-以下截图均来自系统**模拟运行态**（「熊猫优选集团 30 天经营态」快照 + 离线确定性模型），页面顶部琥珀色横幅「当前为全模拟运行态」为系统原生标识。
+以下截图均来自系统**模拟运行态**（`pnpm preview:all` + `pnpm db:seed`，「熊猫优选集团」演示数据集 + 离线确定性模型），页面顶部琥珀色横幅「当前为全模拟运行态」为系统原生标识。
 
 ### PC 端 · B 端工作台
 
-| 经营剧场 · 熊猫运营中心（默认首页） | 晨报 · 经营主页 |
+| 经营剧场 · 熊猫运营中心（默认首页 `/`） | 数字员工 · 人机混编通讯录（`/agents`，82 个岗位） |
 |---|---|
-| ![经营剧场](docs/images/shots/pc-home.png) | ![晨报主页](docs/images/shots/pc-morning.png) |
+| ![经营剧场](docs/images/shots/pc-home.png) | ![数字员工](docs/images/shots/pc-agents.png) |
 
-| 审批中心 | 商品价格矩阵 |
+| 统一待办（`/inbox`） | 审批中心（`/approvals`） |
 |---|---|
-| ![审批中心](docs/images/shots/pc-approval.png) | ![商品价格矩阵](docs/images/shots/pc-price-matrix.png) |
+| ![统一待办](docs/images/shots/pc-inbox.png) | ![审批中心](docs/images/shots/pc-approval.png) |
 
-| 平台运营（多平台价格一致性巡检） | 客服监控墙（8 语种） |
+| 价格健康 · 连续调价流（`/price-health`） | 异常断点 · 根因闭环（`/operational-incidents`） |
 |---|---|
-| ![平台运营](docs/images/shots/pc-platform.png) | ![客服监控墙](docs/images/shots/pc-cs-wall.png) |
+| ![价格健康](docs/images/shots/pc-price-health.png) | ![异常断点](docs/images/shots/pc-incidents.png) |
 
-| 夜班中心 | 技能市场 |
+| 订单经营（`/orders`） | 渠道经营（`/sales-channels`） |
+|---|---|
+| ![订单经营](docs/images/shots/pc-orders.png) | ![渠道经营](docs/images/shots/pc-channels.png) |
+
+| 客户评价（`/customer-reviews`） | 客服质检墙（`/customer-service-monitor`） |
+|---|---|
+| ![客户评价](docs/images/shots/pc-reviews.png) | ![客服质检墙](docs/images/shots/pc-cs-wall.png) |
+
+| 经营分析（`/business-analytics`） | 经营档案 · 数字孪生（`/business-profile`） |
+|---|---|
+| ![经营分析](docs/images/shots/pc-analytics.png) | ![经营档案](docs/images/shots/pc-twin.png) |
+
+| 夜班中心（`/night`） | 技能市场 · 161 技能（`/skills`） |
 |---|---|
 | ![夜班中心](docs/images/shots/pc-night.png) | ![技能市场](docs/images/shots/pc-skills.png) |
 
+| 围栏规则（`/guardrails`） | 事件账本（`/events`） |
+|---|---|
+| ![围栏规则](docs/images/shots/pc-guardrails.png) | ![事件账本](docs/images/shots/pc-events.png) |
+
+| 组织记忆（`/memory`） | 经营驾驶舱 · 数字CEO（`/executive`） |
+|---|---|
+| ![组织记忆](docs/images/shots/pc-memory.png) | ![经营驾驶舱](docs/images/shots/pc-chairman.png) |
+
+### 数字人 · 织伴（Live2D 常驻）
+
+| 织伴开场（S0–S4 全身像登场） | 织伴面板（聊聊 / 设置 / 记忆） |
+|---|---|
+| ![织伴开场](docs/images/shots/pc-mate-welcome.png) | ![织伴面板](docs/images/shots/pc-mate-chat.png) |
+
 ### 移动端
 
-| B 端 · 移动工作台 | C 端 · AI 买家服务对话 | C 端 · 服务大厅 |
-|---|---|---|
-| ![移动工作台](docs/images/shots/mb-workbench.png) | ![买家服务对话](docs/images/shots/mc-chat.png) | ![服务大厅](docs/images/shots/mc-service.png) |
+| B 端 · 移动工作台 | B 端 · 数字员工名册 | C 端 · AI 买家服务对话 | C 端 · 服务大厅 |
+|---|---|---|---|
+| ![移动工作台](docs/images/shots/mb-workbench.png) | ![B端数字员工](docs/images/shots/mb-agents.png) | ![买家服务对话](docs/images/shots/mc-chat.png) | ![服务大厅](docs/images/shots/mc-service.png) |
 
 ---
 
@@ -253,6 +283,20 @@ pnpm db:verify-chain          # 现场验证：全库哈希链逐条重算
 Ask 问询另支持联网实时检索事实面（`ASK_WEB_SEARCH=1`，Bing RSS，免密钥）——比如晨会前直接问「黑五前美国站竞对价格带变动，对我们 Listing 定价的影响」。
 
 **质量门禁**：typecheck 全绿 · base 407/407 · runtime 9/9 · suite 443/443 · 哈希链逐条一致（每版实测）。
+
+---
+
+## 系统架构与业务闭环
+
+<p align="center"><img src="docs/images/architecture.png" alt="熊猫电商运营系统架构（体验层 / 服务层 / ecommerce Bundle + 基座十域 / 运行时地基 / 数据层）" width="92%"/></p>
+
+五层结构自上而下：**体验层**（电商运营台 / 移动 B 端 / C 端 AI 买家服务 / 织伴数字人 + IM 通道）→ **服务层**（Hono + tRPC v11，集团 → 店铺矩阵按租户隔离，资金动作永远人审）→ **能力层**（ecommerce Bundle：82 个岗位 / 161 个技能 / R1–R30 围栏 + 价格与库存纪律 ＋ 基座十域零改动继承）→ **运行时地基**（DeepSeek Harness seam 适配）→ **数据层**（PostgreSQL 17 + pgvector：一企一档、组织记忆、五元事件哈希链）。
+
+<p align="center"><img src="docs/images/business-loop.png" alt="电商集团的一天：提目标 → 围栏判定 → 军团执行 → 夜班值守 → 08:30 战报 → 董事长拍板" width="92%"/></p>
+
+**提目标 → 围栏判定 → 军团执行 → 夜班值守（跨时区）→ 08:30 战报 → 董事长拍板**，六节点闭环；驳回理由回流偏好模型、爆款打法固化为技能，两条回路让军团每一周都比上周更懂这门生意。底部安全带（保底价熔断 / 预算闸 / 对外必审）兜住最贵的三类事故。
+
+> **本机实测（2026-09-19）**：`pnpm suite` 当前 **356/459 通过（103 失败）**，失败几乎全部是外键约束（`threads_workspace_id_fkey` / `night_runs_workspace_id_fkey` / `triggers_workspace_id_fkey`）与「基线围栏装载 0 条」——根因是**套件 scope 仍硬编码基座酒店演示工作区 `ws-yunqi`**，而本仓种子建的是 `ws-panda`（ecommerce）。与其在 README 维持 `suite 392/392 green` 的旧口径，这里如实登记为待修；修复方向是把 suite scope 参数化到 `product.manifest.json` 的演示工作区。
 
 ---
 
