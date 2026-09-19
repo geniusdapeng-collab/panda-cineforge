@@ -124,7 +124,7 @@
 | `@deepseek-ai/cordis-plugin-include` | 1.0.7（声明） | ^1.0.7 | 生产 | vendor/dsh/package.json | 1.0.7 |
 | `@deepseek-ai/cordis-plugin-loader` | 1.0.3（声明） | ^1.0.3 | 生产 | vendor/dsh/package.json | 1.0.3 |
 | `@deepseek-ai/cordis-plugin-timer` | 1.1.4（声明） | ^1.1.4 | 生产 | vendor/dsh/package.json | 1.1.4 |
-| `@deepseek-ai/dsh` | 0.1.5-rc.2 | 0.1.5-rc.2 | 生产 | packages/runtime/dsh-gate/package.json | 0.1.5-rc.2 |
+| `@deepseek-ai/dsh` | 0.1.6-alpha.2 | 0.1.6-alpha.2 | 生产 | packages/runtime/dsh-gate/package.json | 0.1.5-rc.2 |
 | `@deepseek-ai/dsh-acp` | 0.1.2-rc.1（声明） | ^0.1.2-rc.1 | 开发 | vendor/dsh/package.json | 0.0.1-rc.1 |
 | `@deepseek-ai/dsh-acp-app` | 0.1.2-rc.1（声明） | ^0.1.2-rc.1 | 生产 | vendor/dsh/package.json | 0.1.2-alpha.2 |
 | `@deepseek-ai/dsh-agent` | 0.1.2-rc.1（声明） | ^0.1.2-rc.1 | 开发 | vendor/dsh/package.json | 0.1.0-rc.6 |
