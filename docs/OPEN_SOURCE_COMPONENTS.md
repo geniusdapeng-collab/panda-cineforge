@@ -26,13 +26,13 @@
 | 3 | Schemastery | [github.com/deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) · MIT | 3.18.2 | 3.18.2 | 运行时 | 随 dsh 分发（配置 schema 引擎） | 配置文件校验引擎；随 dsh 锁定树升级，不单独升级 |
 | 4 | node-addon-require-builtin | [github.com/deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) · MIT | 0.1.6 | 0.1.6 | 运行时 | 随 dsh 分发（原生插件加载） | dsh 原生插件加载依赖；随 dsh 锁定树升级 |
 | 5 | dsh-im 多平台 IM 接入插件 | [github.com/xmanrui/dsh-im](https://github.com/xmanrui/dsh-im) · MIT | 0.2.2 | **4.21.2** ⬆ | 运行时 | vendor/dsh-im（文档锁定）、scripts/install-im-channels.sh | 钉钉/企微/飞书官方通道首批启用；安装走 pin 版本 + integrity 校验；观察名单（微信 iLink、WhatsApp baileys 等非官方协议）不启用；Slack 枚举位保留未接线 |
-| 6 | Hono | [github.com/honojs/hono](https://github.com/honojs/hono) · MIT | 4.13.5 / 4.13.8 | **4.13.8** ⬆ | 运行时 | apps/server | HTTP 服务层；与 @hono/node-server 同批升级 |
+| 6 | Hono | [github.com/honojs/hono](https://github.com/honojs/hono) · MIT | 4.13.8 | 4.13.8 | 运行时 | apps/server | HTTP 服务层；与 @hono/node-server 同批升级 |
 | 7 | @hono/node-server | [github.com/honojs/node-server](https://github.com/honojs/node-server) · MIT | 2.1.1 | 2.1.1 | 运行时 | apps/server | 随 hono 同批升级；服务端启动路径变更需过 server 契约与 E2E |
-| 8 | tRPC | [github.com/trpc/trpc](https://github.com/trpc/trpc) · MIT | 11.18.0 / 11.19.0 | **11.19.0** ⬆ | 运行时 | apps/server（@trpc/server）、apps/web（@trpc/client） | server/client 必须同版同批升级，跨版本混用会直接破坏三端类型契约 |
+| 8 | tRPC | [github.com/trpc/trpc](https://github.com/trpc/trpc) · MIT | 11.19.0 | 11.19.0 | 运行时 | apps/server（@trpc/server）、apps/web（@trpc/client） | server/client 必须同版同批升级，跨版本混用会直接破坏三端类型契约 |
 | 9 | Drizzle ORM | [github.com/drizzle-team/drizzle-orm](https://github.com/drizzle-team/drizzle-orm) · Apache-2.0 | 0.45.2 | 0.45.2 | 运行时 | packages/db（client.ts / schema.ts） | 类型源与查询构造；DDL 事实源仍是手写 SQL migrations（D5 纪律：schema.ts 只做类型映射，禁止用 drizzle-kit 生成迁移） |
 | 10 | node-postgres（pg） | [github.com/brianc/node-postgres](https://github.com/brianc/node-postgres) · MIT | 8.23.0 | 8.23.0 | 运行时 | packages/db、packages/base、apps/server | PG 驱动；每个 workspace 必须同版，避免多实例连接池语义漂移 |
-| 11 | Zod | [github.com/colinhacks/zod](https://github.com/colinhacks/zod) · MIT | 4.4.3 / 4.6.5 | **4.6.5** ⬆ | 运行时 | apps/server、packages/base、packages/runtime | 事件与契约校验；v4 与 v3 API 差异大，升级必须全量跑契约测试 |
-| 12 | jose（JWT/JWS） | [github.com/panva/jose](https://github.com/panva/jose) · MIT | 6.2.10 / 6.2.12 | **6.2.12** ⬆ | 运行时 | apps/server、packages/base | 会话与租户令牌签发/校验；升级后必须过登录、跨租户越权（RLS）用例 |
+| 11 | Zod | [github.com/colinhacks/zod](https://github.com/colinhacks/zod) · MIT | 4.6.5 | 4.6.5 | 运行时 | apps/server、packages/base、packages/runtime | 事件与契约校验；v4 与 v3 API 差异大，升级必须全量跑契约测试 |
+| 12 | jose（JWT/JWS） | [github.com/panva/jose](https://github.com/panva/jose) · MIT | 6.2.12 | 6.2.12 | 运行时 | apps/server、packages/base | 会话与租户令牌签发/校验；升级后必须过登录、跨租户越权（RLS）用例 |
 | 13 | yaml | [github.com/eemeli/yaml](https://github.com/eemeli/yaml) · ISC | 2.9.0 | **2.9.1** ⬆ | 运行时 | bundle/preset 解析、skills 声明、根脚本 | bundle 与技能 YAML 解析器；与 yaml-governance（治理固定解析器）保持 2.9.0 同版 |
 | 14 | js-yaml | [github.com/nodeca/js-yaml](https://github.com/nodeca/js-yaml) · MIT | 4.2.0 | **5.4.2** ⬆ | 运行时 | 随 dsh 分发（CLI 配置解析） | dsh CLI 配置解析依赖；随 dsh 锁定树升级 |
 | 15 | Commander | [github.com/tj/commander.js](https://github.com/tj/commander.js) · MIT | 15.0.0 | 15.0.0 | 运行时 | 随 dsh 分发（CLI 参数） | dsh CLI 参数解析；随 dsh 锁定树升级 |
@@ -233,7 +233,7 @@
 | `@tailwindcss/vite` | 4.3.3（声明） | 4.3.3 | 开发/生产 | .workloom-runtime-deps/package.json、apps/web/package.json、apps/webc/package.json | 4.3.3 |
 | `@tanstack/react-query` | 5.102.5（声明） | 5.102.5 | 生产 | apps/web/package.json | **5.103.1** ⬆ |
 | `@trpc/client` | 11.18.0（声明） | 11.18.0 | 生产 | apps/web/package.json、apps/webb/package.json | **11.19.0** ⬆ |
-| `@trpc/server` | 11.18.0 / 11.19.0（声明） | 11.18.0 / 11.19.0 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json | 11.19.0 |
+| `@trpc/server` | 11.19.0（声明） | 11.19.0 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json | 11.19.0 |
 | `@types/js-yaml` | 4.0.9（声明） | ^4.0.9 | 开发 | vendor/dsh/package.json | 4.0.9 |
 | `@types/node` | 24.0.0 / 24.13.3 | ^24.0.0 | 开发 | apps/server/package.json、package.json | **26.6.1** ⬆ |
 | `@types/pg` | 8.23.1（声明） | ^8.23.1 | 开发 | apps/server/package.json、packages/base/package.json、packages/db/package.json 等 4 处 | 8.23.1 |
@@ -249,8 +249,8 @@
 | `electron` | 44.1.1 | ^44.1.1 | 开发 | package.json | **44.4.2** ⬆ |
 | `electron-builder` | 26.15.3 | ^26.15.3 | 开发 | package.json | 26.15.3 |
 | `execa` | 10.0.0（声明） | ^10.0.0 | 开发 | vendor/dsh/package.json | **10.0.1** ⬆ |
-| `hono` | 4.13.5 / 4.13.8（声明） | 4.13.5 / 4.13.8 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json | 4.13.8 |
-| `jose` | 6.2.10 / 6.2.12（声明） | 6.2.10 / 6.2.12 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json、packages/base/package.json | 6.2.12 |
+| `hono` | 4.13.8（声明） | 4.13.8 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json | 4.13.8 |
+| `jose` | 6.2.12（声明） | 6.2.12 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json、packages/base/package.json | 6.2.12 |
 | `js-yaml` | 4.2.0（声明） | ^4.2.0 | 生产 | vendor/dsh/package.json | **5.4.2** ⬆ |
 | `jsdom` | 30.0.1 / 30.1.0 | ^30.0.1 | 开发 | apps/web/package.json、apps/webc/package.json、package.json | 30.1.0 |
 | `node-addon-require-builtin` | 0.1.4（声明） | ^0.1.4 | 生产 | vendor/dsh/package.json | **0.1.6** ⬆ |
@@ -271,7 +271,7 @@
 | `ws` | 8.21.0（声明） | 8.21.0 | 开发 | vendor/dsh/package.json | **8.21.3** ⬆ |
 | `yaml` | 2.9.0 | 2.9.0 | 开发/生产 | .workloom-runtime-deps/package.json、apps/server/package.json、package.json 等 4 处 | **2.9.1** ⬆ |
 | `yaml-governance → npm:yaml` | 2.9.0 | npm:yaml@2.9.0 | 开发 | package.json | **2.9.1** ⬆ |
-| `zod` | 4.4.3 / 4.6.5（声明） | 4.4.3 / ^4.6.5 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json、packages/base/package.json 等 6 处 | 4.6.5 |
+| `zod` | 4.6.5（声明） | 4.6.5 / ^4.6.5 | 生产 | .workloom-runtime-deps/package.json、apps/server/package.json、packages/base/package.json 等 6 处 | 4.6.5 |
 
 ### 2.2 Python 依赖（1 个）
 
@@ -297,13 +297,9 @@
 
 ## 3. 有可用更新
 
-登记组件滞后 29 个，直接依赖滞后 25 个 —— 逐项执行单见 `docs/oss-update-plan.md`。
+登记组件滞后 25 个，直接依赖滞后 25 个 —— 逐项执行单见 `docs/oss-update-plan.md`。
 - `DeepSeek Harness（dsh）` 0.1.2-rc.1 → **0.1.5-rc.2**（门禁 runtime-gate）
 - `dsh-im 多平台 IM 接入插件` 0.2.2 → **4.21.2**（门禁 standard）
-- `Hono` 4.13.5 / 4.13.8 → **4.13.8**（门禁 full）
-- `tRPC` 11.18.0 / 11.19.0 → **11.19.0**（门禁 full）
-- `Zod` 4.4.3 / 4.6.5 → **4.6.5**（门禁 standard）
-- `jose（JWT/JWS）` 6.2.10 / 6.2.12 → **6.2.12**（门禁 full）
 - `yaml` 2.9.0 → **2.9.1**（门禁 standard）
 - `js-yaml` 4.2.0 → **5.4.2**（门禁 standard）
 - `Execa` 10.0.0 → **10.0.1**（门禁 standard）
