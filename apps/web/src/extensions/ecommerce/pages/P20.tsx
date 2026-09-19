@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { EmptyState, Skeleton } from "../../../components/hud";
-import { Note, PageHead, Tag } from "../Twin";
+import { Note, PageHead, EcomTag } from "../Twin";
 import { clientValueText, fieldText } from "../display";
 
 type Archive = Record<string, unknown>;
@@ -70,7 +70,7 @@ export default function P20() {
 
   return (
     <Bridge right={rightPanel}>
-      <PageHead title="店铺档案" tag="店铺档案" extra={<Tag tone="gold">一店一档 ×14</Tag>} />
+      <PageHead title="店铺档案" tag="店铺档案" extra={<EcomTag tone="gold">一店一档 ×14</EcomTag>} />
       {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : !archive ? (
         <EmptyState icon="🗂️" title="档案未建立" hint="店铺档案是 数字员工生成内容前的必读三要素之一。" />
       ) : (
@@ -86,9 +86,9 @@ export default function P20() {
                     <div key={k}>
                       <div className="mb-0.5 flex items-center gap-2">
                         <span className="break-words text-sm text-holo">{fieldText(k)}</span>
-                        {k === "forbidden" ? <Tag tone="warn">硬约束 · 双重留痕</Tag> : null}
-                        {k === "goals" ? <Tag tone="gold">经营目标关联来源</Tag> : null}
-                        {k === "faq_kb" ? <Tag tone="go">服务知识关联来源</Tag> : null}
+                        {k === "forbidden" ? <EcomTag tone="warn">硬约束 · 双重留痕</EcomTag> : null}
+                        {k === "goals" ? <EcomTag tone="gold">经营目标关联来源</EcomTag> : null}
+                        {k === "faq_kb" ? <EcomTag tone="go">服务知识关联来源</EcomTag> : null}
                       </div>
                       {renderValue(archive[k])}
                     </div>

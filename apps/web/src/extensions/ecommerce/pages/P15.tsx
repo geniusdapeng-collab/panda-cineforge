@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
-import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, Tag } from "../Twin";
+import { Ev, fmtTime, HBar, Note, PageHead, Row, Stat, EcomTag } from "../Twin";
 import { AIFeedback } from "../../../components/AIFeedback";
 import { clientIdentifierText, clientNodeText, clientValueText } from "../display";
 
@@ -41,7 +41,7 @@ export default function P15() {
 
   return (
     <Bridge right={rightPanel}>
-      <PageHead title="评价与差评防御" tag="口碑防御" extra={<Tag tone="warn">差评 · 两小时内响应</Tag>} />
+      <PageHead title="评价与差评防御" tag="口碑防御" extra={<EcomTag tone="warn">差评 · 两小时内响应</EcomTag>} />
       {!ready ? (<><Skeleton count={2} height={44} /><Skeleton count={4} /></>) : (
         <div className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -54,7 +54,7 @@ export default function P15() {
 
           <SystemDivider time="SLA 告警" summary="差评侦测即开 2h 防御窗口 → 超时自动升级店长（差评响应慢是流失主因）" />
           {sla.length === 0 ? <div className="rounded-lg border border-line bg-card p-3 text-sm text-go">✓ 当前无超时差评</div> : sla.map((ev) => (
-            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone="warn">已升级店长</Tag>}>
+            <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone="warn">已升级店长</EcomTag>}>
               <b className="text-ink2">{clientIdentifierText(ev.object.id)}</b>
               <span className="break-words text-ink3"> · {clientNodeText(ev.context.channel, "销售平台")} · 响应时限 {String(ev.decision.after?.sla_hours ?? 2)} 小时 · {String(ev.decision.after?.rating ?? ev.decision.params?.rating ?? "")} 分 · {clientValueText(ev.decision.after?.topic, "评价主题待归类")}</span>
             </Row>
@@ -65,7 +65,7 @@ export default function P15() {
             const rating = Number(ev.decision.params?.rating ?? 5);
             const isBad = rating <= 3;
             return (
-              <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<Tag tone={isBad ? "warn" : "go"}>{rating} 分 · {isBad ? "已审核" : "自动放行"}</Tag>}>
+              <Row key={ev.event_id} time={fmtTime(ev.context.time)} right={<EcomTag tone={isBad ? "warn" : "go"}>{rating} 分 · {isBad ? "已审核" : "自动放行"}</EcomTag>}>
                 <b className="text-ink2">{clientIdentifierText(ev.object.id)}</b>
                 <span className="break-words text-ink3"> · {clientNodeText(ev.context.channel, "销售平台")} · {isBad ? clientValueText(ev.decision.after?.draft, "致歉草稿已生成").slice(0, 30) + "…" : "感谢回复已发布"}</span>
                 {isBad && (

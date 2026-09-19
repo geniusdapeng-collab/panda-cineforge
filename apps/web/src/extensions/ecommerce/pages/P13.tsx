@@ -7,7 +7,7 @@ import { actionText } from "../../../lib/display";
 import { ensureDemoLogin, trpc } from "../../../lib/trpc";
 import { Bridge } from "../../../shell/Bridge";
 import { EmptyState, Skeleton, SystemDivider } from "../../../components/hud";
-import { Ev, fmtTime, PageHead, Row, Stat, Tag, Note } from "../Twin";
+import { Ev, fmtTime, PageHead, Row, Stat, EcomTag, Note } from "../Twin";
 import { clientIdentifierText, clientNodeText, clientValueText } from "../display";
 
 const rightPanel = (
@@ -76,7 +76,7 @@ export default function P13() {
                     <span className="font-mono text-ink3">{fmtTime(ev.context.time)}</span>
                     <span className="mx-2 font-semibold text-ink2">{actionText(ev.decision.action)}</span>
                     <span className="text-ink3">{clientNodeText(ev.who?.type, "人类成员")}</span>
-                    {ev.rule_impact?.[0] ? <span className="ml-2"><Tag tone="holo">围栏已校验</Tag></span> : null}
+                    {ev.rule_impact?.[0] ? <span className="ml-2"><EcomTag tone="holo">围栏已校验</EcomTag></span> : null}
                     {ev.decision.basis?.[0] ? <div className="mt-0.5 break-words text-sm text-ink3">{clientValueText(ev.decision.basis[0], "执行依据已记录")}</div> : null}
                   </div>
                 </div>
