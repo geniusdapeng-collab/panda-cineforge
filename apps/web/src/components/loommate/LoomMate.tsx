@@ -107,7 +107,9 @@ export function LoomMate() {
     try { const v = localStorage.getItem("loommate.pos"); return v ? JSON.parse(v) as { x: number; y: number } : null; } catch { return null; }
   });
   const [hidden, setHidden] = useState(() => { try { return localStorage.getItem("loommate.hidden") === "1"; } catch { return false; } });
-  const [mini, setMini] = useState(() => { try { return localStorage.getItem("loommate.mini") === "1"; } catch { return false; } });
+  // 首访默认收起为小球（V4 游客走查：展开态 Live2D 占住首屏视觉中心，挡住业务内容）；
+  // 用户显式展开/收起后仍按本机偏好持久化（"0"=展开，"1"=小球，缺省=小球）。
+  const [mini, setMini] = useState(() => { try { return localStorage.getItem("loommate.mini") !== "0"; } catch { return true; } });
   const dragRef = useRef<{ startX: number; startY: number; baseX: number; baseY: number; moved: boolean } | null>(null);
   const persistLocal = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } };
   const availableWidth = Math.max(96, viewport.width - railW - navW - 32);
@@ -209,7 +211,7 @@ export function LoomMate() {
       } catch { /* 本机偏好不可写时仍恢复当前会话 */ }
       setPos(null);
       setHidden(false);
-      setMini(false);
+      setMini(true); // 恢复默认 = 首访默认的小球态
       setOpen("none");
     };
     const setVisibility = (event: Event) => {
@@ -330,7 +332,7 @@ export function LoomMate() {
       if (m) setMemory(m.memory);
     }
     if (p === "chat" && chat.length === 0) {
-      setChat([{ from: "mate", text: `${settings?.display_name ?? "董事长"}好呀～我是${personaName}，您的贴身小秘书！有事叫我查、叫我记、叫我提醒您，都可以哦～` }]);
+      setChat([{ from: "mate", text: `${settings?.display_name ?? "老板"}好呀～我是${personaName}，您的贴身小秘书！有事叫我查、叫我记、叫我提醒您，都可以哦～` }]);
     }
   };
 
@@ -452,10 +454,22 @@ export function LoomMate() {
 
       {/* 本体：形象（可拖拽·松手边缘吸附）+ 名字 + 控制条 */}
       {mini && open === "none" ? (
-        /* 迷你球：64px 圆球贴在原位置，点击展开 */
+        /* 迷你球：64px 圆球贴在原位置，点击展开；键盘语义与展开态一致（方向键移动 · 回车开对话） */
         <button
+          role="button"
           onClick={() => { setMini(false); persistLocal("loommate.mini", "0"); }}
-          title="展开小织"
+          title={`${personaName}（拖拽挪位置 · 点击聊聊）`}
+          aria-label={`${personaName}助手；回车打开对话，方向键移动，按住 Shift 可加速移动`}
+          aria-keyshortcuts="Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight"
+          onKeyDown={(e) => {
+            if (moveByKeyboard(e)) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setMini(false);
+              persistLocal("loommate.mini", "0");
+              void openPanel("chat");
+            }
+          }}
           className="relative block h-16 w-16 overflow-hidden rounded-full border-2 border-gold/60 bg-bg900 shadow-xl transition-transform hover:scale-110"
         >
           <img src="/live2d/mao/poster.png" alt={personaName} draggable={false} className="h-full w-full object-cover" />
@@ -467,7 +481,21 @@ export function LoomMate() {
         </button>
       ) : (
       <div className="flex flex-col items-center">
+        {/* RDAS v3.0 T-02/T-11：视觉保持原样，但把 480px 方框的指针命中区缩小到角色上半身，
+            避免数字人命中区压住审批动作栏；透明区域不拦截点击。 */}
         <div
+          className="relative block"
+          style={{ pointerEvents: "none" }}
+        >
+          {webglOk
+            ? <MateLive2D size={dim} mood={mood} gesture={mateGesture} />
+            : <MateAvatar size={dim} excited={unread > 0} />}
+          {unread > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-alert px-1 text-body font-bold text-white shadow-lg">
+              {unread}
+            </span>
+          )}
+          <div
           role="button" tabIndex={0}
           aria-label={`${personaName}助手；回车打开对话，方向键移动，按住 Shift 可加速移动`}
           aria-keyshortcuts="Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight"
@@ -479,17 +507,10 @@ export function LoomMate() {
               void openPanel("chat");
             }
           }}
-          className="relative block cursor-grab touch-none select-none transition-transform hover:scale-105 active:cursor-grabbing"
+          className="absolute cursor-grab touch-none select-none active:cursor-grabbing"
+          style={{ left: "25%", top: "6%", width: "50%", height: "44%", pointerEvents: "auto", borderRadius: 9999 }}
           title={`${personaName}（拖拽挪位置 · 点击聊聊）`}
-        >
-          {webglOk
-            ? <MateLive2D size={dim} mood={mood} gesture={mateGesture} />
-            : <MateAvatar size={dim} excited={unread > 0} />}
-          {unread > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-alert px-1 text-body font-bold text-white shadow-lg">
-              {unread}
-            </span>
-          )}
+          />
         </div>
         <div className="mt-0.5 flex items-center gap-1.5">
             <span className="rounded-full bg-bg900/90 px-2.5 py-0.5 text-body text-ink shadow">
