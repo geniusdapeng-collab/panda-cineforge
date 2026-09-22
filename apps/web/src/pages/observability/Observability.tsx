@@ -41,7 +41,7 @@ const MODEL_NAME_TEXT: Record<string, string> = {
   mock: "演示模型",
   "mock-llm": "演示模型",
   "human-operator": "人工处理",
-  "human-chairman": "董事长人工决策",
+  "human-chairman": "老板人工决策",
 };
 
 function modelName(value: string | undefined): string {
@@ -105,7 +105,7 @@ export default function Observability({ view }: { view: "events" | "models" }) {
     <div className="space-y-3">
       <div className="text-body font-bold text-holo">当前可见范围</div>
       <div className="rounded-lg border border-line bg-card p-3 text-body leading-relaxed text-ink2">
-        仅汇总当前租户下最近 12 条任务的事件；权限与租户隔离沿用服务端查询规则。
+        只汇总当前公司最近 12 个任务的事件；数据范围与权限隔离由服务端统一控制。
       </div>
       <div className="rounded-lg border border-line bg-card p-3">
         <div className="text-body text-ink3">已读取事件</div>
