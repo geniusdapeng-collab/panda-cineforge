@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 import YAML from "yaml";
 import { safeParseReplayAwareEvent } from "@workloom/base/workdata";
+import { alignReadableIdSequences } from "@workloom/base/workdata";
 import { eventHash as _eh } from "@workloom/base/workdata";
 // #32 修复：哈希链统一生产口径（events.ts 的 canonicalJson/eventHash）——
 // 此前种子用 JSON.stringify 键序算哈希，与生产 canonicalJson 口径不一致，
@@ -1320,6 +1321,11 @@ async function main(): Promise<void> {
   console.log("✓ 凭据引用 ×2（占位密文，事件只记引用 ID）");
 
   // —— 事件写入：切 gateway 角色（F1.2 唯一可 INSERT biz_events）
+    // GR-02（2026-09-29 第二次修复，基座 T-2026-0929-0003）：手写号段写入方收尾对齐号源。
+  // 取号函数只做 nextval（0050 把 max() 读回取号函数导致并发撞号且不收敛）；
+  // "序列落后于手写 id"的问题必须在**写入方**解决——只抬不降、幂等，可重复执行。
+  const seqFloor = await alignReadableIdSequences(owner);
+  console.log(`✓ 可读号源对齐：threads→${seqFloor.threads}`);
   await owner.end();
   const gw = new pg.Client({ connectionString: GATEWAY_URL });
   await gw.connect();
