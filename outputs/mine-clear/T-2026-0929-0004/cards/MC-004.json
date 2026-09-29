@@ -1,0 +1,61 @@
+{
+  "id": "MC-004",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P0",
+  "batch": 0,
+  "state": "fixed",
+  "title": "必需门禁 verify-client-foundation-consumer 在 main 上判红（受管客户端文件指纹漂移）",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": ".workloom-client-foundation.json:997-1000@2aae441",
+      "note": "managedFiles['apps/webc/src/styles/tokens.css'].sha256 = b621ef…（0.1.14 快照）"
+    },
+    {
+      "type": "code",
+      "ref": "apps/webc/src/styles/tokens.css@2aae441",
+      "note": "文件实际 sha256 = de2640c7…（基座 T-2026-0929-0100 修复版，移除 display:flex 覆盖）"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/staticgate-baseline.log",
+      "note": "❌ 三端客户端基座消费门禁失败（1 项）· 受管客户端文件指纹漂移：apps/webc/src/styles/tokens.css"
+    },
+    {
+      "type": "doc",
+      "ref": ".cnb.yml@2aae441",
+      "note": "static-gate（无 allowFailure）第 4 阶段执行 node scripts/verify-client-foundation-consumer.mjs --repo ."
+    }
+  ],
+  "root_cause": {
+    "file": ".workloom-client-foundation.json",
+    "line": 997,
+    "commit": "2aae441",
+    "symbol": "managedFiles"
+  },
+  "trigger_path": "基座同步波次改了受管客户端文件但未同步刷新 .workloom-client-foundation.json 摘要 → 自包含门禁复算指纹失败 → PR/推送流水线 static-gate 恒红（其余 5 仓实测绿，仅本仓红）",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "main 工作树",
+      "expect": "受管文件指纹零漂移，exit 0",
+      "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "把 state 摘要改回 b621ef…",
+      "expect": "门禁重新判红（说明该断言真的能抓住漂移，而不是空转）",
+      "command": "git stash && node scripts/verify-client-foundation-consumer.mjs --repo . ; git stash pop",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "本轮修复卡：MC-104（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

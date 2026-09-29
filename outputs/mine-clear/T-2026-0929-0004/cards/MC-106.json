@@ -1,0 +1,53 @@
+{
+  "id": "MC-106",
+  "kind": "fix",
+  "batch": 1,
+  "state": "fixed",
+  "title": "客服意图路由：行业直连查询前置 + 售后指令疑问句判定",
+  "covers": [
+    "MC-006"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/dialog.ts:55-95@2aae441",
+      "note": "RE_ORDER/RE_MEMBER 前置到 ruleBasedIntent 之前；新增 RE_REPAIR_ACTION / RE_QUESTION_FORM，售后兜底按『指令句建单、疑问句走 KB』"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts → 13 passed（修复前 3 failed）"
+    }
+  ],
+  "fix_plan": "classify() 顺序调整：① 工单/目录/订单/会员直连查询先行 ② 售后动作词命中时，疑问句→kb_qa、指令句→service_request ③ 其余沿用规则表",
+  "blast_radius": "客服前台分流行为变化：明确对象查询不再被当成知识问答；维修类指令能建单；疑问句咨询不误建单（与 dialog.test.ts 9 条表格一致）。文件未登记 extraExclude，受 MC-010 覆盖风险约束",
+  "conflict_paths": [
+    "apps/server/src/service/dialog.ts"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "classify 四例（订单/积分/维修/退款多久到账）",
+      "expect": "biz_query/query_order · biz_query/query_member · service_request · kb_qa",
+      "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意售后动作文本",
+      "expect": "疑问句形态不建单、指令句建单（不回归到 kb_qa 通吃）",
+      "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "regression": {
+    "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": ""
+}

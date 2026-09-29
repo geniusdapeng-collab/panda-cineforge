@@ -1,0 +1,56 @@
+{
+  "id": "MC-007",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P1",
+  "batch": 1,
+  "state": "fixed",
+  "title": "apps/server HTTP E2E 端口钉死 8795：健康检查命中他人服务 → 96 条 E2E 整段失败/跳过",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/e2e.test.ts:13@2aae441",
+      "note": "const PORT = 8795;（无环境变量覆盖）"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/servertest-baseline.log",
+      "note": "FAIL e2e.test.ts：AssertionError expected {Object} to be null / TRPCError: 工作区 panda-group 不存在；96 tests skipped"
+    },
+    {
+      "type": "log",
+      "ref": "lsof -nP -iTCP:8795 -sTCP:LISTEN",
+      "note": "端口被另一会话的 node 进程占用（PID 43831）"
+    }
+  ],
+  "root_cause": {
+    "file": "apps/server/src/service/e2e.test.ts",
+    "line": 13,
+    "commit": "2aae441",
+    "symbol": "PORT"
+  },
+  "trigger_path": "套件只探测 /health 就认为自己的服务已就绪；他人服务同样返回 200 → 后续所有请求打到别人的库 → 全段失败（静默错环境，比 EADDRINUSE 更危险）",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "E2E_SERVER_PORT 指向空闲端口",
+      "expect": "96 passed",
+      "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意并行会话数量",
+      "expect": "服务身份可辨（端口可配 + 探测自身实例），不误连他人服务",
+      "command": "E2E_SERVER_PORT=<free> pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "本轮修复卡：MC-107（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

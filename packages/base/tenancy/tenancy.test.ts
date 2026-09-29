@@ -47,16 +47,20 @@ describe("越版守卫（H-10：403 + 升级提示）", () => {
       const err = e as PlanForbidden;
       expect(err).toBeInstanceOf(PlanForbidden);
       expect(err.statusCode).toBe(403);
-      expect(err.upgradeHint).toContain("pro");
+      // 升级提示已中文化（capabilities.ts#PLAN_LABELS：pro=专业版 / vpc=私有部署版）；
+      // 旧副本仍断言英文 slug，本仓实测 2 条红。断言改为"提示指向目标档位的中文名"，
+      // 并要求错误信息不泄漏内部英文标识（与基座同口径）。
+      expect(err.upgradeHint).toContain("专业版");
+      expect(err.message).not.toMatch(/community|quest|F7\.2/i);
     }
   });
 
-  it("VPC 专属能力的升级提示指向 vpc", () => {
+  it("VPC 专属能力的升级提示指向私有部署版", () => {
     try {
       requireCapability("teams", "localModel");
       expect.unreachable();
     } catch (e) {
-      expect((e as PlanForbidden).upgradeHint).toContain("vpc");
+      expect((e as PlanForbidden).upgradeHint).toContain("私有部署版");
     }
   });
 

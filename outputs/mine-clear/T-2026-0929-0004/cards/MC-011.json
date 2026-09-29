@@ -1,0 +1,54 @@
+{
+  "id": "MC-011",
+  "kind": "problem",
+  "level": "L1",
+  "severity": "P1",
+  "batch": 2,
+  "state": "unfixed",
+  "title": "apps/server 鉴权/权限边界 4 条红：H5 入口凭据校验返回 403 而非 401、scope 不一致未在查库前失败关闭；devtools 路由用 protectedProcedure 而非已验行业权限守卫",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/h5-session-auth.test.ts@2aae441",
+      "note": "3 条：不接受客户端自报身份绕过签名（期望 401 实际 403）、拒绝伪造/篡改凭据（同）、签名工作区与页面配置不一致时在查库前失败关闭（期望 H5_ENTRY_SCOPE_MISMATCH）"
+    },
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/router-governance.test.ts@2aae441",
+      "note": "1 条：每个端点都使用已验行业权限守卫，不依赖客户端隐藏入口 —— devtoolsRouter 仍出现 ': protectedProcedure'"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "apps/server：4 failed / 250 passed（E2E 端口问题修复后的仅存失败）"
+    }
+  ],
+  "root_cause": {
+    "file": "apps/server/src/service/h5-session-auth.test.ts",
+    "line": 1,
+    "commit": "2aae441",
+    "symbol": "H5 入口鉴权 / devtools 守卫"
+  },
+  "trigger_path": "H5 入口把『凭据无效』与『无权访问』混为 403，且 scope 校验发生在查库之后；devtools 路由只要求登录态，未接行业权限守卫 → 与『先围栏后动作』『无回执不算完成』相邻的鉴权边界缺口",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "未签名/篡改的 H5 入口凭据",
+      "expect": "401 且不落库",
+      "command": "pnpm -C apps/server exec vitest run src/service/h5-session-auth.test.ts",
+      "last_result": "fail"
+    },
+    {
+      "kind": "property",
+      "given": "任意端点",
+      "expect": "受已验行业权限守卫保护，不依赖前端隐藏入口",
+      "command": "pnpm -C apps/server exec vitest run src/service/router-governance.test.ts",
+      "last_result": "fail"
+    }
+  ],
+  "notes": "未闭环：涉及鉴权语义与端点守卫改造（安全边界），按第 2 批排期；修复需产品/安全口径确认",
+  "regression": {
+    "command": "pnpm -C apps/server exec vitest run src/service/h5-session-auth.test.ts src/service/router-governance.test.ts   # 期望 0 failed",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

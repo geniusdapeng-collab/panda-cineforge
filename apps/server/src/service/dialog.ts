@@ -51,6 +51,10 @@ const RE_MEMBER = /会员|积分|等级|权益|余额|优惠券/;
 const RE_CATALOG = /服务目录|售后政策|退换货政策|退货政策|保修政策|安装指导|维修政策/;
 /** 售后动作指令（规则表未命中时兜底建单；疑问句已在规则表分流 kb_qa，不会走到这里） */
 const RE_AFTERSALE_ACTION = /退款|退货|换货|换新|价保|补差|纠纷/;
+/** 维修/故障类售后指令（电商实测：充电宝坏了/充不进电，必须能建单） */
+const RE_REPAIR_ACTION = /维修|修一下|修好|坏了|故障|充不进|无法开机|不制冷|不制热|异响|漏水/;
+/** 疑问句形态：同一条售后动作词，问句只答知识库（退款多久到账），指令句才建单（帮我修一下） */
+const RE_QUESTION_FORM = /[?？]|多久|几点|什么时候|怎么|如何|吗|呢|能不能|可不可以|有哪些|在哪/;
 
 export function classify(
   text: string,
@@ -59,17 +63,25 @@ export function classify(
   businessAdapter?: ServiceFrontBusinessAdapter | null,
 ): { intent: Intent; tool?: BizToolName } {
   void businessAdapter;
+  // 行业直连查询优先（2026-09-29 排雷 T-2026-0929-0004）：订单/物流/会员/积分是**明确的对象查询**，
+  // 不能被 base 通用疑问句规则先判成 kb_qa——旧实现只在 `ruled === "biz_query"` 分支里才看 RE_ORDER/RE_MEMBER，
+  // 于是"查一下我的订单""我的会员积分还有多少"落到知识库问答（本仓 dialog.test.ts 实测 2 条红）。
   if (RE_TICKET_STATUS.test(text)) return { intent: "biz_query", tool: "query_ticket" };
   if (RE_CATALOG.test(text)) return { intent: "biz_query", tool: "query_catalog" };
+  if (RE_ORDER.test(text)) return { intent: "biz_query", tool: "query_order" };
+  if (RE_MEMBER.test(text)) return { intent: "biz_query", tool: "query_member" };
   const ruled = ruleBasedIntent(text);
   if (ruled === "complaint") return { intent: "complaint" };
-  if (ruled === "service_request") return { intent: "service_request" };
   if (ruled === "biz_query") {
-    if (RE_MEMBER.test(text)) return { intent: "biz_query", tool: "query_member" };
     return { intent: "biz_query", tool: "query_order" };
   }
-  // 电商售后动作兜底：规则表（base 通用词表）未命中的退款/退货/换货/价保/纠纷指令 → 建单
-  if (!ruled && RE_AFTERSALE_ACTION.test(text)) return { intent: "service_request" };
+  // 电商售后动作兜底：退款/退货/换货/价保/纠纷/维修类**指令句** → 建单；
+  // 疑问句形态（多久/几点/怎么…）仍走知识库，避免把咨询当工单（与 dialog.test.ts 口径一致）。
+  if (RE_AFTERSALE_ACTION.test(text) || RE_REPAIR_ACTION.test(text)) {
+    if (RE_QUESTION_FORM.test(text)) return { intent: "kb_qa" };
+    if (!ruled || ruled === "kb_qa" || ruled === "service_request") return { intent: "service_request" };
+  }
+  if (ruled === "service_request") return { intent: "service_request" };
   return { intent: "kb_qa" }; // 规则未命中：默认先查知识库（低置信走诚实拒答三档）
 }
 

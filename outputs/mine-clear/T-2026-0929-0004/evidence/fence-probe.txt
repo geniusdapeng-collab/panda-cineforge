@@ -1,0 +1,5 @@
+[pii] PII_SALT 未配置，使用 dev 占位盐（仅限开发/测试，生产必须注入 PII_SALT）
+R9 只带 rating（缺 age_hours/replied） → block | impacts: R9:blocked | evalErrors: 1 R9: >= 期望数字，得到 undefined
+price.adjust 只带 params.cost → block | impacts: R1:pass,R14:blocked,R18:blocked | evalErrors: 2 R14: - 期望数字，得到 undefined / R18: * 期望数字，得到 undefined
+price.adjust 全量水合 → auto | impacts: R1:pass | evalErrors: 0 
+evalCondition('params.age_hours >= 2', {params:{rating:2}}) → THROW: >= 期望数字，得到 undefined

@@ -1,0 +1,54 @@
+{
+  "id": "MC-101",
+  "kind": "fix",
+  "batch": 0,
+  "state": "fixed",
+  "title": "套件运行时解析本仓演示工作区与 slug（workspace + name/slug 一次解析）",
+  "covers": [
+    "MC-001",
+    "MC-002"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:52-90@2aae441",
+      "note": "新增 WORKSPACE 解析（① 配的 slug → ② is_example=true → ③ 任一）+ scope/WORKSPACE.slug"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "服务层 318/418 → 408/418；HTTP E2E 0（崩溃）→ 45/45"
+    }
+  ],
+  "fix_plan": "把 `const scope = { ws-yunqi }` 换成顶层 await 解析本仓工作区（owner 连接、RLS 前置）；login() 改用 WORKSPACE.slug；Z 域 zScope 收敛为 scope 别名",
+  "blast_radius": "所有以 scope 为入参的域（A–Z）行为对齐当前工作区；仅解析口径变化，不改业务断言。副作用：解析失败时显式报『本仓至少应有一个工作区（种子未跑？）』",
+  "conflict_paths": [
+    "scripts/suite.ts"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "干净库 + 种子",
+      "expect": "服务层 ≥408/418、HTTP E2E 45/45",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "库中存在测试残留工作区",
+      "expect": "仍解析到演示工作区（is_example=true）",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交（单文件回退即可）",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": "为让下一轮 full 波次不覆盖，需按 MC-010 在基座 child-repos.json 登记；本轮已在报告中显式标注"
+}

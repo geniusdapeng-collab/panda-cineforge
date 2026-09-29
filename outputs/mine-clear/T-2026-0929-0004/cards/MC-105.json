@@ -1,0 +1,71 @@
+{
+  "id": "MC-105",
+  "kind": "fix",
+  "batch": 1,
+  "state": "fixed",
+  "title": "四个 packages/base 测试文件随本仓口径本地化",
+  "covers": [
+    "MC-005"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
+      "note": "BUNDLE_YML → bundles/ecommerce/fences/ecom-baseline.yml；R1/R2/R9 断言改电商口径；PG 集成段 workspace/slug/ruleVersion/lockKey 本地化"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/bundles/bundles.test.ts:52@2aae441",
+      "note": "REGISTERED_PAGES 断言对齐实现（p1–p9，length 9）"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/workdata/recall.test.ts:16@2aae441",
+      "note": "注入 ecomLexicon + scope 改 ws-panda"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/tenancy/tenancy.test.ts:53@2aae441",
+      "note": "升级提示断言改中文档位名（专业版/私有部署版），并要求错误信息不泄漏内部英文标识"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "pnpm -C packages/base test：48 passed / 0 failed（修复前 4 files / 6 tests 红）"
+    }
+  ],
+  "fix_plan": "四个文件的路径/数值/词表/文案断言全部改成本仓口径；不改产品实现",
+  "blast_radius": "fence-engine.test.ts 的 PG 集成段（RUN_DB_TESTS=1）会写 fence_dry_runs；scope 改 ws-panda 后写入本仓工作区（此前指向不存在的 ws-yunqi）",
+  "conflict_paths": [
+    "packages/base/fence-engine/fence-engine.test.ts",
+    "packages/base/bundles/bundles.test.ts",
+    "packages/base/workdata/recall.test.ts",
+    "packages/base/tenancy/tenancy.test.ts"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "本仓工作树",
+      "expect": "48 passed / 0 failed",
+      "command": "pnpm -C packages/base test",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "换行业仓",
+      "expect": "测试从本仓 bundle/工作区取值（不写死酒店路径与工作区）",
+      "command": "pnpm -C packages/base test",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "regression": {
+    "command": "pnpm -C packages/base test",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": ""
+}
