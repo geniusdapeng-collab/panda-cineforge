@@ -2172,7 +2172,8 @@ async function runCases(list: Case[], label: string): Promise<number> {
 const e2eCases: Case[] = [];
 const h2 = (name: string, run: Case["run"]) => { const n = e2eCases.length + 1; e2eCases.push({ id: `H-${String(n).padStart(2, "0")}`, name, run }); };
 
-const PORT = 8787;
+// 端口支持环境变量（与基座同口径）：并行会话/CI 共用 8787 时会让 HTTP E2E 段连到别人的服务或起不来
+const PORT = Number(process.env.SUITE_SERVER_PORT ?? "8787");
 const BASE = `http://localhost:${PORT}`;
 
 async function api<T = unknown>(path: string, opts: { method?: string; token?: string; body?: unknown } = {}): Promise<{ status: number; data: T }> {
