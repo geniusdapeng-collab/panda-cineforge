@@ -4,7 +4,7 @@
   "level": "L1",
   "severity": "P1",
   "batch": 1,
-  "state": "fixed",
+  "state": "verified",
   "title": "packages/base 四个测试文件与实现分叉：fence-engine 指向不存在的 bundles/hotel、bundles 页面注册表断言 25、recall 无词表且工作区 ws-demo、tenancy 断言英文提示",
   "evidence": [
     {
@@ -58,9 +58,12 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "本轮修复卡：MC-105（待 M6 独立验收后转 verified）",
+  "notes": "本轮修复卡：MC-105（待 M6 独立验收后转 verified）；M6 独立环境复验通过（MC-105）",
   "regression": {
     "command": "pnpm -C packages/base test",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
-  }
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }

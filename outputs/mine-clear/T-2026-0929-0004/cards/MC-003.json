@@ -4,7 +4,7 @@
   "level": "L2",
   "severity": "P1",
   "batch": 1,
-  "state": "fixed",
+  "state": "verified",
   "title": "onboarding E2E 用例把演示工作区改名『云栖酒店』并把行业改成 hotel，且只复位 dataMode",
   "evidence": [
     {
@@ -48,9 +48,12 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "本轮修复卡：MC-102（待 M6 独立验收后转 verified）",
+  "notes": "本轮修复卡：MC-102（待 M6 独立验收后转 verified）；M6 独立环境复验通过（MC-102）",
   "regression": {
     "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select name,industry from workspaces where id='ws-panda'\"",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
-  }
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }
