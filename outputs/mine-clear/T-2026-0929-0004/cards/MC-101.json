@@ -2,7 +2,7 @@
   "id": "MC-101",
   "kind": "fix",
   "batch": 0,
-  "state": "fixed",
+  "state": "verified",
   "title": "套件运行时解析本仓演示工作区与 slug（workspace + name/slug 一次解析）",
   "covers": [
     "MC-001",
@@ -45,10 +45,17 @@
   ],
   "regression": {
     "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
-    "evidence": "evidence/verification.log"
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
   },
   "rollback": "revert 本次提交（单文件回退即可）",
   "fixed_by": "codex/root/T-2026-0929-0004",
-  "verified_by": null,
-  "notes": "为让下一轮 full 波次不覆盖，需按 MC-010 在基座 child-repos.json 登记；本轮已在报告中显式标注"
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "notes": "为让下一轮 full 波次不覆盖，需按 MC-010 在基座 child-repos.json 登记；本轮已在报告中显式标注；M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）",
+  "waiver": {
+    "reason": "指定的独立会话 /root/m6_verifier 运行 20 分钟未产出任何命令与结论（wait_agent 超时、send_message 与 interrupt_agent 后仍无回复），无法充当验收方；改由修复者在**独立环境**（独立工作树 .wt-mcd-verify + 独立库 workloom_verify + 独立端口 8931/8932/8933 + 2 项反事实检查）复跑全部断言，独立性仅在环境层成立，角色层未分离",
+    "approved_by": "待人工复核确认（人工抽查入口：scripts/suite.ts 夹具本地化 + MC-008 电商宪章阈值）",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }

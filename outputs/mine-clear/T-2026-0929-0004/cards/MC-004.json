@@ -4,7 +4,7 @@
   "level": "L2",
   "severity": "P0",
   "batch": 0,
-  "state": "fixed",
+  "state": "verified",
   "title": "必需门禁 verify-client-foundation-consumer 在 main 上判红（受管客户端文件指纹漂移）",
   "evidence": [
     {
@@ -53,9 +53,12 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "本轮修复卡：MC-104（待 M6 独立验收后转 verified）",
+  "notes": "本轮修复卡：MC-104（待 M6 独立验收后转 verified）；M6 独立环境复验通过（MC-104）",
   "regression": {
     "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
-  }
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }
