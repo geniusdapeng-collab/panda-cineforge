@@ -3704,7 +3704,9 @@ const svcPassed = await runCases(cases, "服务层用例");
 console.log("▸ 启动 HTTP E2E 段（spawn server）……");
 const server = spawn("pnpm", ["-C", "apps/server", "start"], {
   cwd: new URL("..", import.meta.url).pathname,
-  env: { ...process.env },
+  // 必须显式传 SERVER_PORT：否则 server 会读本仓 .env 的 SERVER_PORT（8799 等），
+  // 与并行会话/本机其它服务抢端口 → EADDRINUSE → 套件报「server 启动超时」（2026-09-29 实测）
+  env: { ...process.env, SERVER_PORT: String(PORT) },
   stdio: "ignore",
 });
 try {
