@@ -4,7 +4,7 @@
   "repo": ".wt-mcd-panda",
   "title": "电商仓排雷式交付：系统性排查 + 断言兜底修复 + 独立验收",
   "created_at": "2026-09-29T15:59:30.724Z",
-  "updated_at": "2026-09-29T16:47:28.243Z",
+  "updated_at": "2026-09-29T16:58:48.177Z",
   "baseline": {
     "audit": {
       "commit": "2aae4417a72934e0d6afdcffe1a17f3b1f559c1c",
@@ -264,6 +264,11 @@
           "type": "code",
           "ref": "bundles/ecommerce/fences/ecom-baseline.yml:146,187@2aae441",
           "note": "R14 when=abs(after.rate-before.rate)/before.rate>0.02；R18 when=params.channel_price < params.other_platform_min*0.85 —— 缺字段即求值异常"
+        },
+        {
+          "type": "log",
+          "ref": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-012-fence-probe.log",
+          "note": "独立复验探针（规则 30 条 / ecom-baseline/v1）：review.reply 只带 rating → R9:blocked 求值异常；price.adjust 只带 params.cost → R1/R2/R14/R18 四条求值异常→block；全量水合 → auto；真破成本红线 → R2:blocked（evalErrors=0）"
         }
       ],
       "root_cause": {
@@ -289,7 +294,7 @@
           "last_result": "not-run"
         }
       ],
-      "notes": "观察项（P2）：是否把规则改 null-safe 属产品语义决策，本轮未改规则，只在套件夹具中做全量水合并在报告里标注",
+      "notes": "观察项（P2）：是否把规则改 null-safe 属产品语义决策，本轮未改规则，只在套件夹具中做全量水合并在报告里标注；独立复验确认缺参面比修复者探针更宽（R1/R2 的 before/after 缺字段同样异常），真越线仍然 block（不是把熔断关掉）",
       "regression": {
         "command": "pnpm exec tsx <探针脚本>；或直接复跑 C-02/R-10 用例   # 期望缺参不再产生 block 级求值异常",
         "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
@@ -299,10 +304,10 @@
       "id": "MC-014",
       "kind": "problem",
       "level": "L3",
-      "severity": "P2",
-      "batch": 3,
+      "severity": "P1",
+      "batch": 2,
       "state": "open",
-      "title": "E2E 断言 H-17（P21 三端点互洽）在并发取数下不稳定：同一棵树两次跑一次红",
+      "title": "chairmanQueue 与 theater 的 L4 计数不一致（独立环境 5/5 稳定 20 vs 19）——疑似端点一致性缺陷",
       "evidence": [
         {
           "type": "log",
@@ -318,35 +323,46 @@
           "type": "code",
           "ref": "scripts/suite.ts:2620@2aae441",
           "note": "Promise.all 并发取 state/theater/chairmanQueue，断言 chairmanQueue.length == min(theater.pendingByTier.l4_chairman, 20)"
+        },
+        {
+          "type": "log",
+          "ref": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-014-h17-x5.log",
+          "note": "独立会话（无回复但留证）连续 5 轮：每轮 ✗ H-17 融合·P21 三端点互洽 —— 断言失败：L4 队列=分层计数（队列上限 20 截断口径）（期望 20，实际 19）"
+        },
+        {
+          "type": "code",
+          "ref": "apps/server/src/trpc/router.ts:3066-3070@12475b4",
+          "note": "chairmanQueue 用 approvals JOIN biz_events（e.event_id=a.event_id）取 pending L4，LIMIT 20；theater 直接 count approvals 表（router.ts:3139 附近）——JOIN 丢行会使两端口计数差 1"
         }
       ],
       "root_cause": {
-        "file": "scripts/suite.ts",
-        "line": 2620,
-        "commit": "2aae441",
-        "symbol": "H-17 计数断言"
+        "file": "apps/server/src/trpc/router.ts",
+        "line": 3066,
+        "commit": "12475b4",
+        "symbol": "chairmanQueue 查询"
       },
-      "trigger_path": "两个端点各自独立读取 pending 计数，套件在同一时刻并发请求；期间若后台节拍/前序用例产生新的 L4 审批，两端快照即错位（19 vs 18）",
+      "trigger_path": "当存在 pending L4 审批行其 event_id 在 biz_events 中缺失或跨工作区（测试造数/历史脏行）时，chairmanQueue 的 INNER JOIN 少返回 1 行，而 theater 直接 count(*) 得到 20 → 断言 20 vs 19；独立环境因前序用例造出该脏行而 5/5 稳定复现",
       "assertions": [
         {
           "kind": "sample",
-          "given": "连跑 5 次 suite",
-          "expect": "H-17 稳定绿（或断言改为容许 ±1 的时序窗口）",
-          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
-          "last_result": "fail"
+          "given": "独立环境连续 5 轮 suite",
+          "expect": "H-17 5/5 绿；若两端口确实不同源，断言应改为『差 ≤ 0 且给出丢行原因』",
+          "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep -A1 'H-17 融合'; done",
+          "last_result": "fail",
+          "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-014-h17-x5.log"
         },
         {
           "kind": "property",
-          "given": "任意并发时序",
-          "expect": "计数断言不因快照时序抖动而红",
-          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "given": "任意 pending L4 审批集合",
+          "expect": "chairmanQueue 与 theater.pendingByTier['l4_chairman'] 同源同值（或明确声明截断口径）",
+          "command": "psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select count(*) from approvals a left join biz_events e on e.event_id=a.event_id where a.status='pending' and a.tier='l4_chairman' and e.event_id is null\"",
           "last_result": "not-run"
         }
       ],
-      "notes": "1/5 观测，属 P2 稳定性问题；建议断言改为『差 ≤ 并发窗口』或串行取数对比",
+      "notes": "独立会话复验证据：H-17 在其环境 5/5 稳定红（期望 20 实际 19），修复者环境 1/5 红 → 从『偶发』升级为『数据相关的一致性缺陷』（P1）；建议按 chairmanQueue/theater 同源化或补 LEFT JOIN 口径修复",
       "regression": {
-        "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep 'H-17'; done   # 期望 5/5 绿",
-        "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+        "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep -A1 'H-17 融合'; done",
+        "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-014-h17-x5.log"
       }
     },
     {
@@ -779,7 +795,7 @@
       "severity": "P2",
       "batch": 3,
       "state": "open",
-      "title": "单元测试在开发库遗留 4 个临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
+      "title": "RUN_DB_TESTS=1 的 PG 集成测试在开发库遗留临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
       "evidence": [
         {
           "type": "db",
@@ -790,6 +806,11 @@
           "type": "log",
           "ref": "evidence/suite-after-verify1.log",
           "note": "本轮实测事故：套件按『ORDER BY id LIMIT 1』兜底解析到 ws-0i0bcu → 服务层 363/418（R/Z 域成片红），改用 is_example 优先后恢复 408/418"
+        },
+        {
+          "type": "log",
+          "ref": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-013-trigger.log",
+          "note": "独立复验定位：seed 后 / suite 后 / packages/base 单测后 工作区均只有 ws-panda；触发源是 RUN_DB_TESTS=1 的 PG 集成测试（该档留下 4 个临时工作区）"
         }
       ],
       "root_cause": {
@@ -816,7 +837,7 @@
           "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
         }
       ],
-      "notes": "套件侧已改为『演示工作区优先』（见 MC-101）；测试清理属独立排期",
+      "notes": "套件侧已改为『演示工作区优先』（见 MC-101）；测试清理属独立排期；独立复验已把触发源从『单元测试』收窄到『RUN_DB_TESTS=1 的 PG 集成档』",
       "regression": {
         "command": "pnpm test && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select id,slug from workspaces\"   # 期望无测试残留工作区",
         "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
@@ -1066,7 +1087,7 @@
       "rollback": "revert 本次提交",
       "fixed_by": "codex/root/T-2026-0929-0004",
       "verified_by": "codex/root@m6-独立环境复验(8653448)",
-      "notes": "根因在同步链路（改文件未同 PR 刷 state）；建议基座 fanout 把 state 刷新纳入同一波次（基座已有 0.1.16 波次在做同类复位）；M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）",
+      "notes": "根因在同步链路（改文件未同 PR 刷 state）；建议基座 fanout 把 state 刷新纳入同一波次（基座已有 0.1.16 波次在做同类复位）；M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）；独立会话负对照证据：outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-negctl-MC-004.log",
       "waiver": {
         "reason": "指定的独立会话 /root/m6_verifier 运行 20 分钟未产出任何命令与结论（wait_agent 超时、send_message 与 interrupt_agent 后仍无回复），无法充当验收方；改由修复者在**独立环境**（独立工作树 .wt-mcd-verify + 独立库 workloom_verify + 独立端口 8931/8932/8933 + 2 项反事实检查）复跑全部断言，独立性仅在环境层成立，角色层未分离",
         "approved_by": "待人工复核确认（人工抽查入口：scripts/suite.ts 夹具本地化 + MC-008 电商宪章阈值）",
@@ -1204,7 +1225,7 @@
       "rollback": "revert 本次提交",
       "fixed_by": "codex/root/T-2026-0929-0004",
       "verified_by": "codex/root@m6-独立环境复验(8653448)",
-      "notes": "M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）",
+      "notes": "M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）；独立会话负对照证据：outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-negctl-MC-006.log",
       "waiver": {
         "reason": "指定的独立会话 /root/m6_verifier 运行 20 分钟未产出任何命令与结论（wait_agent 超时、send_message 与 interrupt_agent 后仍无回复），无法充当验收方；改由修复者在**独立环境**（独立工作树 .wt-mcd-verify + 独立库 workloom_verify + 独立端口 8931/8932/8933 + 2 项反事实检查）复跑全部断言，独立性仅在环境层成立，角色层未分离",
         "approved_by": "待人工复核确认（人工抽查入口：scripts/suite.ts 夹具本地化 + MC-008 电商宪章阈值）",
@@ -1263,7 +1284,7 @@
       "rollback": "revert 本次提交",
       "fixed_by": "codex/root/T-2026-0929-0004",
       "verified_by": "codex/root@m6-独立环境复验(8653448)",
-      "notes": "仍留一条 P2：探测只认 /health，建议加实例身份探针；本轮未改（避免超出排雷范围）；M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）",
+      "notes": "仍留一条 P2：探测只认 /health，建议加实例身份探针；本轮未改（避免超出排雷范围）；M6：独立环境复跑通过（见 evidence/m6-independent-verification.md）；独立会话负对照证据：outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-negctl-MC-007.log",
       "waiver": {
         "reason": "指定的独立会话 /root/m6_verifier 运行 20 分钟未产出任何命令与结论（wait_agent 超时、send_message 与 interrupt_agent 后仍无回复），无法充当验收方；改由修复者在**独立环境**（独立工作树 .wt-mcd-verify + 独立库 workloom_verify + 独立端口 8931/8932/8933 + 2 项反事实检查）复跑全部断言，独立性仅在环境层成立，角色层未分离",
         "approved_by": "待人工复核确认（人工抽查入口：scripts/suite.ts 夹具本地化 + MC-008 电商宪章阈值）",
@@ -1329,7 +1350,7 @@
   ],
   "gates": [],
   "handoff": {
-    "generated_at": "2026-09-29T16:47:28.242Z",
+    "generated_at": "2026-09-29T16:58:48.170Z",
     "acceptance_command": "node scripts/acceptance/fleet-run.mjs --repo .wt-mcd-panda --env local-preview",
     "open_problem_ids": [
       "MC-008",
