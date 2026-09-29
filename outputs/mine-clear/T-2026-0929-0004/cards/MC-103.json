@@ -1,0 +1,59 @@
+{
+  "id": "MC-103",
+  "kind": "fix",
+  "batch": 1,
+  "state": "fixed",
+  "title": "行业夹具本地化：ecom 词表、岗位/技能/哨兵围栏、C 域规则口径、场景包、J/O 域巡检与多步审批",
+  "covers": [
+    "MC-001",
+    "MC-005"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:95-130@2aae441",
+      "note": "FIXTURE_SKILL=margin-guard / FIXTURE_PRICING_PRESET=temu-pricing / FIXTURE_SERVICE_PRESET=service-qc / FIXTURE_AGENT_PRESET=amz-listing / FIXTURE_SENTINEL_RULE=R4 + ecomRecallLexicon + INDUSTRY_SLUG/INDUSTRY_SCENE_ID"
+    },
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:300-360@2aae441",
+      "note": "C-02/03/04/23/24 改用 ecom 口径（R1 降价≤10% auto、R2 毛利红线 block、R9 差评 SLA review）"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "服务层 318→408（含本轮 25 条语义夹具修复）"
+    }
+  ],
+  "fix_plan": "把基座酒店口径的夹具逐条换成电商口径：词表/岗位/技能/围栏哨兵/规则断言/场景包；J 域改为断言『未装配行业适配器必须显式失败并留痕』；O-06 改为多步审批循环（每步都要人批，已批不二次挂起）",
+  "blast_radius": "改动的是套件断言口径（不是产品实现）：换行业仓运行需各自提供自己的夹具；断言强度不降（J 域从『巡检通过』改为『显式失败+留痕』，O-06 增加『至少一次人工裁决』断言）",
+  "conflict_paths": [
+    "scripts/suite.ts"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "干净库+种子",
+      "expect": "服务层 ≥408/418，失败仅剩 R 域治理口径 10 条",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意行业仓",
+      "expect": "套件用本仓 bundle 的岗位/技能/围栏/场景口径（INDUSTRY_SLUG 运行时解析）",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": ""
+}

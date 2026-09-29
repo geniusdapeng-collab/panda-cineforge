@@ -1,0 +1,56 @@
+{
+  "id": "MC-003",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P1",
+  "batch": 1,
+  "state": "fixed",
+  "title": "onboarding E2E 用例把演示工作区改名『云栖酒店』并把行业改成 hotel，且只复位 dataMode",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2535@2aae441",
+      "note": "body: { displayName: '云栖酒店', industry: 'hotel', note: 'E2E 向导验收' }；复位语句只 jsonb_set dataMode"
+    },
+    {
+      "type": "db",
+      "ref": "psql workspaces@实测",
+      "note": "跑完套件后 workspaces.industry 由 ecommerce 变 hotel、name 变『云栖酒店』；profiles.industry 同步被改"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/suite-after4.log",
+      "note": "H-15 断言失败：期望 panda-ops-center，实际 office-generic（行业=hotel → 本仓无 bundles/hotel → 场景兜底）"
+    }
+  ],
+  "root_cause": {
+    "file": "scripts/suite.ts",
+    "line": 2535,
+    "commit": "2aae441",
+    "symbol": "onboarding 经营主体写入用例"
+  },
+  "trigger_path": "onboarding.setupWorkspace 是生产接口，按设计会写 workspaces.name/industry + profiles.industry/archive.business；用例只复位了 dataMode，于是行业语义链路（数字职场场景包/行业适配器选择）在套件跑完后永久走错分支",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "运行 pnpm suite 后立刻查库",
+      "expect": "ws-panda / 熊猫优选集团 / ecommerce 保持不变",
+      "command": "psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select id,name,industry from workspaces where id='ws-panda'\"",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意行业仓运行套件",
+      "expect": "套件对演示工作区的名字/行业/档案改动在用例出口逐项还原",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "本轮修复卡：MC-102（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select name,industry from workspaces where id='ws-panda'\"",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

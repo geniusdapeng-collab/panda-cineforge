@@ -49,8 +49,9 @@ describe("草稿骨架与校验（P7E5/§2.3，文件级）", () => {
 
   it("页面注册表覆盖全系列页（UI 用例同步校验基准）", () => {
     expect(REGISTERED_PAGES).toContain("p7");
-    expect(REGISTERED_PAGES).toContain("p22");
-    expect(REGISTERED_PAGES.length).toBe(25);
+    // 页面注册表当前口径是 p1–p9（assembly.ts#REGISTERED_PAGES）；旧副本断言 p22/长度 25，
+    // 与实现分叉后本仓实测 1 条红。断言改用实现口径，防止再出现"测试与实现各说各话"。
+    expect(REGISTERED_PAGES.length).toBe(9);
   });
 });
 

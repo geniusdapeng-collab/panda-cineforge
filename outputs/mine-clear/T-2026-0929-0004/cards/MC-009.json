@@ -1,0 +1,49 @@
+{
+  "id": "MC-009",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P1",
+  "batch": 2,
+  "state": "unfixed",
+  "title": "RUN_DB_TESTS=1 时 packages/base PG 集成测试 32 条红（skill-ops/skills/inspection/im-channels/workdata/bundles/tenancy/approvals）",
+  "evidence": [
+    {
+      "type": "log",
+      "ref": "evidence/pg-integration.log",
+      "note": "RUN_DB_TESTS=1 pnpm -C packages/base test：Test Files 10 failed | 32 failed tests（skill-ops 10、skills 4、security-audit 3、inspection 3、im-channels 3、bundles 3、recall 2、memory 2、tenancy 1、approvals 1）"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/skills/skills.test.ts:1@2aae441",
+      "note": "多个文件仍 scope=ws-yunqi（skills 4 处、skill-ops 1 处、inspection 1 处、bundles 1 处）；另有一批断言依赖酒店种子快照"
+    }
+  ],
+  "root_cause": {
+    "file": "packages/base/skills/skills.test.ts",
+    "line": 1,
+    "commit": "2aae441",
+    "symbol": "PG 集成夹具"
+  },
+  "trigger_path": "CI test-gate 会带 RUN_DB_TESTS=1（allowFailure 掩盖中）；这些文件一半是本仓自有副本（extraExclude），一半是同步副本，夹具口径未随行业仓迁移",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "RUN_DB_TESTS=1 + 干净库",
+      "expect": "0 failed（先按工作区口径与行业夹具逐文件本地化）",
+      "command": "set -a && . ./.env && set +a && RUN_DB_TESTS=1 pnpm -C packages/base test",
+      "last_result": "fail"
+    },
+    {
+      "kind": "property",
+      "given": "任意仓库",
+      "expect": "PG 集成夹具从本仓种子/工作区解析取值，不写死酒店工作区",
+      "command": "RUN_DB_TESTS=1 pnpm -C packages/base test",
+      "last_result": "not-run"
+    }
+  ],
+  "notes": "未闭环：与 issue #62「存量红 103 条」同源，需按文件排期（第 2/3 批）",
+  "regression": {
+    "command": "set -a && . ./.env && set +a && RUN_DB_TESTS=1 pnpm -C packages/base test   # 期望 0 failed",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

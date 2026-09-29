@@ -1,0 +1,49 @@
+{
+  "id": "MC-012",
+  "kind": "problem",
+  "level": "L1",
+  "severity": "P2",
+  "batch": 3,
+  "state": "open",
+  "title": "电商基线多条 price.adjust 规则缺参即 fail-closed block（R14 汇率、R18 跨平台倒挂），诊断噪音大",
+  "evidence": [
+    {
+      "type": "script",
+      "ref": "evidence/fence-probe.txt",
+      "note": "evalCondition('params.age_hours >= 2', {params:{rating:2}}) → THROW『>= 期望数字，得到 undefined』；judge({object:price,action:price.adjust,params:{cost:50}}) → block，evalErrors=1，triggeredBy 含『汇率波动触发重定价（求值异常→block）/多平台价格倒挂告警（求值异常→block）』"
+    },
+    {
+      "type": "code",
+      "ref": "bundles/ecommerce/fences/ecom-baseline.yml:146,187@2aae441",
+      "note": "R14 when=abs(after.rate-before.rate)/before.rate>0.02；R18 when=params.channel_price < params.other_platform_min*0.85 —— 缺字段即求值异常"
+    }
+  ],
+  "root_cause": {
+    "file": "bundles/ecommerce/fences/ecom-baseline.yml",
+    "line": 146,
+    "commit": "2aae441",
+    "symbol": "R14/R18 when 表达式"
+  },
+  "trigger_path": "改价草稿只带 price 时，R14/R18 求值异常 → E2.1 按 block（宁可错杀）；运行时靠基座 W-01 兜底降级人工裁决（packages/runtime/src/loop.ts:398-410），但留痕/UI 显示『求值异常→block』，且直接调 judge 的调用方会拿到 block",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "judge(price.adjust 只带 params.cost)",
+      "expect": "不因缺汇率/倒挂字段出现求值异常（规则 null-safe：缺字段视为不命中）",
+      "command": "pnpm exec tsx scripts/fence-probe.mts",
+      "last_result": "fail"
+    },
+    {
+      "kind": "property",
+      "given": "任意改价草稿",
+      "expect": "缺可选字段不产生 block 级求值异常；真越线仍 block",
+      "command": "pnpm suite # C-02/R-10",
+      "last_result": "not-run"
+    }
+  ],
+  "notes": "观察项（P2）：是否把规则改 null-safe 属产品语义决策，本轮未改规则，只在套件夹具中做全量水合并在报告里标注",
+  "regression": {
+    "command": "pnpm exec tsx <探针脚本>；或直接复跑 C-02/R-10 用例   # 期望缺参不再产生 block 级求值异常",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

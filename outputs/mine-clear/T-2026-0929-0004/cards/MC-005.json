@@ -1,0 +1,66 @@
+{
+  "id": "MC-005",
+  "kind": "problem",
+  "level": "L1",
+  "severity": "P1",
+  "batch": 1,
+  "state": "fixed",
+  "title": "packages/base 四个测试文件与实现分叉：fence-engine 指向不存在的 bundles/hotel、bundles 页面注册表断言 25、recall 无词表且工作区 ws-demo、tenancy 断言英文提示",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
+      "note": "BUNDLE_YML 指向 ../../../bundles/hotel/fences/hotel-baseline.yml（本仓只有 bundles/ecommerce）→ ENOENT 整个文件红"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/bundles/bundles.test.ts:52@2aae441",
+      "note": "期望 REGISTERED_PAGES 含 p22 且 length=25；实现 assembly.ts#REGISTERED_PAGES 实为 p1–p9"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/workdata/recall.test.ts:16@2aae441",
+      "note": "scope.workspaceId='ws-demo' 且 new MockNlTranslator() 未注入行业词表"
+    },
+    {
+      "type": "code",
+      "ref": "packages/base/tenancy/tenancy.test.ts:53@2aae441",
+      "note": "断言 upgradeHint 含 'pro'/'vpc'；实现已中文化（专业版/私有部署版）"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/unit-baseline.log",
+      "note": "修复前 pnpm test：packages/base 6 failed / 641 passed，4 个文件红"
+    }
+  ],
+  "root_cause": {
+    "file": "packages/base/fence-engine/fence-engine.test.ts",
+    "line": 16,
+    "commit": "2aae441",
+    "symbol": "BUNDLE_YML"
+  },
+  "trigger_path": "四个文件都是本仓自有副本（extraExclude 或已本地化），基座重构后未跟随，断言停留在酒店口径/旧实现口径",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "修复后",
+      "expect": "packages/base 48 passed / 0 failed",
+      "command": "pnpm -C packages/base test",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意仓库运行该测试",
+      "expect": "测试断言与实现同源（bundle 路径/页面注册表/行业词表/文案口径都取本仓口径）",
+      "command": "pnpm -C packages/base test",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "本轮修复卡：MC-105（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "pnpm -C packages/base test",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

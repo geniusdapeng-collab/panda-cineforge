@@ -1,0 +1,54 @@
+{
+  "id": "MC-010",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P1",
+  "batch": 2,
+  "state": "unfixed",
+  "title": "行业语义写在公共同步路径：38 个偏离文件 + 32 个缺失文件未登记 extraExclude，下一次 full 波次会整文件覆盖",
+  "evidence": [
+    {
+      "type": "script",
+      "ref": "evidence/base-drift.txt",
+      "note": "与基座 main 逐文件比对：identical 461 / differing 38 / missing 32 / repo-excluded 18（范围 packages/base、packages/{runtime,shared,db}、apps/server/src、scripts）"
+    },
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/dialog.ts@2aae441",
+      "note": "本仓电商客服规则内联在同步文件中（190 行差异），文件不在 sync/child-repos.json#children[panda].extraExclude"
+    },
+    {
+      "type": "code",
+      "ref": "sync/base-sync.mjs:744-760,851-887@95cf8ff",
+      "note": "fileNeedsSync：child 内容 ≠ base 内容即 copy（整文件覆盖），makePlan 不查历史、不做冲突拒绝"
+    }
+  ],
+  "root_cause": {
+    "file": "sync/child-repos.json",
+    "line": 1,
+    "commit": "95cf8ff",
+    "symbol": "children[].extraExclude"
+  },
+  "trigger_path": "子仓把行业语义写在受管路径却未登记 extraExclude → 下一次 `full` 波次（code wave）会把本仓电商实现覆盖成基座通用实现（本仓 dialog/客服/服务层被抹平），属典型『联动地雷』",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "对 panda 跑 node sync/fanout-cnb.mjs --mode full --only panda-cineforge --dry-run",
+      "expect": "受保护文件清单包含本次偏离文件（或差异文件均为已登记行业资产）",
+      "command": "node sync/fanout-cnb.mjs --mode full --only panda-cineforge --dry-run",
+      "last_result": "not-run"
+    },
+    {
+      "kind": "property",
+      "given": "基座同名文件变更",
+      "expect": "本仓行业实现不被静默覆盖（extraExclude 生效）",
+      "command": "node sync/base-sync.mjs --repo workloom-ai/panda-cineforge --dry-run",
+      "last_result": "not-run"
+    }
+  ],
+  "notes": "未闭环：修复需改基座 sync/child-repos.json（治理路径，协议 §3 需人审放行）；本报告给出建议清单，不在本轮越权合并",
+  "regression": {
+    "command": "node sync/fanout-cnb.mjs --mode full --only panda-cineforge --dry-run   # 在 workloom-im 仓运行，期望偏离文件列入保护清单",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

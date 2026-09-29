@@ -1,0 +1,54 @@
+{
+  "id": "MC-014",
+  "kind": "problem",
+  "level": "L3",
+  "severity": "P2",
+  "batch": 3,
+  "state": "open",
+  "title": "E2E 断言 H-17（P21 三端点互洽）在并发取数下不稳定：同一棵树两次跑一次红",
+  "evidence": [
+    {
+      "type": "log",
+      "ref": "evidence/suite-after4.log",
+      "note": "FAIL：L4 队列=分层计数（队列上限 20 截断口径）（期望 19，实际 18）"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "同环境随后 4 次运行 H-17 全绿（1/5 观测失败）"
+    },
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2620@2aae441",
+      "note": "Promise.all 并发取 state/theater/chairmanQueue，断言 chairmanQueue.length == min(theater.pendingByTier.l4_chairman, 20)"
+    }
+  ],
+  "root_cause": {
+    "file": "scripts/suite.ts",
+    "line": 2620,
+    "commit": "2aae441",
+    "symbol": "H-17 计数断言"
+  },
+  "trigger_path": "两个端点各自独立读取 pending 计数，套件在同一时刻并发请求；期间若后台节拍/前序用例产生新的 L4 审批，两端快照即错位（19 vs 18）",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "连跑 5 次 suite",
+      "expect": "H-17 稳定绿（或断言改为容许 ±1 的时序窗口）",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "fail"
+    },
+    {
+      "kind": "property",
+      "given": "任意并发时序",
+      "expect": "计数断言不因快照时序抖动而红",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "not-run"
+    }
+  ],
+  "notes": "1/5 观测，属 P2 稳定性问题；建议断言改为『差 ≤ 并发窗口』或串行取数对比",
+  "regression": {
+    "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep 'H-17'; done   # 期望 5/5 绿",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

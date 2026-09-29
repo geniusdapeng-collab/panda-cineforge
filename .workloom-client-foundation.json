@@ -995,7 +995,7 @@
       "mode": 420
     },
     "apps/webc/src/styles/tokens.css": {
-      "sha256": "b621ef3227d7f00aa7676e844b68bc93b986953b014ecbc0118bf9f3e9cd3c59",
+      "sha256": "de2640c74725db4323c735131b7dd9a733e69adcc676c3ceb205dbbde2e53e03",
       "mode": 420
     },
     "apps/webc/tsconfig.json": {

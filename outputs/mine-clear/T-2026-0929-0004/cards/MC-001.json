@@ -1,0 +1,56 @@
+{
+  "id": "MC-001",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P1",
+  "batch": 1,
+  "state": "fixed",
+  "title": "套件工作区口径钉死基座酒店的 ws-yunqi：本仓（ws-panda）服务层 100/418 假红，FK/RLS 成片失败",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:52@2aae441",
+      "note": "const scope = { tenantId: 'tenant-demo', workspaceId: 'ws-yunqi' }"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/suite-baseline.log",
+      "note": "修复前 pnpm suite 服务层 318/418：48 条 *_workspace_id_fkey（threads/night_runs/triggers/agents/skill_dist_*）、22 条 Cannot read properties of undefined (reading 'archive')、6 条 im_openids 未映射、5 条 reading 'id'、池健康/注入/巡检等断言"
+    },
+    {
+      "type": "db",
+      "ref": "psql workspaces@2aae441",
+      "note": "种子后库里只有 ws-panda（slug=panda-group，industry=ecommerce）"
+    }
+  ],
+  "root_cause": {
+    "file": "scripts/suite.ts",
+    "line": 52,
+    "commit": "2aae441",
+    "symbol": "scope"
+  },
+  "trigger_path": "本仓演示工作区是 ws-panda；套件所有写路径（threads/night_runs/triggers/agents/skill_installs/skill_dist_*）都带 ws-yunqi → 外键/RLS 全拒；profiles 查询取不到行 → R 域读到 undefined",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "干净库 + 迁移 + 种子后运行 pnpm suite",
+      "expect": "服务层用例 ≥408/418，失败仅剩 R 域 10 条",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "换到任意行业仓（演示工作区 slug 不同）",
+      "expect": "套件运行时解析本仓演示工作区（is_example=true），不钉死 slug",
+      "command": "node -e \"import('./scripts/suite.ts')\" # 或直接看 suite 首段解析日志",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "上一轮 issue #62 已把它记为『存量红 103 条』并与本仓基座修复解耦；本轮定位为单一根因（工作区口径）；本轮修复卡：MC-101/MC-103（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

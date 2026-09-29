@@ -10,16 +10,36 @@ import {
   NL_TRANSLATE_TIMEOUT_MS,
   type EventFilter,
   type NlTranslator,
+  type NlTranslatorLexicon,
 } from "./recall.js";
 
-const scope = { tenantId: "tenant-demo", workspaceId: "ws-demo" };
+const scope = { tenantId: "tenant-demo", workspaceId: "ws-panda" };
+
+/**
+ * 行业检索词表（本仓=电商）：MockNlTranslator 的行业语义由各仓注入——
+ * 基座用 hotelLexicon，本仓用 ecomLexicon；旧副本既未注入词表、工作区又写成 ws-demo，
+ * 于是「差评/R2/退款」三条直译断言全 undefined（本仓实测 3 条红）。
+ */
+const ecomLexicon: NlTranslatorLexicon = {
+  objects: [
+    { terms: ["差评", "评价", "评分"], value: "review" },
+    { terms: ["价格", "调价", "售价", "降价"], value: "price" },
+    { terms: ["订单", "退款", "对账", "售后"], value: "order" },
+  ],
+  actions: [
+    { terms: ["退款"], value: "order.refund" },
+    { terms: ["调价", "改价", "降价"], value: "price.adjust" },
+    { terms: ["回复"], value: "review.reply" },
+  ],
+  ruleIds: ["R1", "R2", "R3", "R4", "R5", "R6"],
+};
 
 describe("buildWhere（结构化过滤）", () => {
   it("强制租户+工作区范围（越权返回空的第一道）", () => {
     const { sql, params } = buildWhere({}, scope);
     expect(sql).toContain("tenant_id = $1");
     expect(sql).toContain("workspace_id = $2");
-    expect(params).toEqual(["tenant-demo", "ws-demo"]);
+    expect(params).toEqual(["tenant-demo", "ws-panda"]);
   });
 
   it("对象/动作/规则结果组合过滤，全参数化", () => {
@@ -29,7 +49,7 @@ describe("buildWhere（结构化过滤）", () => {
     );
     expect(sql).toContain("payload->'object'->>'type' = $3");
     expect(sql).toContain("@>");
-    expect(params).toEqual(["tenant-demo", "ws-demo", "review", "review.reply", "review"]);
+    expect(params).toEqual(["tenant-demo", "ws-panda", "review", "review.reply", "review"]);
   });
 
   it("非法字符直接拒绝（防注入底线）", () => {
@@ -43,7 +63,7 @@ describe("buildWhere（结构化过滤）", () => {
 });
 
 describe("MockNlTranslator（D4 无 Key 演示）", () => {
-  const t = new MockNlTranslator();
+  const t = new MockNlTranslator(ecomLexicon);
 
   it("「昨天的差评」→ review + 昨日时间窗", async () => {
     const f = await t.translate("昨天的差评有哪些", scope);

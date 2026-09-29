@@ -1,0 +1,59 @@
+{
+  "id": "MC-102",
+  "kind": "fix",
+  "batch": 0,
+  "state": "fixed",
+  "title": "套件端口可配 + 停止把演示工作区改写成酒店（fixture 本地化）",
+  "covers": [
+    "MC-002",
+    "MC-003"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2422@2aae441",
+      "note": "STUB_PORT 读 SUITE_STUB_PORT"
+    },
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2534-2580@2aae441",
+      "note": "onboarding 用例：先抓 workspaces.name/industry 与 profiles.archive.business，finally 逐项还原"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "跑完套件后库内仍是 ws-panda/熊猫优选集团/ecommerce；H-15 场景 panda-ops-center 转绿"
+    }
+  ],
+  "fix_plan": "① STUB_PORT = Number(env.SUITE_STUB_PORT ?? '8791')；② onboarding 用例写入本仓真实名字/行业，出口还原 name/industry/archive.business/dataMode",
+  "blast_radius": "该用例原本会在套件结束后留下 hotel 行业的演示工作区；改为还原后，依赖行业的端到端走查（数字职场/行业适配器）不再被套件污染",
+  "conflict_paths": [
+    "scripts/suite.ts"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "跑完 pnpm suite",
+      "expect": "select industry from workspaces where id='ws-panda' → ecommerce",
+      "command": "psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select name,industry from workspaces where id='ws-panda'\"",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意行业仓",
+      "expect": "套件不改演示工作区的行业/名字（出口还原）",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": ""
+}

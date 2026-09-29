@@ -10,7 +10,13 @@ import { fileURLToPath } from "node:url";
 import { SignJWT } from "jose";
 import pg from "pg";
 
-const PORT = 8795;
+/**
+ * 端口可配（2026-09-29 排雷 T-2026-0929-0004）：并行会话/本机其它服务常占 8795，
+ * 旧实现钉死端口且只探测 /health——健康检查会命中**别人的服务**，随后 loginAs 报
+ * "工作区 panda-group 不存在"，整个 E2E 套件（96 条）在 beforeAll 就整段失败。
+ * 约定：E2E_SERVER_PORT 覆盖端口；探测时要求服务自称本套件身份（见 /health 探针）。
+ */
+const PORT = Number(process.env.E2E_SERVER_PORT ?? "8795");
 const BASE = `http://localhost:${PORT}`;
 const ROOT = fileURLToPath(new URL("../../../../", import.meta.url));
 const RUN = `e2e-${Date.now().toString(36)}`;

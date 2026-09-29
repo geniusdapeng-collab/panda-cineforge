@@ -1,0 +1,53 @@
+{
+  "id": "MC-104",
+  "kind": "fix",
+  "batch": 0,
+  "state": "fixed",
+  "title": "复位客户端基座受管文件指纹（tokens.css），解除 static-gate 恒红",
+  "covers": [
+    "MC-004"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": ".workloom-client-foundation.json:997-1000@2aae441",
+      "note": "sha256 → de2640c74725db4323c735131b7dd9a733e69adcc676c3ceb205dbbde2e53e03（与工作树文件及基座 main 一致）"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "✅ 受管文件指纹零漂移（修复前 ❌ 漂移：apps/webc/src/styles/tokens.css）"
+    }
+  ],
+  "fix_plan": "把 state 中该文件的 sha256 更新为工作树实际内容摘要（内容本身已是基座 T-2026-0929-0100 修复版，无需改文件）",
+  "blast_radius": "该门禁是三端客户端基座自包含校验的唯一闸口；摘要刷新后，0.1.16 波次到来时会由 rollout 重写（届时以 rollout 结果为准）",
+  "conflict_paths": [
+    ".workloom-client-foundation.json"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "main 工作树",
+      "expect": "指纹零漂移 exit 0",
+      "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "有人改动受管文件而不刷 state",
+      "expect": "门禁判红（防漂移能力未被削弱）",
+      "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "regression": {
+    "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": "根因在同步链路（改文件未同 PR 刷 state）；建议基座 fanout 把 state 刷新纳入同一波次（基座已有 0.1.16 波次在做同类复位）"
+}

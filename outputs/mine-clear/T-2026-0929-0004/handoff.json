@@ -1,0 +1,312 @@
+{
+  "schema": "workloom.mine-clear/handoff@1",
+  "task_id": "T-2026-0929-0004",
+  "repo": ".wt-mcd-panda",
+  "generated_at": "2026-09-29T16:07:26.470Z",
+  "audit_baseline": "2aae4417a72934e0d6afdcffe1a17f3b1f559c1c",
+  "repair_baseline": null,
+  "acceptance_baseline": null,
+  "environment_claim": "local-preview",
+  "invariants": [
+    {
+      "id": "INV-1",
+      "text": "租户边界覆盖数据库 RLS、运行时上下文、事件、缓存和外部连接器。",
+      "source": "AGENTS.md#4.1"
+    },
+    {
+      "id": "INV-2",
+      "text": "经营事件、审批和关键回执只增不改；纠正通过新事件表达，不静默覆盖证据。",
+      "source": "AGENTS.md#4.2"
+    },
+    {
+      "id": "INV-3",
+      "text": "所有外部或变更性动作及其子调用，统一经过权限、PII、围栏和审批链路。",
+      "source": "AGENTS.md#4.3"
+    },
+    {
+      "id": "INV-4",
+      "text": "涉钱、敏感数据、群发、公开发布、交易和破坏性变更必须按高风险处理并由人审批。",
+      "source": "AGENTS.md#4.4"
+    },
+    {
+      "id": "INV-5",
+      "text": "没有真实回执就不能标记完成；mock、模拟和体验模式在数据结构与界面上都要明确区分。",
+      "source": "AGENTS.md#4.5"
+    },
+    {
+      "id": "INV-6",
+      "text": "客户原始经营数据不得上行；蜂群只接受白名单化、最小化、匿名化且可审计的元数据或派生经验。",
+      "source": "AGENTS.md#4.6"
+    },
+    {
+      "id": "INV-7",
+      "text": "租户覆盖层只能收紧围栏，不能放宽平台不可变红线。",
+      "source": "AGENTS.md#4.7"
+    },
+    {
+      "id": "INV-8",
+      "text": "模型、提示词、技能、bundle、策略和热更新必须先评测再灰度，且始终可回滚。",
+      "source": "AGENTS.md#4.8"
+    },
+    {
+      "id": "INV-9",
+      "text": "platform-ops、平台账户运营和平台秘密只属于 Andromeda。",
+      "source": "AGENTS.md#4.9"
+    },
+    {
+      "id": "INV-10",
+      "text": "Tiger 在获得单独的合规审查和用户明确授权前，只能模拟或纸面交易。",
+      "source": "AGENTS.md#4.10"
+    },
+    {
+      "id": "INV-11",
+      "text": "令牌、密码、API key、私钥、客户凭证和私密客户数据不得进入源码、文档、上下文、提示词、日志或提交。",
+      "source": "AGENTS.md#4.11"
+    },
+    {
+      "id": "INV-12",
+      "text": "个性化与行业扩展不得形成公共机制的第二事实源。",
+      "source": "AGENTS.md#4.12"
+    }
+  ],
+  "closed_problems": [],
+  "open_problems": [
+    {
+      "id": "MC-008",
+      "kind": "problem",
+      "state": "open",
+      "severity": "P1",
+      "title": "R 域 10 条治理/宪章用例仍红：酒店宪章阈值/KPI 口径（basePrice 458→600、procurement 2500、入住率类 KPI）与电商宪章不匹配",
+      "evidence": "scripts/suite.ts:2700-3100@2aae441",
+      "root_cause": "scripts/suite.ts:2700@2aae441",
+      "fix_plan": null,
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite   # 期望失败清单只剩 R 域 10 条，改夹具后逐条转绿"
+    },
+    {
+      "id": "MC-009",
+      "kind": "problem",
+      "state": "unfixed",
+      "severity": "P1",
+      "title": "RUN_DB_TESTS=1 时 packages/base PG 集成测试 32 条红（skill-ops/skills/inspection/im-channels/workdata/bundles/tenancy/approvals）",
+      "evidence": "evidence/pg-integration.log",
+      "root_cause": "packages/base/skills/skills.test.ts:1@2aae441",
+      "fix_plan": null,
+      "regression": "set -a && . ./.env && set +a && RUN_DB_TESTS=1 pnpm -C packages/base test   # 期望 0 failed"
+    },
+    {
+      "id": "MC-011",
+      "kind": "problem",
+      "state": "unfixed",
+      "severity": "P1",
+      "title": "apps/server 鉴权/权限边界 4 条红：H5 入口凭据校验返回 403 而非 401、scope 不一致未在查库前失败关闭；devtools 路由用 protectedProcedure 而非已验行业权限守卫",
+      "evidence": "apps/server/src/service/h5-session-auth.test.ts@2aae441",
+      "root_cause": "apps/server/src/service/h5-session-auth.test.ts:1@2aae441",
+      "fix_plan": null,
+      "regression": "pnpm -C apps/server exec vitest run src/service/h5-session-auth.test.ts src/service/router-governance.test.ts   # 期望 0 failed"
+    },
+    {
+      "id": "MC-012",
+      "kind": "problem",
+      "state": "open",
+      "severity": "P2",
+      "title": "电商基线多条 price.adjust 规则缺参即 fail-closed block（R14 汇率、R18 跨平台倒挂），诊断噪音大",
+      "evidence": "evidence/fence-probe.txt",
+      "root_cause": "bundles/ecommerce/fences/ecom-baseline.yml:146@2aae441",
+      "fix_plan": null,
+      "regression": "pnpm exec tsx <探针脚本>；或直接复跑 C-02/R-10 用例   # 期望缺参不再产生 block 级求值异常"
+    },
+    {
+      "id": "MC-014",
+      "kind": "problem",
+      "state": "open",
+      "severity": "P2",
+      "title": "E2E 断言 H-17（P21 三端点互洽）在并发取数下不稳定：同一棵树两次跑一次红",
+      "evidence": "evidence/suite-after4.log",
+      "root_cause": "scripts/suite.ts:2620@2aae441",
+      "fix_plan": null,
+      "regression": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep 'H-17'; done   # 期望 5/5 绿"
+    },
+    {
+      "id": "MC-001",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P1",
+      "title": "套件工作区口径钉死基座酒店的 ws-yunqi：本仓（ws-panda）服务层 100/418 假红，FK/RLS 成片失败",
+      "evidence": "scripts/suite.ts:52@2aae441",
+      "root_cause": "scripts/suite.ts:52@2aae441",
+      "fix_plan": null,
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
+    },
+    {
+      "id": "MC-002",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P1",
+      "title": "HTTP E2E 段登录钉死 yunqi-hotel + 模型 stub 端口硬编码 8791：整个 E2E 段在登录处崩掉（44 条不可跑）",
+      "evidence": "scripts/suite.ts:2251@2aae441",
+      "root_cause": "scripts/suite.ts:2251@2aae441",
+      "fix_plan": null,
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
+    },
+    {
+      "id": "MC-003",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P1",
+      "title": "onboarding E2E 用例把演示工作区改名『云栖酒店』并把行业改成 hotel，且只复位 dataMode",
+      "evidence": "scripts/suite.ts:2535@2aae441",
+      "root_cause": "scripts/suite.ts:2535@2aae441",
+      "fix_plan": null,
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select name,industry from workspaces where id='ws-panda'\""
+    },
+    {
+      "id": "MC-004",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P0",
+      "title": "必需门禁 verify-client-foundation-consumer 在 main 上判红（受管客户端文件指纹漂移）",
+      "evidence": ".workloom-client-foundation.json:997-1000@2aae441",
+      "root_cause": ".workloom-client-foundation.json:997@2aae441",
+      "fix_plan": null,
+      "regression": "node scripts/verify-client-foundation-consumer.mjs --repo ."
+    },
+    {
+      "id": "MC-005",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P1",
+      "title": "packages/base 四个测试文件与实现分叉：fence-engine 指向不存在的 bundles/hotel、bundles 页面注册表断言 25、recall 无词表且工作区 ws-demo、tenancy 断言英文提示",
+      "evidence": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
+      "root_cause": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
+      "fix_plan": null,
+      "regression": "pnpm -C packages/base test"
+    },
+    {
+      "id": "MC-006",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P1",
+      "title": "客服意图路由：明确的订单/会员查询与维修类售后指令被误判为知识问答（kb_qa）",
+      "evidence": "apps/server/src/service/dialog.ts:63-80@2aae441",
+      "root_cause": "apps/server/src/service/dialog.ts:63@2aae441",
+      "fix_plan": null,
+      "regression": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts"
+    },
+    {
+      "id": "MC-007",
+      "kind": "problem",
+      "state": "fixed",
+      "severity": "P1",
+      "title": "apps/server HTTP E2E 端口钉死 8795：健康检查命中他人服务 → 96 条 E2E 整段失败/跳过",
+      "evidence": "apps/server/src/service/e2e.test.ts:13@2aae441",
+      "root_cause": "apps/server/src/service/e2e.test.ts:13@2aae441",
+      "fix_plan": null,
+      "regression": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts"
+    },
+    {
+      "id": "MC-013",
+      "kind": "problem",
+      "state": "open",
+      "severity": "P2",
+      "title": "单元测试在开发库遗留 4 个临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
+      "evidence": "psql workspaces@实测",
+      "root_cause": "apps/server/src/service/accounts-router.ts:1@2aae441",
+      "fix_plan": null,
+      "regression": "pnpm test && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select id,slug from workspaces\"   # 期望无测试残留工作区"
+    },
+    {
+      "id": "MC-101",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "套件运行时解析本仓演示工作区与 slug（workspace + name/slug 一次解析）",
+      "evidence": "scripts/suite.ts:52-90@2aae441",
+      "root_cause": null,
+      "fix_plan": "把 `const scope = { ws-yunqi }` 换成顶层 await 解析本仓工作区（owner 连接、RLS 前置）；login() 改用 WORKSPACE.slug；Z 域 zScope 收敛为 scope 别名",
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
+    },
+    {
+      "id": "MC-102",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "套件端口可配 + 停止把演示工作区改写成酒店（fixture 本地化）",
+      "evidence": "scripts/suite.ts:2422@2aae441",
+      "root_cause": null,
+      "fix_plan": "① STUB_PORT = Number(env.SUITE_STUB_PORT ?? '8791')；② onboarding 用例写入本仓真实名字/行业，出口还原 name/industry/archive.business/dataMode",
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
+    },
+    {
+      "id": "MC-103",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "行业夹具本地化：ecom 词表、岗位/技能/哨兵围栏、C 域规则口径、场景包、J/O 域巡检与多步审批",
+      "evidence": "scripts/suite.ts:95-130@2aae441",
+      "root_cause": null,
+      "fix_plan": "把基座酒店口径的夹具逐条换成电商口径：词表/岗位/技能/围栏哨兵/规则断言/场景包；J 域改为断言『未装配行业适配器必须显式失败并留痕』；O-06 改为多步审批循环（每步都要人批，已批不二次挂起）",
+      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
+    },
+    {
+      "id": "MC-104",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "复位客户端基座受管文件指纹（tokens.css），解除 static-gate 恒红",
+      "evidence": ".workloom-client-foundation.json:997-1000@2aae441",
+      "root_cause": null,
+      "fix_plan": "把 state 中该文件的 sha256 更新为工作树实际内容摘要（内容本身已是基座 T-2026-0929-0100 修复版，无需改文件）",
+      "regression": "node scripts/verify-client-foundation-consumer.mjs --repo ."
+    },
+    {
+      "id": "MC-105",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "四个 packages/base 测试文件随本仓口径本地化",
+      "evidence": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
+      "root_cause": null,
+      "fix_plan": "四个文件的路径/数值/词表/文案断言全部改成本仓口径；不改产品实现",
+      "regression": "pnpm -C packages/base test"
+    },
+    {
+      "id": "MC-106",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "客服意图路由：行业直连查询前置 + 售后指令疑问句判定",
+      "evidence": "apps/server/src/service/dialog.ts:55-95@2aae441",
+      "root_cause": null,
+      "fix_plan": "classify() 顺序调整：① 工单/目录/订单/会员直连查询先行 ② 售后动作词命中时，疑问句→kb_qa、指令句→service_request ③ 其余沿用规则表",
+      "regression": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts"
+    },
+    {
+      "id": "MC-107",
+      "kind": "fix",
+      "state": "fixed",
+      "severity": null,
+      "title": "apps/server E2E 端口可配（解除 96 条 E2E 误连他人服务）",
+      "evidence": "apps/server/src/service/e2e.test.ts:13-20@2aae441",
+      "root_cause": null,
+      "fix_plan": "端口改为环境变量可覆盖；默认值不变（8795），CI 单实例行为不变",
+      "regression": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts"
+    },
+    {
+      "id": "MC-010",
+      "kind": "problem",
+      "state": "unfixed",
+      "severity": "P1",
+      "title": "行业语义写在公共同步路径：38 个偏离文件 + 32 个缺失文件未登记 extraExclude，下一次 full 波次会整文件覆盖",
+      "evidence": "evidence/base-drift.txt",
+      "root_cause": "sync/child-repos.json:1@95cf8ff",
+      "fix_plan": null,
+      "regression": "node sync/fanout-cnb.mjs --mode full --only panda-cineforge --dry-run   # 在 workloom-im 仓运行，期望偏离文件列入保护清单"
+    }
+  ],
+  "acceptance_commands": [
+    "pnpm acceptance:profile:check",
+    "node scripts/acceptance/fleet-run.mjs --repo .wt-mcd-panda --env local-preview",
+    "node scripts/acceptance/fleet-run.mjs --repo .wt-mcd-panda --env local-preview --live-only   # 生产最小侵入档"
+  ],
+  "notes": "环境档位为 local-preview：报告只能写『本机预览结构验收』，不得写『生产实测通过』（RDAS v3.1 §0）"
+}

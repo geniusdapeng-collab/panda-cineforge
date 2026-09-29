@@ -9,7 +9,7 @@
  *      复用种子，业务数据不依赖种子行、不跨用例污染；失败不中断，末尾汇总报告。
  */
 import { spawn, type ChildProcess } from "node:child_process";
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import pg from "pg";
 import { routeIntent, ruleBasedRoute, LlmIntentClassifier, registerAskKbSearch, runAsk, type IntentClassifier } from "@workloom/runtime";
@@ -17,7 +17,7 @@ import { runQuest } from "@workloom/runtime";
 import {
   gatewayAppend, gatewayAppendIdempotent, checkPermission, isWriteAction,
   maskText, maskDeep, canonicalJson, eventHash, GENESIS_HASH,
-  searchEvents, MockNlTranslator, nlSearchEvents,
+  searchEvents, MockNlTranslator, nlSearchEvents, type NlTranslatorLexicon,
   upsertMemory, searchMemories, getMemorySources, transitionMemory, recordMemoryUsage, MockEmbedder,
   insertWithReadableId, THREAD_ID_SOURCE,
 } from "@workloom/base/workdata";
@@ -49,7 +49,109 @@ const APP_URL = process.env.DATABASE_APP_URL ?? "postgres://workloom_app:workloo
 const GW_URL = process.env.DATABASE_GATEWAY_URL ?? "postgres://workloom_gateway:workloom_dev_gateway@localhost:5432/workloom";
 const app = new pg.Pool({ connectionString: APP_URL, max: 40 });
 const gw = new pg.Pool({ connectionString: GW_URL, max: 25 });
-const scope = { tenantId: "tenant-demo", workspaceId: "ws-yunqi" };
+
+/**
+ * 工作区口径（跨仓可移植，2026-09-29 排雷 T-2026-0929-0004 修复）：
+ * 各行业仓的演示工作区不同（hotel/eagle/hyperreality=ws-yunqi / panda=ws-panda / …），
+ * 套件必须在**运行时解析本仓真实工作区**，不能钉死某个 slug——否则换仓即因外键与 RLS 全红
+ * （panda 实测：threads/night_runs/triggers/agents/skill_dist_*_workspace_id_fkey ×48、
+ * profiles.archive undefined ×22、members.im_openids 映射 ×6，共 100/418 假红）。
+ * 解析顺序：① 本仓配置的 slug（存在即用）→ ② 演示工作区（is_example=true，种子里就是它）
+ *           → ③ 任一工作区兜底；无 DATABASE_URL 时退回基座口径。
+ * ② 不能省：单元测试会往同一个开发库塞临时工作区（实测 4 个 ws-xxx「云栖一号店/二号店」），
+ * 若按 id 取"第一个"，套件会解析到测试遗留工作区——数据全空，R/Z 域成片红（2026-09-29 实测）。
+ */
+const WORKSPACE = await (async () => {
+  // slug 也要一起解析：HTTP E2E 段的 auth.loginAs 需要本仓真实工作区 slug（panda-group），
+  // 不能钉基座的 yunqi-hotel——否则整个 E2E 段在登录处就断言失败、套件直接崩掉（2026-09-29 实测）。
+  const fallback = { tenantId: "tenant-demo", workspaceId: "ws-yunqi", slug: "yunqi-hotel" };
+  const ownerUrl = process.env.DATABASE_URL;
+  if (!ownerUrl) return fallback;
+  const client = new pg.Client({ connectionString: ownerUrl });
+  await client.connect();
+  try {
+    // 必须用 owner 连接：RLS 下 suite 自己的 scope 在本仓可能根本不存在
+    const prefer = await client.query<{ id: string; tenant_id: string; slug: string }>(
+      `SELECT id, tenant_id, slug FROM workspaces WHERE id=$1`, [fallback.workspaceId]);
+    if (prefer.rows[0]) return { tenantId: prefer.rows[0].tenant_id, workspaceId: prefer.rows[0].id, slug: prefer.rows[0].slug };
+    const demo = await client.query<{ id: string; tenant_id: string; slug: string }>(
+      `SELECT id, tenant_id, slug FROM workspaces WHERE is_example = true ORDER BY id LIMIT 1`);
+    if (demo.rows[0]) return { tenantId: demo.rows[0].tenant_id, workspaceId: demo.rows[0].id, slug: demo.rows[0].slug };
+    const any = await client.query<{ id: string; tenant_id: string; slug: string }>(
+      `SELECT id, tenant_id, slug FROM workspaces ORDER BY id LIMIT 1`);
+    assert(any.rows[0], "本仓至少应有一个工作区（种子未跑？先 pnpm db:seed）");
+    return { tenantId: any.rows[0]!.tenant_id, workspaceId: any.rows[0]!.id, slug: any.rows[0]!.slug };
+  } finally {
+    await client.end();
+  }
+})();
+const scope = { tenantId: WORKSPACE.tenantId, workspaceId: WORKSPACE.workspaceId };
+
+/**
+ * 行业检索词表（本仓=电商）：MockNlTranslator 的行业语义由各仓注入——
+ * 基座 suite 用 hotelRecallLexicon，本仓用 ecomRecallLexicon；生产 runtime 只消费活动 Bundle 的装配声明。
+ */
+const ecomRecallLexicon: NlTranslatorLexicon = {
+  objects: [
+    { terms: ["差评", "评价", "评分"], value: "review" },
+    { terms: ["价格", "调价", "售价", "降价"], value: "price" },
+    { terms: ["订单", "退款", "对账", "售后"], value: "order" },
+  ],
+  actions: [
+    { terms: ["退款"], value: "order.refund" },
+    { terms: ["调价", "改价", "降价"], value: "price.adjust" },
+    { terms: ["回复"], value: "review.reply" },
+  ],
+  ruleIds: ["R1", "R2", "R3", "R4", "R5", "R6"],
+};
+
+/**
+ * 本仓行业标识与场景包：bundles/<slug>/ 是本仓唯一行业包目录，
+ * floor 场景（bundles/<slug>/floor-scene.json）与行业语义用例都按它取口径，
+ * 不再钉基座的 "hotel"（那会让本仓用例断言一个本仓不存在的场景）。
+ */
+const INDUSTRY_SLUG = readdirSync(new URL("../bundles/", import.meta.url), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
+  .map((entry) => entry.name)[0] ?? "ecommerce";
+const INDUSTRY_SCENE_ID = (JSON.parse(
+  readFileSync(new URL(`../bundles/${INDUSTRY_SLUG}/floor-scene.json`, import.meta.url), "utf8"),
+) as { id: string }).id;
+
+/**
+ * 本仓夹具口径（基座酒店 fixture → 电商）：只替换"本仓 bundle 里不存在的酒店岗位/技能名"，
+ * 断言口径不变（安装幂等 / 绑定快照 / 并集收缩 / Quest 闭环）。
+ *  - 官方技能 margin-guard（绑定 R1/R2/R30）替代 hotel revenue-manager
+ *  - 岗位 temu-pricing（Temu核价运营，R2/R14/R16/R18）替代 hotel pricing-agent
+ *  - 岗位 service-qc（客服质检官，R9/R12/R26）替代 hotel review-agent
+ *  - 岗位 amz-listing（亚马逊Listing优化师，R8/R11/R16/R24）替代 hotel content-agent
+ */
+const FIXTURE_SKILL = "margin-guard";
+const FIXTURE_PRICING_PRESET = "temu-pricing";
+const FIXTURE_SERVICE_PRESET = "service-qc";
+const FIXTURE_AGENT_PRESET = "amz-listing";
+/** 哨兵围栏：必须是真实规则且种子安装行未持有（本仓种子快照为 R1R2R30 / R3 / []） */
+const FIXTURE_SENTINEL_RULE = "R4";
+
+/**
+ * 电商改价探针（C 域用）：本仓基线的 price.adjust 规则有多条（R1/R2/R8/R13/R14/R15/R17/R18），
+ * 每条都吃 before/after/params/context 的不同字段；缺字段会被 E2.1 判成"求值异常→block"
+ * （实测：R14 汇率、R18 跨平台倒挂都会因缺参误报熔断）。这里做**全量水合**，只留被测字段可变，
+ * 断言口径仍是不变量本身：小幅降价 auto、破毛利红线 block、deny 优先并集。
+ */
+function priceProbe(over: {
+  before?: number; after?: number; cost?: number;
+  rate?: number; afterRate?: number; channelPrice?: number; otherMin?: number;
+  context?: Record<string, unknown>; params?: Record<string, unknown>;
+} = {}) {
+  return {
+    object: { type: "price", id: "SKU-DEMO-01" },
+    action: "price.adjust",
+    before: { price: over.before ?? 100, rate: over.rate ?? 7.1 },
+    after: { price: over.after ?? 100, rate: over.afterRate ?? over.rate ?? 7.1 },
+    context: { shop_new: false, platform_new: false, price_protect_period: false, night_shift: false, ...over.context },
+    params: { cost: over.cost ?? 50, vat_changed: false, duty_changed: false, channel_price: over.channelPrice ?? 110, other_platform_min: over.otherMin ?? 120, ...over.params },
+  };
+}
 
 interface Case { id: string; name: string; run: () => Promise<void> | void }
 const cases: Case[] = [];
@@ -300,20 +402,24 @@ c("种子基线规则装载 ≥6 条且含 R1-R6", async () => {
   assert(rules.length >= 6, `装载 ${rules.length} 条`);
   for (const id of ["R1", "R2", "R3", "R4", "R5", "R6"]) assert(rules.some((r) => r.rule_id === id), `缺 ${id}`);
 });
-c("R1 涨幅 ≤8% → auto", async () => {
+// 行业口径（本仓=电商 R1/R2/R9，替代基座酒店 R1/R2/R6）：
+//   R1 单品单日降价 ≤10% → auto；R2 售价 < 成本×1.15 → block；R9 差评 2 小时 SLA → review。
+// 探针必须带 params.cost：R2 的 when 引用 `params.cost * 1.15`，缺参会按求值异常→block（E2.1 fail-closed），
+//   那是"缺参"语义（Z-03 已用运行时降级口径覆盖），不是本用例要测的"未破红线"语义。
+c("R1 降价 ≤10% → auto", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "room_price", id: "RT-DLX-KING" }, action: "price.adjust", before: { price: 458 }, after: { price: 468 }, context: { channel_new: false } }, rules, "review");
+  const v = judge(priceProbe({ after: 95 }), rules, "review");
   eq(v.level, "auto", `判定（${v.triggeredBy.join("/")}）`);
 });
-c("R2 破保底价 ¥380 → block 熔断", async () => {
+c("R2 破毛利红线（售价 < 成本×1.15）→ block 熔断", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "room_price" }, action: "price.adjust", before: { price: 458 }, after: { price: 350 }, context: { channel_new: false } }, rules, "review");
-  eq(v.level, "block", "破保底必熔断");
+  const v = judge(priceProbe({ before: 100, after: 50, cost: 50 }), rules, "review");
+  eq(v.level, "block", "破毛利红线必熔断");
 });
-c("R6 差评回复 → review 挂起", async () => {
+c("R9 差评 2 小时 SLA 未回复 → review 挂起", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "review" }, action: "review.reply", params: { rating: 2 } }, rules, "review");
-  eq(v.level, "review", "差评回复必审");
+  const v = judge({ object: { type: "review" }, action: "review.reply", params: { rating: 2, age_hours: 3, replied: false } }, rules, "review");
+  eq(v.level, "review", "差评超时未回复必审");
 });
 c("读类动作无命中恒 auto（不进 default_level）", async () => {
   const rules = await activeRules();
@@ -387,13 +493,13 @@ c("默认档 defaultLevel=block 写类无命中熔断", () => {
 });
 c("判定结果 impacts 只含命中规则", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "room_price" }, action: "price.adjust", before: { price: 458 }, after: { price: 459 }, context: { channel_new: false } }, rules, "review");
+  const v = judge(priceProbe({ after: 99 }), rules, "review");
   assert(v.impacts.length >= 1 && v.impacts.length < rules.length, "impacts 为命中子集");
 });
-c("基线 R2 与 R1 并集：涨幅 2% 但破保底 → block", async () => {
+c("基线 R2 与 R1 并集：降价 2% 但破毛利红线 → block", async () => {
   const rules = await activeRules();
-  const v = judge({ object: { type: "room_price" }, action: "price.adjust", before: { price: 385 }, after: { price: 370 }, context: { channel_new: false } }, rules, "review");
-  eq(v.level, "block", "保底价优先");
+  const v = judge(priceProbe({ before: 100, after: 98, cost: 100 }), rules, "review");
+  eq(v.level, "block", "毛利红线优先");
 });
 c("多对象类型规则不匹配对象跳过", () => {
   const v = judge({ object: { type: "channel" }, action: "price.adjust" }, [{ rule_id: "X", version: "v1", name: "x", level: "block", is_baseline: false, objectTypes: ["room_price"], actions: ["price.adjust"], when: "true" }], "auto");
@@ -479,7 +585,7 @@ d("检索：limit 上限截断 200", async () => {
   assert(page.events.length <= 200, "limit 封顶");
 });
 d("NL 检索：Mock 翻译器结构化", async () => {
-  const r = await nlSearchEvents(app, scope, "夜班被熔断的调价", new MockNlTranslator());
+  const r = await nlSearchEvents(app, scope, "夜班被熔断的调价", new MockNlTranslator(ecomRecallLexicon));
   eq(r.degraded, false, "不降级");
   eq(r.filter?.ruleResult, "blocked", "NL 翻译熔断");
 });
@@ -490,7 +596,7 @@ d("NL 检索：翻译超时降级不伪造结果", async () => {
   eq(r.page, null, "不伪造");
 });
 d("NL 翻译器规则直译 R2", async () => {
-  const f = await new MockNlTranslator().translate("R2 的熔断记录", scope);
+  const f = await new MockNlTranslator(ecomRecallLexicon).translate("R2 的熔断记录", scope);
   eq(f.ruleId, "R2", "R 编号直译");
 });
 d("事件五元 zod 完整（附录 E 回读）", async () => {
@@ -1100,23 +1206,23 @@ h("dry-run 预览 → 安装放行", async () => {
   await qApp(`DELETE FROM skills WHERE id=$1`, [d.skillId]);
 });
 h("重复安装幂等 deduped", async () => {
-  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === "revenue-manager")!;
+  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === FIXTURE_SKILL)!;
   await uninstallSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" }).catch(() => undefined);
   await installSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
   const r2 = await installSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
   eq(r2.deduped, true, "重复幂等");
 });
 h("安装即绑定快照（#17 口径）", async () => {
-  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === "revenue-manager")!;
+  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === FIXTURE_SKILL)!;
   await uninstallSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" }).catch(() => undefined);
   await installSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
   const row = await qApp<{ fence_bindings_snapshot: string[] }>(`SELECT fence_bindings_snapshot FROM skill_installs WHERE skill_id=$1 AND workspace_id=$2`, [revenue.id, scope.workspaceId]);
   assert(row.rows[0]!.fence_bindings_snapshot.includes("R1"), "快照含绑定");
 });
 h("卸载即并集收缩", async () => {
-  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === "revenue-manager")!;
+  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === FIXTURE_SKILL)!;
   await installSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
-  const agent = await qApp<{ id: string }>(`SELECT id FROM agents WHERE workspace_id=$1 AND preset_key='content-agent'`, [scope.workspaceId]);
+  const agent = await qApp<{ id: string }>(`SELECT id FROM agents WHERE workspace_id=$1 AND preset_key=$2`, [scope.workspaceId, FIXTURE_AGENT_PRESET]);
   const before = await resolveAgentFenceBindings(app, scope, agent.rows[0]!.id);
   await uninstallSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
   const after = await resolveAgentFenceBindings(app, scope, agent.rows[0]!.id);
@@ -1177,7 +1283,7 @@ h("卸载未安装技能报错（L8.3 幂等约束）", async () => {
   assert(threw, "未安装应报");
 });
 h("技能安装事件留痕（skill.installed）", async () => {
-  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === "revenue-manager")!;
+  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === FIXTURE_SKILL)!;
   await uninstallSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" }).catch(() => undefined);
   await installSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
   const page = await searchEvents(app, scope, { action: "skill.installed" });
@@ -1191,7 +1297,7 @@ h("CHECK 约束：team 技能 ID 必须 skill-t- 前缀（#16）", async () => {
   assert(threw, "DB 约束应拒伪造");
 });
 h("dry-run 报告结构（replayed/perRule）", async () => {
-  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === "revenue-manager")!;
+  const revenue = (await listSkills(app, scope, { level: "official" })).find((s) => s.name === FIXTURE_SKILL)!;
   const r = await dryRunSkill(app, gw, scope, { skillId: revenue.id, by: "MEM-001" });
   assert(typeof r.replayed === "number" && Array.isArray(r.perRule), "报告结构");
 });
@@ -1294,15 +1400,15 @@ h("D15-④ 吊销：装配围栏并集排除吊销技能", async () => {
   const { revokeSkill, installSkill, resolveAgentFenceBindings } = await import("@workloom/base/skills");
   const skillId = `skill-t-ws-yunqi-revasm-${SFX}`;
   // 哨兵绑定 R3：真实规则且种子安装行快照（R1R2/R4R5/R6/[]）无人持有（R5 会被 channel-reconciler 干扰，D31 实测；E8.1 要求真实规则）
-  await qApp(`INSERT INTO skills (id, level, bundle, name, version, description, fence_bindings, body, desensitized) VALUES ($1,'official','workloom-hotel','装配吊销','1.0.0','d','["R3"]','b',true)`, [skillId]);
+  await qApp(`INSERT INTO skills (id, level, bundle, name, version, description, fence_bindings, body, desensitized) VALUES ($1,'official','ecommerce','装配吊销','1.0.0','d',$2,'b',true)`, [skillId, JSON.stringify([FIXTURE_SENTINEL_RULE])]);
   await installSkill(app, gw, scope, { skillId, by: "MEM-001" });
-  // 用 pricing-agent（content-agent 自带 R3 会干扰哨兵，D31 实测；pricing-agent 基线 R1R2，R3 仅来自本测试安装行）
-  const ag = await qApp<{ id: string }>(`SELECT id FROM agents WHERE workspace_id=$1 AND preset_key='pricing-agent'`, [scope.workspaceId]);
+  // 用本仓核价岗（其基线不含哨兵围栏，哨兵仅来自本测试安装行）
+  const ag = await qApp<{ id: string }>(`SELECT id FROM agents WHERE workspace_id=$1 AND preset_key=$2`, [scope.workspaceId, FIXTURE_PRICING_PRESET]);
   const before = await resolveAgentFenceBindings(app, scope, ag.rows[0]!.id);
-  assert(before.includes("R3"), "吊销前并入");
+  assert(before.includes(FIXTURE_SENTINEL_RULE), "吊销前并入");
   await revokeSkill(app, gw, scope, { skillId, reason: "测试吊销", by: "MEM-001" });
   const after = await resolveAgentFenceBindings(app, scope, ag.rows[0]!.id);
-  assert(!after.includes("R3"), "吊销后并集收缩");
+  assert(!after.includes(FIXTURE_SENTINEL_RULE), "吊销后并集收缩");
   const { uninstallSkill } = await import("@workloom/base/skills");
   await uninstallSkill(app, gw, scope, { skillId, by: "MEM-001" });
 });
@@ -1421,9 +1527,21 @@ i("跨工作区记忆不可见", async () => {
 
 /* ================= J · 巡检（10 条） ================= */
 const j = C("J");
-j("巡检扫描正常快照 → ok", async () => {
+j("巡检未装配行业适配器 → 显式失败并留痕（不静默通过）", async () => {
+  /**
+   * 本仓行业包未启用巡检适配器（apps/server/src/industry/inspection-adapter-catalog.ts 显式为空集，
+   * 注释："电商行业尚未启用巡检适配器，Bundle 投影必须显式保持关闭"）。
+   * 因此这里断言的不变量不是"巡检通过"（那是酒店基线的口径），而是 L9.2/E9.1：
+   * 缺适配器必须**显式失败 + 落 inspect.run.failed（转人工巡检）**，不得静默返回 ok。
+   */
   const r = await runInspectionScan(app, gw, scope, { snapshot: { channels: [], rooms: [], reviews: [] } });
-  assert(r.ok, "正常巡检通过");
+  assert(!r.ok, "缺适配器不得静默通过");
+  assert(r.failedEventId, "失败必须留痕");
+  const row = await qApp<{ n: string }>(
+    `SELECT count(*)::text AS n FROM biz_events WHERE workspace_id=$1 AND event_id=$2 AND payload->'decision'->>'action'='inspect.run.failed'`,
+    [scope.workspaceId, r.failedEventId],
+  );
+  eq(row.rows[0]!.n, "1", "inspect.run.failed 落库");
 });
 j("探针失败重试后写 inspect.run.failed（不静默）", async () => {
   const boom = (() => { throw new Error("探针爆炸"); }) as never;
@@ -1438,32 +1556,32 @@ j("异常快照产出 anomaly 事件", async () => {
 });
 j("一键派单建线程回链（F9.3）", async () => {
   const ev = await mkEvent("inspect.anomaly", { basis: ["套件异常"] });
-  const d1 = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
+  const d1 = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
   assert(d1.threadId, "建单");
   const row = await qApp<{ status: string }>(`SELECT status FROM threads WHERE id=$1`, [d1.threadId]);
   eq(row.rows[0]!.status, "queued", "线程就绪");
 });
 j("重复派单幂等", async () => {
   const ev = await mkEvent("inspect.anomaly", { basis: ["套件异常幂等"] });
-  await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
-  const d2 = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
+  await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
+  const d2 = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
   eq(d2.deduped, true, "重复派单幂等");
 });
 j("不存在异常派单 NOT_FOUND", async () => {
   let threw = false;
-  try { await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: `E-99999999`, presetKey: "review-agent", by: "MEM-001" }); } catch { threw = true; }
+  try { await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: `E-99999999`, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" }); } catch { threw = true; }
   assert(threw, "不存在应拒");
 });
 j("处理成功回链写事件", async () => {
   const ev = await mkEvent("inspect.anomaly", { basis: ["套件回链"] });
-  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
+  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
   await resolveAnomaly(app, gw, scope, { anomalyEventId: ev, threadId: d.threadId, ok: true, by: "MEM-001" });
   const page = await searchEvents(app, scope, { action: "inspect.resolved" });
   assert(page.total >= 1, "回链留痕");
 });
 j("处理失败升级严重度 + 转需介入（E9.3）", async () => {
   const ev = await mkEvent("inspect.anomaly", { basis: ["套件升级"] });
-  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
+  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
   await resolveAnomaly(app, gw, scope, { anomalyEventId: ev, threadId: d.threadId, ok: false, by: "MEM-001" });
   const page = await searchEvents(app, scope, { action: "inspect.escalated" });
   assert(page.total >= 1, "升级留痕");
@@ -1475,7 +1593,7 @@ j("巡检状态条投影可读", async () => {
 });
 j("派单事件 links 回异常事件", async () => {
   const ev = await mkEvent("inspect.anomaly", { basis: ["套件回链验证"] });
-  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
+  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
   const page = await searchEvents(app, scope, { sessionId: d.threadId });
   assert(page.events.some((x) => (x.links ?? []).includes(ev)), "回链溯源");
 });
@@ -1745,12 +1863,12 @@ const o = C("O");
 o("晨间问数：口语化提问路由 ask + NL 检索可达", async () => {
   const r = ruleBasedRoute("请问上周营收多少？");
   eq(r.mode, "ask", "问数路由 ask");
-  const nl = await nlSearchEvents(app, scope, "上周的调价记录", new MockNlTranslator());
+  const nl = await nlSearchEvents(app, scope, "上周的调价记录", new MockNlTranslator(ecomRecallLexicon));
   assert(nl.page !== undefined || nl.degraded, "NL 检索可达（正常或降级）");
 });
 o("晨会派单：一句话调价任务跑通到 completed", async () => {
   const tid = await mkThread();
-  const r = await runQuest(app, gw, scope, { threadId: tid, goal: "把周五主打款调价 5%", presetKey: "pricing-agent" });
+  const r = await runQuest(app, gw, scope, { threadId: tid, goal: "把周五主打款调价 5%", presetKey: FIXTURE_PRICING_PRESET });
   eq(r.status, "completed", "调价任务完成");
   const row = await qApp<{ status: string }>(`SELECT status FROM threads WHERE id=$1`, [tid]);
   eq(row.rows[0]!.status, "completed", "线程状态同步");
@@ -1788,11 +1906,23 @@ o("高危桌面操作授权链：无授权拒 → 审批 → 带授权放行", a
 });
 o("差评 Quest 审批恢复闭环：挂起 → 批准 → 重放完成", async () => {
   const tid = await mkThread();
-  const r1 = await runQuest(app, gw, scope, { threadId: tid, goal: "回复差评", presetKey: "review-agent" });
+  const r1 = await runQuest(app, gw, scope, { threadId: tid, goal: "回复差评", presetKey: FIXTURE_SERVICE_PRESET });
   eq(r1.status, "pending_review", "越围栏挂起");
-  await decide(app, gw, scope, boss, r1.pendingApprovalId!, { type: "approve" });
-  const r2 = await runQuest(app, gw, scope, { threadId: tid, goal: "回复差评", presetKey: "review-agent" });
-  eq(r2.status, "completed", "批准后恢复完成");
+  /**
+   * 本仓的确定性规划器会把一个目标拆成多步（读步 + 若干写步），**每个写步各自挂起一次**
+   * （酒店基线只有单个写步，旧断言只批一张）。逐张批准直到闭环，上限 5 张防死循环；
+   * 不变量不变：每一步都必须先有人工裁决，且已批步骤不得二次挂起（#34 恢复闭环）。
+   */
+  let cur = r1;
+  let approvals = 0;
+  while (cur.status === "pending_review" && approvals < 5) {
+    assert(cur.pendingApprovalId, "挂起必须给出审批单号");
+    await decide(app, gw, scope, boss, cur.pendingApprovalId!, { type: "approve" });
+    approvals += 1;
+    cur = await runQuest(app, gw, scope, { threadId: tid, goal: "回复差评", presetKey: FIXTURE_SERVICE_PRESET });
+  }
+  assert(approvals >= 1, "至少一次人工裁决（不得绕过审批）");
+  eq(cur.status, "completed", "批准后恢复完成");
 });
 o("夜班晨收：确认班次 → 取决策包给店长过目", async () => {
   const id = await ensureReady(app, gw, scope, `2099-07-01-${SFX}`);
@@ -1821,7 +1951,7 @@ o("访客咨询：未映射 openid 按外部访客留痕", async () => {
   eq(r.identity, "visitor", "访客口径");
 });
 o("自然语言查账：店长口语检索被驳回的调价", async () => {
-  const r = await nlSearchEvents(app, scope, "被驳回的调价", new MockNlTranslator());
+  const r = await nlSearchEvents(app, scope, "被驳回的调价", new MockNlTranslator(ecomRecallLexicon));
   assert(r.page !== undefined || r.degraded, "查账可达");
 });
 o("店长看组织记忆：驳回校准偏好可见", async () => {
@@ -1836,16 +1966,30 @@ o("店长看技能目录：官方可见 + team 仅本工作区", async () => {
   const team = await listSkills(app, scope, { level: "team" });
   assert(team.every((s) => s.id.startsWith(`skill-t-${scope.workspaceId}-`)), "team 隔离");
 });
-o("店长发起巡检并消解异常：扫描 → 派单 → 标记处理", async () => {
-  const scan = await runInspectionScan(app, gw, scope, { snapshot: { channels: [{ channel: "美团", our_price: 458, competitor_price: 300, parity: false }], rooms: [], reviews: [] } });
-  assert(scan.anomalies.length >= 1, "巡检发现异常");
-  const ev = scan.anomalies[0]!.eventId;
-  if (ev) {
-    const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev, presetKey: "review-agent", by: "MEM-001" });
-    await resolveAnomaly(app, gw, scope, { anomalyEventId: ev, threadId: d.threadId, ok: true, by: "MEM-001" });
-    const page = await searchEvents(app, scope, { action: "inspect.resolved" });
-    assert(page.total >= 1, "消解留痕");
-  }
+o("异常派单与消解闭环：扫描显式失败 → 异常事件 → 派单 → 标记处理", async () => {
+  /**
+   * 酒店基线口径是"适配器扫出异常 → 派单 → 消解"；本仓未装配行业巡检适配器，
+   * 所以扫描半段只会走"显式失败 + 转人工"（E9.4），不会产出异常；
+   * 派单/消解半段是**基座公共能力**，用一条符合 inspect.anomaly 契约的异常事件照样要跑通
+   * （人工巡检/外部监控同样走这条链路），断言口径不放松。
+   */
+  const scan = await runInspectionScan(app, gw, scope, { snapshot: { channels: [{ channel: "天猫", our_price: 458, competitor_price: 300, parity: false }], rooms: [], reviews: [] } });
+  assert(!scan.ok, "缺适配器显式失败");
+  eq(scan.anomalies.length, 0, "无适配器不得产出假异常");
+  const ev = await gatewayAppend(gw, { ...scope, actor: { id: "inspection-agent", type: "agent" as const, fenceBindings: ["R1"] } }, {
+    who: { type: "agent", id: "inspection-agent", version: "v1" },
+    context: { tenant_id: scope.tenantId, workspace_id: scope.workspaceId, time: new Date().toISOString() },
+    object: { type: "listing", id: `SKU-ANOM-${SFX}` },
+    decision: {
+      action: "inspect.anomaly",
+      after: { summary: "套件造：跨平台价格倒挂 ¥458 → ¥300", severity: "high", dedupeKey: `suite-anom-${SFX}`, source: "price-parity-watch" },
+    },
+    rule_impact: [],
+  });
+  const d = await dispatchFromAnomaly(app, gw, scope, { anomalyEventId: ev.eventId, presetKey: FIXTURE_SERVICE_PRESET, by: "MEM-001" });
+  await resolveAnomaly(app, gw, scope, { anomalyEventId: ev.eventId, threadId: d.threadId, ok: true, by: "MEM-001" });
+  const page = await searchEvents(app, scope, { action: "inspect.resolved" });
+  assert(page.total >= 1, "消解留痕");
 });
 o("一天收尾：本工作区哈希链自检（接龙 + 重算一致）", async () => {
   const rows = await qApp<{ payload: unknown; prev_hash: string; hash: string }>(`SELECT payload, prev_hash, hash FROM biz_events WHERE workspace_id=$1 ORDER BY seq`, [scope.workspaceId]);
@@ -2189,7 +2333,7 @@ const httpStatus = async (path: string, opts: { method?: string; token?: string;
   ?? (await api(path, opts)).status;
 
 async function login(memberNo: string): Promise<string> {
-  const { data } = await api<{ result?: { data?: { token?: string } } }>("/trpc/auth.loginAs", { method: "POST", body: { workspaceSlug: "yunqi-hotel", memberNo } });
+  const { data } = await api<{ result?: { data?: { token?: string } } }>("/trpc/auth.loginAs", { method: "POST", body: { workspaceSlug: WORKSPACE.slug, memberNo } });
   const token = data.result?.data?.token;
   assert(token, `loginAs ${memberNo} 签发`);
   return token!;
@@ -2374,7 +2518,7 @@ function defineE2E(): void {
 
 /* ---- D24 落地向导 E2E：模拟态横幅事实源 → 真实模型装配 → ask 真实推理 → 真实模式 ---- */
 let llmStub: Server | null = null;
-const STUB_PORT = 8791;
+const STUB_PORT = Number(process.env.SUITE_STUB_PORT ?? "8791");
 h2("onboarding.status 全模拟运行态（横幅事实源：simulated + mock）", async () => {
   const { data } = await api<{ result?: { data?: { dataMode?: string; llm?: { real?: boolean }; workspace?: { events?: number; agents?: number } } } }>("/trpc/onboarding.status", { token: tokenOwner });
   eq(data.result?.data?.dataMode, "simulated", "种子库默认模拟态");
@@ -2432,21 +2576,44 @@ h2("onboarding 还原 mock 装配（套件环境复位）", async () => {
   eq(st.result?.data?.llm?.real, false, "status 复位 mock");
 });
 h2("onboarding 经营主体写入 + 启用真实模式（横幅熄灭）→ 复位模拟态", async () => {
-  const { data } = await api<{ result?: { data?: { ok?: boolean } } }>("/trpc/onboarding.setupWorkspace", {
-    method: "POST", token: tokenOwner, body: { displayName: "云栖酒店", industry: "hotel", note: "E2E 向导验收" },
-  });
-  eq(data.result?.data?.ok, true, "主体档案写入");
-  const { data: act } = await api<{ result?: { data?: { dataMode?: string } } }>("/trpc/onboarding.activateRealMode", { method: "POST", token: tokenOwner });
-  eq(act.result?.data?.dataMode, "real", "真实模式激活");
-  const { data: st } = await api<{ result?: { data?: { dataMode?: string } } }>("/trpc/onboarding.status", { token: tokenOwner });
-  eq(st.result?.data?.dataMode, "real", "status 反映 real（横幅熄灭条件达成）");
-  const ev = await qApp<{ n: string }>(
-    `SELECT count(*)::text AS n FROM biz_events WHERE workspace_id=$1 AND payload->'decision'->>'action'='onboarding.real_mode_activated'`,
-    [scope.workspaceId],
-  );
-  assert(Number(ev.rows[0]!.n) >= 1, "切换留痕");
-  // 复位：套件出口保持种子模拟态（事件保留，append-only 纪律）
-  await qApp(`UPDATE profiles SET archive=jsonb_set(archive,'{dataMode}','"simulated"'::jsonb) WHERE workspace_id=$1`, [scope.workspaceId]);
+  /**
+   * 前态必须在动手前抓：本用例走的是生产 onboarding 接口，它按设计会改
+   * workspaces.name / workspaces.industry / profiles.industry / profiles.archive.business。
+   * 历史版本在这里写死"云栖酒店 + hotel"且只复位 dataMode，实测后果是——
+   * 演示工作区被改名成酒店、行业被改成 hotel，本仓（电商）的行业链路（数字职场场景包、
+   * 行业适配器选择）从此走错分支（H-15 实测：floor 退回 office-generic，且脏状态跨走查/演示留存）。
+   * 因此：① 写入值取本仓真实名字与行业；② 出口逐项还原（含 business 档案）。
+   */
+  const pre = (await qApp<{ name: string; industry: string }>(
+    `SELECT name, industry FROM workspaces WHERE id=$1`, [scope.workspaceId])).rows[0]!;
+  const preBusiness = (await qApp<{ business: unknown }>(
+    `SELECT archive->'business' AS business FROM profiles WHERE workspace_id=$1`, [scope.workspaceId])).rows[0]!.business ?? {};
+  try {
+    const { data } = await api<{ result?: { data?: { ok?: boolean } } }>("/trpc/onboarding.setupWorkspace", {
+      method: "POST", token: tokenOwner, body: { displayName: `${pre.name}（E2E 向导验收）`, industry: pre.industry, note: "E2E 向导验收" },
+    });
+    eq(data.result?.data?.ok, true, "主体档案写入");
+    const { data: act } = await api<{ result?: { data?: { dataMode?: string } } }>("/trpc/onboarding.activateRealMode", { method: "POST", token: tokenOwner });
+    eq(act.result?.data?.dataMode, "real", "真实模式激活");
+    const { data: st } = await api<{ result?: { data?: { dataMode?: string } } }>("/trpc/onboarding.status", { token: tokenOwner });
+    eq(st.result?.data?.dataMode, "real", "status 反映 real（横幅熄灭条件达成）");
+    const ev = await qApp<{ n: string }>(
+      `SELECT count(*)::text AS n FROM biz_events WHERE workspace_id=$1 AND payload->'decision'->>'action'='onboarding.real_mode_activated'`,
+      [scope.workspaceId],
+    );
+    assert(Number(ev.rows[0]!.n) >= 1, "切换留痕");
+  } finally {
+    // 复位：名字 / 行业 / 经营主体档案 / 数据模式四项逐项还原（事件保留，append-only 纪律）
+    await qApp(`UPDATE workspaces SET name=$2, industry=$3 WHERE id=$1`, [scope.workspaceId, pre.name, pre.industry]);
+    await qApp(
+      `UPDATE profiles
+          SET industry=$2,
+              archive = jsonb_set(jsonb_set(archive,'{business}',$3::jsonb),'{dataMode}','"simulated"'::jsonb),
+              updated_at=now()
+        WHERE workspace_id=$1`,
+      [scope.workspaceId, pre.industry, JSON.stringify(preBusiness)],
+    );
+  }
 });
 
 /* ---- D26 大版本融合 E2E：LLM 装配×节拍 / 开箱运行态 / 真实模式融合 / P21 互洽 / 降级链 ---- */
@@ -2476,7 +2643,7 @@ h2("融合·开箱运行态（种子即重度使用：卫星/实况/职场/请�
   assert((d?.satellites ?? []).length >= 5, "员工卫星群 ≥5");
   assert((d?.ticker ?? []).length >= 10, "实况字幕流 ≥10");
   assert(d?.floor, "floor 段在场");
-  eq(d?.floor?.scene?.id, "hotel-lobby", "行业场景包命中（前厅）");
+  eq(d?.floor?.scene?.id, INDUSTRY_SCENE_ID, `行业场景包命中（bundles/${INDUSTRY_SLUG}/floor-scene.json）`);
   const agents = d?.floor?.agents ?? [];
   assert(agents.length >= 5, "职场员工 ≥5");
   assert(agents.some((a) => a.state === "asking"), "开箱即有举手请示（种子 pending 审批）");
@@ -2673,7 +2840,7 @@ h2("融合·LLM 降级链：死端配置被拒 → mock 兜底应答不断链", 
         { action: "biz.price.read", objectType: "room_price", tool: "biz.price.read", params: { object_id: "OBJ-DLX-01" }, label: "读取当前价格" },
         { action: "price.adjust", objectType: "room_price", tool: "biz.price.write", params: { object_id: "OBJ-DLX-01", price: 510 }, label: "LLM 规划：调价至 ¥510" },
       ]);
-      const r1 = await runQuest(app, gw, scope, { threadId: tid, goal: "把周五主打款调价到 510", presetKey: "pricing-agent", llmCall: plan510 });
+      const r1 = await runQuest(app, gw, scope, { threadId: tid, goal: "把周五主打款调价到 510", presetKey: FIXTURE_PRICING_PRESET, llmCall: plan510 });
       eq(r1.status, "pending_review", "R1 越线挂起（11.35%>8%）");
       const apr = (await qApp<{ tier: string }>(`SELECT tier FROM approvals WHERE approval_id=$1`, [r1.pendingApprovalId!])).rows[0]!;
       eq(apr.tier, "l2_captain", "带内（11.35%<15%）路由 L2");
@@ -2681,7 +2848,7 @@ h2("融合·LLM 降级链：死端配置被拒 → mock 兜底应答不断链", 
       assert(q.decided >= 1, "CEO 裁决批准");
       const st = (await qApp<{ status: string }>(`SELECT status FROM approvals WHERE approval_id=$1`, [r1.pendingApprovalId!])).rows[0]!;
       eq(st.status, "approved", "审批已批准");
-      const r2 = await runQuest(app, gw, scope, { threadId: tid, goal: "把周五主打款调价到 510", presetKey: "pricing-agent", llmCall: plan510 });
+      const r2 = await runQuest(app, gw, scope, { threadId: tid, goal: "把周五主打款调价到 510", presetKey: FIXTURE_PRICING_PRESET, llmCall: plan510 });
       eq(r2.status, "completed", "批准后续跑 completed（恢复闭环）");
     } finally {
       await restoreArchive(arc);
@@ -3191,11 +3358,11 @@ h2("融合·LLM 降级链：死端配置被拒 → mock 兜底应答不断链", 
 
   WC("theater×floor 一致性：floor 覆盖全部 ready 员工且工位齐备", async () => {
     const ready = await qApp<{ n: string }>(`SELECT count(*)::text AS n FROM agents WHERE workspace_id=$1 AND status='ready'`, [scope.workspaceId]);
-    const floor = await buildFloor(app, scope, "hotel");
+    const floor = await buildFloor(app, scope, INDUSTRY_SLUG);
     const readyInFloor = floor.agents.filter((a) => a.state !== "disabled");
     eq(readyInFloor.length, Number(ready.rows[0]!.n), "ready 员工全覆盖");
     for (const a of readyInFloor) assert(a.stationId, `${a.name} 有工位`);
-    eq(floor.scene.id, "hotel-lobby", "行业场景包命中（im 种子 industry=hotel）");
+    eq(floor.scene.id, INDUSTRY_SCENE_ID, `行业场景包命中（bundles/${INDUSTRY_SLUG}/floor-scene.json）`);
   });
 
   WC("请示全链融合：举手 → 裁决 → 回位（事件留痕）", async () => {
@@ -3491,28 +3658,11 @@ h2("融合·LLM 降级链：死端配置被拒 → mock 兜底应答不断链", 
 const z = C("Z");
 
 /**
- * 工作区口径：各行业仓的演示工作区不同（hotel=ws-yunqi / panda=panda-group / …），
- * 这套不变量用例必须**运行时解析本仓真实工作区**，不能钉死某一个 slug——
- * 否则换仓即因外键失败，用例就成了"只在基座成立"的假绿（panda 实测：threads_workspace_id_fkey）。
+ * 工作区口径：Z 域与全仓共用同一份运行时解析结果（见文件顶部 scope）。
+ * 历史上这里单独解析一次、其余域仍钉死 ws-yunqi，于是本仓只有 Z 域是绿的——
+ * 现在顶层 scope 已统一为运行时解析，此处只做别名，避免两套口径再次分叉。
  */
-const zScope = await (async () => {
-  const ownerUrl = process.env.DATABASE_URL;
-  if (!ownerUrl) return scope;
-  const client = new pg.Client({ connectionString: ownerUrl });
-  await client.connect();
-  try {
-    // 必须用 owner 连接：RLS 下 suite 自己的 scope（多为 ws-yunqi）在本仓可能根本不存在
-    const prefer = await client.query<{ id: string; tenant_id: string }>(
-      `SELECT id, tenant_id FROM workspaces WHERE id=$1`, [scope.workspaceId]);
-    if (prefer.rows[0]) return { tenantId: prefer.rows[0].tenant_id, workspaceId: prefer.rows[0].id };
-    const any = await client.query<{ id: string; tenant_id: string }>(
-      `SELECT id, tenant_id FROM workspaces ORDER BY id LIMIT 1`);
-    assert(any.rows[0], "本仓至少应有一个工作区（种子未跑？）");
-    return { tenantId: any.rows[0]!.tenant_id, workspaceId: any.rows[0]!.id };
-  } finally {
-    await client.end();
-  }
-})();
+const zScope = scope;
 
 /**
  * 本仓工作区下的查询/写入：RLS 上下文必须跟随 zScope——

@@ -1,0 +1,23 @@
+{
+  "schema": "workloom.mine-clear/baseline@1",
+  "task_id": "T-2026-0929-0004",
+  "repo": ".wt-mcd-panda",
+  "repo_path": "/Users/mac/WorkLoom-fleet/.wt-mcd-panda",
+  "remote": "origin",
+  "audit": {
+    "commit": "2aae4417a72934e0d6afdcffe1a17f3b1f559c1c",
+    "branch": "task/T-2026-0929-0004",
+    "remote": "origin",
+    "remote_main": "2aae4417a72934e0d6afdcffe1a17f3b1f559c1c",
+    "fetched_at": null,
+    "dirty_count": 8,
+    "notes": [
+      "工作树不干净（8 项未提交改动）：排雷结论只对已提交内容成立"
+    ]
+  },
+  "smoke": {
+    "status": "not-run",
+    "notes": "M0 冒烟：健康检查 + 一条核心业务链路，跑完回填这里"
+  },
+  "created_at": "2026-09-29T15:59:30.723Z"
+}

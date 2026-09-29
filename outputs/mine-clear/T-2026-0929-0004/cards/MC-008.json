@@ -1,0 +1,54 @@
+{
+  "id": "MC-008",
+  "kind": "problem",
+  "level": "L1",
+  "severity": "P1",
+  "batch": 2,
+  "state": "open",
+  "title": "R 域 10 条治理/宪章用例仍红：酒店宪章阈值/KPI 口径（basePrice 458→600、procurement 2500、入住率类 KPI）与电商宪章不匹配",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2700-3100@2aae441",
+      "note": "R-03 用 priceCtx{afterPrice:480/600, basePrice:458} 断言 L2/L4；R-09/R-16 用酒店 KPI 触发熔断；R-26 用酒店编制口径"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "服务层 408/418，失败清单：R-03/06/09/10/11/16/19/20/21/26（10 条）"
+    },
+    {
+      "type": "db",
+      "ref": "psql profiles.archive->charter@实测",
+      "note": "本仓宪章是电商口径：ranges.price-change-ratio{lower .85,upper 1.15}、caps.procurement=100000、circuit_breaker.kpi_floor{acos .28, margin_rate .13}"
+    }
+  ],
+  "root_cause": {
+    "file": "scripts/suite.ts",
+    "line": 2700,
+    "commit": "2aae441",
+    "symbol": "R 域用例夹具"
+  },
+  "trigger_path": "R 域用例把酒店宪章数值写死在断言里（价格带 458/600、采购上限 2500、KPI 入住率等），本仓宪章数值不同 → 期望与实际系统性错位；需按电商宪章重写夹具（产品语义工作，需确认阈值口径）",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "按电商宪章（±15% 价格带、采购上限 100000→试用降档）重写 R-03/R-06/R-11/R-19/R-20",
+      "expect": "裁决路由/节拍用例转绿",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "not-run"
+    },
+    {
+      "kind": "property",
+      "given": "宪章数值变化（grant/caps/ranges）",
+      "expect": "R 域用例从宪章读取而非硬编码，换行业仓即用",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "not-run"
+    }
+  ],
+  "notes": "本卡未闭环：需要产品侧确认电商自治阈值与 KPI 熔断口径后才能改断言；回归命令已在 assertions 中给出",
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite   # 期望失败清单只剩 R 域 10 条，改夹具后逐条转绿",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

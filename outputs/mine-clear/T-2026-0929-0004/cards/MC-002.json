@@ -1,0 +1,56 @@
+{
+  "id": "MC-002",
+  "kind": "problem",
+  "level": "L2",
+  "severity": "P1",
+  "batch": 1,
+  "state": "fixed",
+  "title": "HTTP E2E 段登录钉死 yunqi-hotel + 模型 stub 端口硬编码 8791：整个 E2E 段在登录处崩掉（44 条不可跑）",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2251@2aae441",
+      "note": "login(): body { workspaceSlug: 'yunqi-hotel', memberNo }"
+    },
+    {
+      "type": "code",
+      "ref": "scripts/suite.ts:2377@2aae441",
+      "note": "const STUB_PORT = 8791;"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/suite-baseline.log",
+      "note": "修复前：Error: 断言失败：loginAs MEM-001 签发 → 套件直接退出（E2E 用例 0 条执行）"
+    }
+  ],
+  "root_cause": {
+    "file": "scripts/suite.ts",
+    "line": 2251,
+    "commit": "2aae441",
+    "symbol": "login"
+  },
+  "trigger_path": "本仓 slug=panda-group：auth.loginAs 按 slug 查工作区 → NOT_FOUND → 断言失败 → 整个 Part B 段不执行；并行会话占用 8791 时 EADDRINUSE 先崩",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "干净库 + 空闲端口",
+      "expect": "HTTP E2E 用例 45/45 通过",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "并行会话占用默认端口",
+      "expect": "端口可经 SUITE_SERVER_PORT / SUITE_STUB_PORT 覆盖，不互相踩踏",
+      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "本轮修复卡：MC-101/MC-102（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

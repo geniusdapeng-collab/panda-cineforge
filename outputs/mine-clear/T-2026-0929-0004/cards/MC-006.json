@@ -1,0 +1,51 @@
+{
+  "id": "MC-006",
+  "kind": "problem",
+  "level": "L1",
+  "severity": "P1",
+  "batch": 1,
+  "state": "fixed",
+  "title": "客服意图路由：明确的订单/会员查询与维修类售后指令被误判为知识问答（kb_qa）",
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/dialog.ts:63-80@2aae441",
+      "note": "RE_ORDER/RE_MEMBER 只在 ruled==='biz_query' 分支内被使用；售后兜底要求 !ruled → base 规则表先判 kb_qa 时行业规则永不生效"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/servertest-baseline.log",
+      "note": "FAIL dialog.test.ts：「查一下我的订单」expected biz_query/query_order，实际 kb_qa；「我的会员积分还有多少」同；「充电宝坏了，帮我修一下」expected service_request，实际 kb_qa"
+    }
+  ],
+  "root_cause": {
+    "file": "apps/server/src/service/dialog.ts",
+    "line": 63,
+    "commit": "2aae441",
+    "symbol": "classify"
+  },
+  "trigger_path": "用户问「我的订单/积分」这类**明确对象查询**时，base 通用疑问句规则先命中 kb_qa；维修类（坏了/修）不在 RE_AFTERSALE_ACTION 词表内 → 客服前台答非所问或拒答，且不建单",
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "classify('查一下我的订单') / classify('我的会员积分还有多少') / classify('充电宝坏了，帮我修一下') / classify('退款多久到账')",
+      "expect": "biz_query/query_order · biz_query/query_member · service_request · kb_qa",
+      "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "任意文本",
+      "expect": "疑问句形态的售后咨询仍走 kb_qa，不把咨询误建单",
+      "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    }
+  ],
+  "notes": "本轮修复卡：MC-106（待 M6 独立验收后转 verified）",
+  "regression": {
+    "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+  }
+}

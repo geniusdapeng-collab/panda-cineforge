@@ -1,0 +1,52 @@
+{
+  "id": "MC-107",
+  "kind": "fix",
+  "batch": 0,
+  "state": "fixed",
+  "title": "apps/server E2E 端口可配（解除 96 条 E2E 误连他人服务）",
+  "covers": [
+    "MC-007"
+  ],
+  "evidence": [
+    {
+      "type": "code",
+      "ref": "apps/server/src/service/e2e.test.ts:13-20@2aae441",
+      "note": "PORT = Number(process.env.E2E_SERVER_PORT ?? '8795')"
+    },
+    {
+      "type": "log",
+      "ref": "evidence/verification.log",
+      "note": "E2E_SERVER_PORT=8896 → 96 passed（修复前 96 skipped/整段失败）"
+    }
+  ],
+  "fix_plan": "端口改为环境变量可覆盖；默认值不变（8795），CI 单实例行为不变",
+  "blast_radius": "并行会话不再互相踩端口；若端口仍被占，会以 EADDRINUSE 明确暴露（而不是静默连到别人服务）",
+  "conflict_paths": [
+    "apps/server/src/service/e2e.test.ts"
+  ],
+  "assertions": [
+    {
+      "kind": "sample",
+      "given": "E2E_SERVER_PORT=空闲端口",
+      "expect": "96 passed",
+      "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+      "last_result": "pass",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    },
+    {
+      "kind": "property",
+      "given": "默认端口被他人占用",
+      "expect": "失败信息指向端口/身份，而不是『工作区不存在』",
+      "command": "E2E_SERVER_PORT=8795 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+      "last_result": "fail"
+    }
+  ],
+  "regression": {
+    "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+    "evidence": "evidence/verification.log"
+  },
+  "rollback": "revert 本次提交",
+  "fixed_by": "codex/root/T-2026-0929-0004",
+  "verified_by": null,
+  "notes": "仍留一条 P2：探测只认 /health，建议加实例身份探针；本轮未改（避免超出排雷范围）"
+}
