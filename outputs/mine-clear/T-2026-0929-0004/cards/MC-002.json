@@ -4,7 +4,7 @@
   "level": "L2",
   "severity": "P1",
   "batch": 1,
-  "state": "fixed",
+  "state": "verified",
   "title": "HTTP E2E 段登录钉死 yunqi-hotel + 模型 stub 端口硬编码 8791：整个 E2E 段在登录处崩掉（44 条不可跑）",
   "evidence": [
     {
@@ -48,9 +48,12 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "本轮修复卡：MC-101/MC-102（待 M6 独立验收后转 verified）",
+  "notes": "本轮修复卡：MC-101/MC-102（待 M6 独立验收后转 verified）；M6 独立环境复验通过（MC-101/MC-102）",
   "regression": {
     "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
-  }
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }

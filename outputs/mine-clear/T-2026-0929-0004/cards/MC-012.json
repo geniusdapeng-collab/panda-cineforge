@@ -16,6 +16,11 @@
       "type": "code",
       "ref": "bundles/ecommerce/fences/ecom-baseline.yml:146,187@2aae441",
       "note": "R14 when=abs(after.rate-before.rate)/before.rate>0.02；R18 when=params.channel_price < params.other_platform_min*0.85 —— 缺字段即求值异常"
+    },
+    {
+      "type": "log",
+      "ref": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-012-fence-probe.log",
+      "note": "独立复验探针（规则 30 条 / ecom-baseline/v1）：review.reply 只带 rating → R9:blocked 求值异常；price.adjust 只带 params.cost → R1/R2/R14/R18 四条求值异常→block；全量水合 → auto；真破成本红线 → R2:blocked（evalErrors=0）"
     }
   ],
   "root_cause": {
@@ -41,7 +46,7 @@
       "last_result": "not-run"
     }
   ],
-  "notes": "观察项（P2）：是否把规则改 null-safe 属产品语义决策，本轮未改规则，只在套件夹具中做全量水合并在报告里标注",
+  "notes": "观察项（P2）：是否把规则改 null-safe 属产品语义决策，本轮未改规则，只在套件夹具中做全量水合并在报告里标注；独立复验确认缺参面比修复者探针更宽（R1/R2 的 before/after 缺字段同样异常），真越线仍然 block（不是把熔断关掉）",
   "regression": {
     "command": "pnpm exec tsx <探针脚本>；或直接复跑 C-02/R-10 用例   # 期望缺参不再产生 block 级求值异常",
     "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"

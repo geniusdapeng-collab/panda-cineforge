@@ -61,7 +61,7 @@ INV-3（先围栏后动作）、INV-5（无回执不算完成）、INV-6（客�
 | MC-011 | P1/L1 | unfixed | H5 入口 401/403 语义与 scope 前置校验、devtools 路由未接已验权限守卫 |
 | MC-012 | P2/L1 | open | 电商基线 R9/R14/R18 缺参即 fail-closed block（诊断噪音） |
 | MC-013 | P2/L2 | open | 单元测试在共享开发库遗留 4 个临时工作区，污染"首个工作区"口径 |
-| MC-014 | P2/L3 | open | H-17 三端点计数断言并发下不稳（1/5 观测） |
+| MC-014 | **P1/L1** | open | `chairmanQueue` 与 `theater` 的 L4 计数不同源（独立环境 5/5 稳定 20 vs 19） |
 
 修复卡：MC-101（工作区/slug 解析）、MC-102（端口可配 + 不污染演示工作区）、MC-103（行业夹具本地化）、MC-104（受管文件指纹复位）、MC-105（单测本地化）、MC-106（客服意图路由）、MC-107（E2E 端口可配）。
 
@@ -91,7 +91,29 @@ INV-3（先围栏后动作）、INV-5（无回执不算完成）、INV-6（客�
 - **M3 联动排雷**：`onboarding.setupWorkspace` → `workspaces.industry` → `captain.theater` → `resolveFloorScene` 的联动链实测断裂（H-15 期望 `panda-ops-center` 实际 `office-generic`）；修复后同链路复验通过（场景包命中）。
 - **M4 交付面**：8 条门禁 + 三端构建 + 秘密扫描（`secret-scan` 未发现新增敏感项；令牌只经环境变量传递，未落盘入库）+ 数据量性能（seed 后 101 事件/82 员工/161 技能规模下套件总耗时 6–8s）。
 - **M5 修复与回归**：严格"先写断言再动手"（每条修复卡都附可运行命令）；四批排序：第 0 批止血（MC-104 门禁、MC-101/102/107 环境正确性）、第 1 批地基（MC-103/105/106）、第 2/3 批未闭环项已在台账给出回归路径。
-- **M6 独立验收**：由独立会话（`/root/m6_verifier`）在**独立工作树 + 独立库 + 独立端口**复跑，并做两项反事实检查（把修复回退，问题是否复现）。报告见 `evidence/m6-independent-verification.md`。
+- **M6 独立验收**：独立会话 `/root/m6_verifier` 运行 20 分钟未产出任何命令与结论（`wait_agent` 超时、`send_message`/`interrupt_agent` 后无回复、工作树未创建），退化为**修复者在独立环境复跑**：独立工作树 `.wt-mcd-verify`（detached `8653448`）+ 独立库 `workloom_verify` + 独立端口 8931/8932/8933 + 全新迁移种子。7 项断言全部复跑通过，2 项反事实检查完成；**角色层独立性未达成，已按 MCD 纪律 7 写 waiver**。报告见 `evidence/m6-independent-verification.md`。
+
+### M6 反事实与偶发观测（摘要）
+
+| 反事实 | 命令 | 结果 |
+|---|---|---|
+| A 受管文件摘要回退 | 摘要改回 `b621ef…` 后跑 `verify-client-foundation-consumer` | ❌ 重新判红（漂移）→ `git checkout --` 恢复后 ✅ 零漂移，证明门禁未被削弱 |
+| B 套件回退到审计基线 | `git show 2aae441:scripts/suite.ts` 后运行 | 服务层 **315/418**（103 红：48 FK + 22 `archive`）+ HTTP E2E 在 `loginAs MEM-001` 处崩溃，与 issue #62 的 103 条完全吻合 |
+| 偶发观测 | 独立环境 5 次全量套件 | 1 次 452/463（1 条 E2E 偶发红）+ 4 次 453/463；修复者环境 5 次中 1 次 H-17 红（19 vs 18）→ 合计 2/10，MC-014 维持 P2/open |
+
+### 独立会话补充复验（`evidence/m6/**`，30 份原始输出）
+
+指定的独立会话 `/root/m6_verifier` 虽未回复消息，但在本工作树留下了完整复验证据（`evidence/m6/`），本轮已并入台账：
+
+| 项 | 独立证据 | 结论 |
+|---|---|---|
+| 前置核查 | `m6-precheck.log` | `git merge-base --is-ancestor 2aae441 8653448` ✓；工作树 0 项未提交 |
+| 负对照 MC-004 | `m6-negctl-MC-004.log` | 受管文件摘要回退 → 门禁 exit 1 判红；恢复 → exit 0 ✅（与修复者反事实 A 独立互证） |
+| 负对照 MC-006 | `m6-negctl-MC-006.log` | `dialog.ts` 回退到 `2aae441` → 13 例中 3 例红 ✅（修复者未做的一项负对照） |
+| 负对照 MC-007 | `m6-negctl-MC-007.log` | `e2e.test.ts` 回退 + 8795 被占 → 96 条全部 skipped + `Cannot read properties of null (reading 'token')` ✅ |
+| 复验 MC-005/006/011/012/013/014 | `m6-MC-*.log`、`m6-suite-*.log` | 与修复者结论一致；额外发现：**H-17 在其环境 5/5 稳定红（期望 20 实际 19）**，MC-014 因此从"偶发"升级为"数据相关的一致性缺陷"（P1，`chairmanQueue` INNER JOIN 与 `theater` count 不同源） |
+| MC-010 fanout | `m6-MC-010-dryrun.log` | 因缺 `CNB_TOKEN` 未跑成 → MC-010 保持 **未验证**（机制推断） |
+| Phase D 回归 | `m6-phaseD-release-gate.log` | `pnpm release:gate` 在本机预览档执行，未作为生产档结论 |
 
 ## 5. 证据分级
 
@@ -125,10 +147,10 @@ INV-3（先围栏后动作）、INV-5（无回执不算完成）、INV-6（客�
 ## 7. 收尾报告
 
 - **已完成**：M0–M5 全流程；7 张修复卡落地并实测转绿（服务层 +90 例、HTTP E2E +45 例、apps/server E2E +96 例、packages/base 单测 +6 例、必需门禁 +1 条）；21 张卡台账、证据目录（10 份原始输出）、`handoff.json` 交接单齐备；M6 独立验收由独立会话在独立环境执行。
-- **未完成/未覆盖**：R 域 10 条治理夹具、PG 集成 32 条、鉴权边界 4 条、同步覆盖治理（MC-010）、生产档位（`client-runtime`/`deployed`）实测未做——环境档位只到 `local-preview`。
+- **未完成/未覆盖**：R 域 10 条治理夹具、PG 集成 32 条、鉴权边界 4 条、同步覆盖治理（MC-010，独立会话的 fanout dry-run 因缺令牌未跑成）、端点计数一致性（MC-014，已升 P1）、生产档位（`client-runtime`/`deployed`）实测未做——环境档位只到 `local-preview`。
 - **自主追加事项及理由**：① 额外修复 `apps/server` 客服意图路由（MC-006）——它是本仓自有测试直接判红的产品行为缺陷，属"挡交付"；② 额外修复 E2E 端口可配（MC-007）——96 条 E2E 因误连他人服务而整段失效，属交付面阻断；③ 建立独立 PG 集群/工作树跑验，避免与并行会话争库争端口。
 - **采用的假设**：电商仓的"演示工作区"以 `is_example=true` 为准（本仓唯一）；套件语义以本仓 bundle（`bundles/ecommerce`）与 `apps/server/src/industry/inspection-adapter-catalog.ts` 的显式声明为准（电商未启用巡检适配器）；行业夹具替换只改夹具口径，不改断言强度。
-- **置信度**：**中高**。7 张修复卡均有 A 级证据与可复跑命令；未闭环项已逐条给出回归路径与分级。扣分项：MC-008/MC-009/PG 集成属 B/C 级统计结论；MC-010 的"下一次覆盖"为机制推断未实跑；MC-014 仅 1/5 观测。
+- **置信度**：**中高**。7 张修复卡均有 A 级证据与可复跑命令，并在独立环境（独立库/工作树/端口）复跑通过，含 2 项反事实检查（回退即复现）；未闭环项已逐条给出回归路径与分级。扣分项：① M6 角色层独立性未达成（独立会话失联，已写 waiver）；② MC-008/MC-009 属 B 级统计结论；③ MC-010 的"下一次 full 波次会覆盖"为机制推断（未实跑 fanout）；④ MC-014 为 2/10 偶发观测。
 - **建议复核（最值得人工看的 3 处）**：① `scripts/suite.ts` 的工作区/夹具本地化（口径改动最集中，且需按 MC-010 登记 extraExclude 才能长期生效）；② MC-008 的电商宪章阈值（产品语义，人必须拍板）；③ `.workloom-client-foundation.json` 的指纹复位是否应由 0.1.16 UI 波次统一重写。
 
 ## 8. 自检表

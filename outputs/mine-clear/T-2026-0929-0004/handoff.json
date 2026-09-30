@@ -2,7 +2,7 @@
   "schema": "workloom.mine-clear/handoff@1",
   "task_id": "T-2026-0929-0004",
   "repo": ".wt-mcd-panda",
-  "generated_at": "2026-09-29T16:07:26.470Z",
+  "generated_at": "2026-09-29T16:58:48.170Z",
   "audit_baseline": "2aae4417a72934e0d6afdcffe1a17f3b1f559c1c",
   "repair_baseline": null,
   "acceptance_baseline": null,
@@ -69,7 +69,330 @@
       "source": "AGENTS.md#4.12"
     }
   ],
-  "closed_problems": [],
+  "closed_problems": [
+    {
+      "id": "MC-001",
+      "title": "套件工作区口径钉死基座酒店的 ws-yunqi：本仓（ws-panda）服务层 100/418 假红，FK/RLS 成片失败",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "干净库 + 迁移 + 种子后运行 pnpm suite",
+          "expect": "服务层用例 ≥408/418，失败仅剩 R 域 10 条",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "换到任意行业仓（演示工作区 slug 不同）",
+          "expect": "套件运行时解析本仓演示工作区（is_example=true），不钉死 slug",
+          "command": "node -e \"import('./scripts/suite.ts')\" # 或直接看 suite 首段解析日志",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-002",
+      "title": "HTTP E2E 段登录钉死 yunqi-hotel + 模型 stub 端口硬编码 8791：整个 E2E 段在登录处崩掉（44 条不可跑）",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "干净库 + 空闲端口",
+          "expect": "HTTP E2E 用例 45/45 通过",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "并行会话占用默认端口",
+          "expect": "端口可经 SUITE_SERVER_PORT / SUITE_STUB_PORT 覆盖，不互相踩踏",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-003",
+      "title": "onboarding E2E 用例把演示工作区改名『云栖酒店』并把行业改成 hotel，且只复位 dataMode",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "运行 pnpm suite 后立刻查库",
+          "expect": "ws-panda / 熊猫优选集团 / ecommerce 保持不变",
+          "command": "psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select id,name,industry from workspaces where id='ws-panda'\"",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意行业仓运行套件",
+          "expect": "套件对演示工作区的名字/行业/档案改动在用例出口逐项还原",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-004",
+      "title": "必需门禁 verify-client-foundation-consumer 在 main 上判红（受管客户端文件指纹漂移）",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "main 工作树",
+          "expect": "受管文件指纹零漂移，exit 0",
+          "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "把 state 摘要改回 b621ef…",
+          "expect": "门禁重新判红（说明该断言真的能抓住漂移，而不是空转）",
+          "command": "git stash && node scripts/verify-client-foundation-consumer.mjs --repo . ; git stash pop",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-005",
+      "title": "packages/base 四个测试文件与实现分叉：fence-engine 指向不存在的 bundles/hotel、bundles 页面注册表断言 25、recall 无词表且工作区 ws-demo、tenancy 断言英文提示",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "修复后",
+          "expect": "packages/base 48 passed / 0 failed",
+          "command": "pnpm -C packages/base test",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意仓库运行该测试",
+          "expect": "测试断言与实现同源（bundle 路径/页面注册表/行业词表/文案口径都取本仓口径）",
+          "command": "pnpm -C packages/base test",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-006",
+      "title": "客服意图路由：明确的订单/会员查询与维修类售后指令被误判为知识问答（kb_qa）",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "classify('查一下我的订单') / classify('我的会员积分还有多少') / classify('充电宝坏了，帮我修一下') / classify('退款多久到账')",
+          "expect": "biz_query/query_order · biz_query/query_member · service_request · kb_qa",
+          "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意文本",
+          "expect": "疑问句形态的售后咨询仍走 kb_qa，不把咨询误建单",
+          "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-007",
+      "title": "apps/server HTTP E2E 端口钉死 8795：健康检查命中他人服务 → 96 条 E2E 整段失败/跳过",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "E2E_SERVER_PORT 指向空闲端口",
+          "expect": "96 passed",
+          "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意并行会话数量",
+          "expect": "服务身份可辨（端口可配 + 探测自身实例），不误连他人服务",
+          "command": "E2E_SERVER_PORT=<free> pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-101",
+      "title": "套件运行时解析本仓演示工作区与 slug（workspace + name/slug 一次解析）",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "干净库 + 种子",
+          "expect": "服务层 ≥408/418、HTTP E2E 45/45",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "库中存在测试残留工作区",
+          "expect": "仍解析到演示工作区（is_example=true）",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-102",
+      "title": "套件端口可配 + 停止把演示工作区改写成酒店（fixture 本地化）",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "跑完 pnpm suite",
+          "expect": "select industry from workspaces where id='ws-panda' → ecommerce",
+          "command": "psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select name,industry from workspaces where id='ws-panda'\"",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意行业仓",
+          "expect": "套件不改演示工作区的行业/名字（出口还原）",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-103",
+      "title": "行业夹具本地化：ecom 词表、岗位/技能/哨兵围栏、C 域规则口径、场景包、J/O 域巡检与多步审批",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "干净库+种子",
+          "expect": "服务层 ≥408/418，失败仅剩 R 域治理口径 10 条",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意行业仓",
+          "expect": "套件用本仓 bundle 的岗位/技能/围栏/场景口径（INDUSTRY_SLUG 运行时解析）",
+          "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-104",
+      "title": "复位客户端基座受管文件指纹（tokens.css），解除 static-gate 恒红",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "main 工作树",
+          "expect": "指纹零漂移 exit 0",
+          "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "有人改动受管文件而不刷 state",
+          "expect": "门禁判红（防漂移能力未被削弱）",
+          "command": "node scripts/verify-client-foundation-consumer.mjs --repo .",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-105",
+      "title": "四个 packages/base 测试文件随本仓口径本地化",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "本仓工作树",
+          "expect": "48 passed / 0 failed",
+          "command": "pnpm -C packages/base test",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "换行业仓",
+          "expect": "测试从本仓 bundle/工作区取值（不写死酒店路径与工作区）",
+          "command": "pnpm -C packages/base test",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-106",
+      "title": "客服意图路由：行业直连查询前置 + 售后指令疑问句判定",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "classify 四例（订单/积分/维修/退款多久到账）",
+          "expect": "biz_query/query_order · biz_query/query_member · service_request · kb_qa",
+          "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "任意售后动作文本",
+          "expect": "疑问句形态不建单、指令句建单（不回归到 kb_qa 通吃）",
+          "command": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts",
+          "last_result": "pass"
+        }
+      ]
+    },
+    {
+      "id": "MC-107",
+      "title": "apps/server E2E 端口可配（解除 96 条 E2E 误连他人服务）",
+      "verified_by": "codex/root@m6-独立环境复验(8653448)",
+      "verified_at": "2026-09-30T00:35:00+08:00",
+      "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md",
+      "assertions": [
+        {
+          "kind": "sample",
+          "given": "E2E_SERVER_PORT=空闲端口",
+          "expect": "96 passed",
+          "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+          "last_result": "pass"
+        },
+        {
+          "kind": "property",
+          "given": "默认端口被他人占用",
+          "expect": "失败信息指向端口/身份，而不是『工作区不存在』",
+          "command": "E2E_SERVER_PORT=8795 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
+          "last_result": "fail"
+        }
+      ]
+    }
+  ],
   "open_problems": [
     {
       "id": "MC-008",
@@ -119,177 +442,23 @@
       "id": "MC-014",
       "kind": "problem",
       "state": "open",
-      "severity": "P2",
-      "title": "E2E 断言 H-17（P21 三端点互洽）在并发取数下不稳定：同一棵树两次跑一次红",
+      "severity": "P1",
+      "title": "chairmanQueue 与 theater 的 L4 计数不一致（独立环境 5/5 稳定 20 vs 19）——疑似端点一致性缺陷",
       "evidence": "evidence/suite-after4.log",
-      "root_cause": "scripts/suite.ts:2620@2aae441",
+      "root_cause": "apps/server/src/trpc/router.ts:3066@12475b4",
       "fix_plan": null,
-      "regression": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep 'H-17'; done   # 期望 5/5 绿"
-    },
-    {
-      "id": "MC-001",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P1",
-      "title": "套件工作区口径钉死基座酒店的 ws-yunqi：本仓（ws-panda）服务层 100/418 假红，FK/RLS 成片失败",
-      "evidence": "scripts/suite.ts:52@2aae441",
-      "root_cause": "scripts/suite.ts:52@2aae441",
-      "fix_plan": null,
-      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
-    },
-    {
-      "id": "MC-002",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P1",
-      "title": "HTTP E2E 段登录钉死 yunqi-hotel + 模型 stub 端口硬编码 8791：整个 E2E 段在登录处崩掉（44 条不可跑）",
-      "evidence": "scripts/suite.ts:2251@2aae441",
-      "root_cause": "scripts/suite.ts:2251@2aae441",
-      "fix_plan": null,
-      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
-    },
-    {
-      "id": "MC-003",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P1",
-      "title": "onboarding E2E 用例把演示工作区改名『云栖酒店』并把行业改成 hotel，且只复位 dataMode",
-      "evidence": "scripts/suite.ts:2535@2aae441",
-      "root_cause": "scripts/suite.ts:2535@2aae441",
-      "fix_plan": null,
-      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select name,industry from workspaces where id='ws-panda'\""
-    },
-    {
-      "id": "MC-004",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P0",
-      "title": "必需门禁 verify-client-foundation-consumer 在 main 上判红（受管客户端文件指纹漂移）",
-      "evidence": ".workloom-client-foundation.json:997-1000@2aae441",
-      "root_cause": ".workloom-client-foundation.json:997@2aae441",
-      "fix_plan": null,
-      "regression": "node scripts/verify-client-foundation-consumer.mjs --repo ."
-    },
-    {
-      "id": "MC-005",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P1",
-      "title": "packages/base 四个测试文件与实现分叉：fence-engine 指向不存在的 bundles/hotel、bundles 页面注册表断言 25、recall 无词表且工作区 ws-demo、tenancy 断言英文提示",
-      "evidence": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
-      "root_cause": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
-      "fix_plan": null,
-      "regression": "pnpm -C packages/base test"
-    },
-    {
-      "id": "MC-006",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P1",
-      "title": "客服意图路由：明确的订单/会员查询与维修类售后指令被误判为知识问答（kb_qa）",
-      "evidence": "apps/server/src/service/dialog.ts:63-80@2aae441",
-      "root_cause": "apps/server/src/service/dialog.ts:63@2aae441",
-      "fix_plan": null,
-      "regression": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts"
-    },
-    {
-      "id": "MC-007",
-      "kind": "problem",
-      "state": "fixed",
-      "severity": "P1",
-      "title": "apps/server HTTP E2E 端口钉死 8795：健康检查命中他人服务 → 96 条 E2E 整段失败/跳过",
-      "evidence": "apps/server/src/service/e2e.test.ts:13@2aae441",
-      "root_cause": "apps/server/src/service/e2e.test.ts:13@2aae441",
-      "fix_plan": null,
-      "regression": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts"
+      "regression": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep -A1 'H-17 融合'; done"
     },
     {
       "id": "MC-013",
       "kind": "problem",
       "state": "open",
       "severity": "P2",
-      "title": "单元测试在开发库遗留 4 个临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
+      "title": "RUN_DB_TESTS=1 的 PG 集成测试在开发库遗留临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
       "evidence": "psql workspaces@实测",
       "root_cause": "apps/server/src/service/accounts-router.ts:1@2aae441",
       "fix_plan": null,
       "regression": "pnpm test && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select id,slug from workspaces\"   # 期望无测试残留工作区"
-    },
-    {
-      "id": "MC-101",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "套件运行时解析本仓演示工作区与 slug（workspace + name/slug 一次解析）",
-      "evidence": "scripts/suite.ts:52-90@2aae441",
-      "root_cause": null,
-      "fix_plan": "把 `const scope = { ws-yunqi }` 换成顶层 await 解析本仓工作区（owner 连接、RLS 前置）；login() 改用 WORKSPACE.slug；Z 域 zScope 收敛为 scope 别名",
-      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
-    },
-    {
-      "id": "MC-102",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "套件端口可配 + 停止把演示工作区改写成酒店（fixture 本地化）",
-      "evidence": "scripts/suite.ts:2422@2aae441",
-      "root_cause": null,
-      "fix_plan": "① STUB_PORT = Number(env.SUITE_STUB_PORT ?? '8791')；② onboarding 用例写入本仓真实名字/行业，出口还原 name/industry/archive.business/dataMode",
-      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
-    },
-    {
-      "id": "MC-103",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "行业夹具本地化：ecom 词表、岗位/技能/哨兵围栏、C 域规则口径、场景包、J/O 域巡检与多步审批",
-      "evidence": "scripts/suite.ts:95-130@2aae441",
-      "root_cause": null,
-      "fix_plan": "把基座酒店口径的夹具逐条换成电商口径：词表/岗位/技能/围栏哨兵/规则断言/场景包；J 域改为断言『未装配行业适配器必须显式失败并留痕』；O-06 改为多步审批循环（每步都要人批，已批不二次挂起）",
-      "regression": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite"
-    },
-    {
-      "id": "MC-104",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "复位客户端基座受管文件指纹（tokens.css），解除 static-gate 恒红",
-      "evidence": ".workloom-client-foundation.json:997-1000@2aae441",
-      "root_cause": null,
-      "fix_plan": "把 state 中该文件的 sha256 更新为工作树实际内容摘要（内容本身已是基座 T-2026-0929-0100 修复版，无需改文件）",
-      "regression": "node scripts/verify-client-foundation-consumer.mjs --repo ."
-    },
-    {
-      "id": "MC-105",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "四个 packages/base 测试文件随本仓口径本地化",
-      "evidence": "packages/base/fence-engine/fence-engine.test.ts:16@2aae441",
-      "root_cause": null,
-      "fix_plan": "四个文件的路径/数值/词表/文案断言全部改成本仓口径；不改产品实现",
-      "regression": "pnpm -C packages/base test"
-    },
-    {
-      "id": "MC-106",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "客服意图路由：行业直连查询前置 + 售后指令疑问句判定",
-      "evidence": "apps/server/src/service/dialog.ts:55-95@2aae441",
-      "root_cause": null,
-      "fix_plan": "classify() 顺序调整：① 工单/目录/订单/会员直连查询先行 ② 售后动作词命中时，疑问句→kb_qa、指令句→service_request ③ 其余沿用规则表",
-      "regression": "pnpm -C apps/server exec vitest run src/service/dialog.test.ts"
-    },
-    {
-      "id": "MC-107",
-      "kind": "fix",
-      "state": "fixed",
-      "severity": null,
-      "title": "apps/server E2E 端口可配（解除 96 条 E2E 误连他人服务）",
-      "evidence": "apps/server/src/service/e2e.test.ts:13-20@2aae441",
-      "root_cause": null,
-      "fix_plan": "端口改为环境变量可覆盖；默认值不变（8795），CI 单实例行为不变",
-      "regression": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts"
     },
     {
       "id": "MC-010",

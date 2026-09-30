@@ -4,7 +4,7 @@
   "level": "L2",
   "severity": "P1",
   "batch": 1,
-  "state": "fixed",
+  "state": "verified",
   "title": "套件工作区口径钉死基座酒店的 ws-yunqi：本仓（ws-panda）服务层 100/418 假红，FK/RLS 成片失败",
   "evidence": [
     {
@@ -48,9 +48,12 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "上一轮 issue #62 已把它记为『存量红 103 条』并与本仓基座修复解耦；本轮定位为单一根因（工作区口径）；本轮修复卡：MC-101/MC-103（待 M6 独立验收后转 verified）",
+  "notes": "上一轮 issue #62 已把它记为『存量红 103 条』并与本仓基座修复解耦；本轮定位为单一根因（工作区口径）；本轮修复卡：MC-101/MC-103（待 M6 独立验收后转 verified）；M6 独立环境复验通过（MC-101/MC-103）",
   "regression": {
     "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
-  }
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }

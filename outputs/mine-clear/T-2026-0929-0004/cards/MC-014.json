@@ -2,10 +2,10 @@
   "id": "MC-014",
   "kind": "problem",
   "level": "L3",
-  "severity": "P2",
-  "batch": 3,
+  "severity": "P1",
+  "batch": 2,
   "state": "open",
-  "title": "E2E 断言 H-17（P21 三端点互洽）在并发取数下不稳定：同一棵树两次跑一次红",
+  "title": "chairmanQueue 与 theater 的 L4 计数不一致（独立环境 5/5 稳定 20 vs 19）——疑似端点一致性缺陷",
   "evidence": [
     {
       "type": "log",
@@ -21,34 +21,45 @@
       "type": "code",
       "ref": "scripts/suite.ts:2620@2aae441",
       "note": "Promise.all 并发取 state/theater/chairmanQueue，断言 chairmanQueue.length == min(theater.pendingByTier.l4_chairman, 20)"
+    },
+    {
+      "type": "log",
+      "ref": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-014-h17-x5.log",
+      "note": "独立会话（无回复但留证）连续 5 轮：每轮 ✗ H-17 融合·P21 三端点互洽 —— 断言失败：L4 队列=分层计数（队列上限 20 截断口径）（期望 20，实际 19）"
+    },
+    {
+      "type": "code",
+      "ref": "apps/server/src/trpc/router.ts:3066-3070@12475b4",
+      "note": "chairmanQueue 用 approvals JOIN biz_events（e.event_id=a.event_id）取 pending L4，LIMIT 20；theater 直接 count approvals 表（router.ts:3139 附近）——JOIN 丢行会使两端口计数差 1"
     }
   ],
   "root_cause": {
-    "file": "scripts/suite.ts",
-    "line": 2620,
-    "commit": "2aae441",
-    "symbol": "H-17 计数断言"
+    "file": "apps/server/src/trpc/router.ts",
+    "line": 3066,
+    "commit": "12475b4",
+    "symbol": "chairmanQueue 查询"
   },
-  "trigger_path": "两个端点各自独立读取 pending 计数，套件在同一时刻并发请求；期间若后台节拍/前序用例产生新的 L4 审批，两端快照即错位（19 vs 18）",
+  "trigger_path": "当存在 pending L4 审批行其 event_id 在 biz_events 中缺失或跨工作区（测试造数/历史脏行）时，chairmanQueue 的 INNER JOIN 少返回 1 行，而 theater 直接 count(*) 得到 20 → 断言 20 vs 19；独立环境因前序用例造出该脏行而 5/5 稳定复现",
   "assertions": [
     {
       "kind": "sample",
-      "given": "连跑 5 次 suite",
-      "expect": "H-17 稳定绿（或断言改为容许 ±1 的时序窗口）",
-      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
-      "last_result": "fail"
+      "given": "独立环境连续 5 轮 suite",
+      "expect": "H-17 5/5 绿；若两端口确实不同源，断言应改为『差 ≤ 0 且给出丢行原因』",
+      "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep -A1 'H-17 融合'; done",
+      "last_result": "fail",
+      "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-014-h17-x5.log"
     },
     {
       "kind": "property",
-      "given": "任意并发时序",
-      "expect": "计数断言不因快照时序抖动而红",
-      "command": "SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite",
+      "given": "任意 pending L4 审批集合",
+      "expect": "chairmanQueue 与 theater.pendingByTier['l4_chairman'] 同源同值（或明确声明截断口径）",
+      "command": "psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select count(*) from approvals a left join biz_events e on e.event_id=a.event_id where a.status='pending' and a.tier='l4_chairman' and e.event_id is null\"",
       "last_result": "not-run"
     }
   ],
-  "notes": "1/5 观测，属 P2 稳定性问题；建议断言改为『差 ≤ 并发窗口』或串行取数对比",
+  "notes": "独立会话复验证据：H-17 在其环境 5/5 稳定红（期望 20 实际 19），修复者环境 1/5 红 → 从『偶发』升级为『数据相关的一致性缺陷』（P1）；建议按 chairmanQueue/theater 同源化或补 LEFT JOIN 口径修复",
   "regression": {
-    "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep 'H-17'; done   # 期望 5/5 绿",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
+    "command": "for i in 1 2 3 4 5; do SUITE_STUB_PORT=8891 SUITE_SERVER_PORT=8892 pnpm suite | grep -A1 'H-17 融合'; done",
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-014-h17-x5.log"
   }
 }

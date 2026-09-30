@@ -4,7 +4,7 @@
   "level": "L2",
   "severity": "P1",
   "batch": 1,
-  "state": "fixed",
+  "state": "verified",
   "title": "apps/server HTTP E2E 端口钉死 8795：健康检查命中他人服务 → 96 条 E2E 整段失败/跳过",
   "evidence": [
     {
@@ -48,9 +48,12 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "本轮修复卡：MC-107（待 M6 独立验收后转 verified）",
+  "notes": "本轮修复卡：MC-107（待 M6 独立验收后转 verified）；M6 独立环境复验通过（MC-107）",
   "regression": {
     "command": "E2E_SERVER_PORT=8896 pnpm -C apps/server exec vitest run src/service/e2e.test.ts",
-    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
-  }
+    "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
+  },
+  "verified_by": "codex/root@m6-独立环境复验(8653448)",
+  "verified_at": "2026-09-30T00:35:00+08:00",
+  "verification_evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/m6-independent-verification.md"
 }

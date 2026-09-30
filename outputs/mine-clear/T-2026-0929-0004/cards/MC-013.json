@@ -5,7 +5,7 @@
   "severity": "P2",
   "batch": 3,
   "state": "open",
-  "title": "单元测试在开发库遗留 4 个临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
+  "title": "RUN_DB_TESTS=1 的 PG 集成测试在开发库遗留临时工作区（云栖一号店/二号店），污染任何『取首个工作区』的口径",
   "evidence": [
     {
       "type": "db",
@@ -16,6 +16,11 @@
       "type": "log",
       "ref": "evidence/suite-after-verify1.log",
       "note": "本轮实测事故：套件按『ORDER BY id LIMIT 1』兜底解析到 ws-0i0bcu → 服务层 363/418（R/Z 域成片红），改用 is_example 优先后恢复 408/418"
+    },
+    {
+      "type": "log",
+      "ref": "outputs/mine-clear/T-2026-0929-0004/evidence/m6/m6-MC-013-trigger.log",
+      "note": "独立复验定位：seed 后 / suite 后 / packages/base 单测后 工作区均只有 ws-panda；触发源是 RUN_DB_TESTS=1 的 PG 集成测试（该档留下 4 个临时工作区）"
     }
   ],
   "root_cause": {
@@ -42,7 +47,7 @@
       "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
     }
   ],
-  "notes": "套件侧已改为『演示工作区优先』（见 MC-101）；测试清理属独立排期",
+  "notes": "套件侧已改为『演示工作区优先』（见 MC-101）；测试清理属独立排期；独立复验已把触发源从『单元测试』收窄到『RUN_DB_TESTS=1 的 PG 集成档』",
   "regression": {
     "command": "pnpm test && psql -h 127.0.0.1 -p 5471 -U postgres -d workloom -c \"select id,slug from workspaces\"   # 期望无测试残留工作区",
     "evidence": "outputs/mine-clear/T-2026-0929-0004/evidence/verification.log"
