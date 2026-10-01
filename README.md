@@ -358,3 +358,9 @@ Apache-2.0（vendor/dsh 与 vendor/dsh-im 为 MIT）。
 **WorkLoom 熊猫电商运营系统 —— 换一种活法，从现在开始。**
 
 </div>
+
+## 桌面 Agent 接入（Codex / DeepSeek Harness）
+
+本仓内置桌面 Agent 入口：`node scripts/workloom-agent.mjs list`（能力清单）与
+`node scripts/workloom-agent-mcp.mjs`（stdio MCP）。接入步骤、本仓可用能力与安全边界见
+[`docs/AGENT-CLIENTS.md`](docs/AGENT-CLIENTS.md)。
