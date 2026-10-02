@@ -2,7 +2,7 @@
  "schema": "workloom.capabilities/v2",
  "repo": "panda-ecom",
  "description": "WorkLoom 熊猫电商运营系统 · 电商卖家的 AI 运营决策层（电商垂直版）",
- "generatedAt": "2026-10-02T18:40:40.504Z",
+ "generatedAt": "2026-10-02T19:39:08.948Z",
  "demoPages": [
   "panda-ecom-demo-c.html",
   "panda-ecom-demo-mobile.html",
