@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 106,
+  "revision": 108,
   "tasks": {
     "82": {
       "number": 82,
@@ -5437,6 +5437,35 @@
       },
       "previous": "5bcae9ccfc8b3f2c2007346693b1f36e64ceaf2e31ea44c3343d7640c8b789af",
       "digest": "9c2cab665d516ee396c217269bba1b9cc2126b3f4d17a555bff8e4487de05de6"
+    },
+    {
+      "sequence": 107,
+      "at": "2026-10-06T19:46:25.213Z",
+      "kind": "installation_updated",
+      "data": {
+        "installer": 87,
+        "merge": {
+          "sha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
+          "sourceSha": "86b57818f95716f3b4f4f917b5b503991bab80fd",
+          "mainSha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+          "checkSha": "8b884a357b5d000542bbaa09090590b0804a521a",
+          "mergedBy": "cnb.dYiF05kxAGA",
+          "verifiedAt": "2026-10-06T19:46:21.526Z"
+        },
+        "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2"
+      },
+      "previous": "9c2cab665d516ee396c217269bba1b9cc2126b3f4d17a555bff8e4487de05de6",
+      "digest": "9a7d89543b6b581f51c616d9a59056ee91ed9c5c5fbc15c6d4303dfa1f1b2730"
+    },
+    {
+      "sequence": 108,
+      "at": "2026-10-06T19:46:24.446Z",
+      "kind": "transaction",
+      "data": {
+        "id": "install-updated:87:80d16853bcc8b419df6aac889ad2df32b251bad2"
+      },
+      "previous": "9a7d89543b6b581f51c616d9a59056ee91ed9c5c5fbc15c6d4303dfa1f1b2730",
+      "digest": "01066d457a14536df96195a7bc2098bac2dfa67cfdd40f82684d00ed4705fc4c"
     }
   ]
 }
