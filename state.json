@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 88,
+  "revision": 90,
   "tasks": {
     "82": {
       "number": 82,
@@ -1601,7 +1601,7 @@
         "marker": "delivery-origin:87:86b57818f95716f3b4f4f917b5b503991bab80fd:d6e68d092b3f8021280ff15fbb849058672b5275",
         "at": 1791313268039
       },
-      "mergePhase": "prepared",
+      "mergePhase": "merge_requested",
       "mergeSnapshot": {
         "repo": "workloom-ai/panda-cineforge",
         "number": 88,
@@ -1708,7 +1708,8 @@
         "generation": {
           "protocol": 8
         }
-      }
+      },
+      "mergeRequestedAt": 1791315194878
     },
     "88": {
       "number": 88,
@@ -5116,6 +5117,30 @@
       },
       "previous": "3eddd6f15bec51b050e3e8e39cb951aae3fd721d8a50fc535b53cf11b0d34371",
       "digest": "a3fd59607d2c48c127cafefdc1e85e17ba9d6cfb1675e00ea1974fa2b4db0b0a"
+    },
+    {
+      "sequence": 89,
+      "at": "2026-10-06T19:33:14.878Z",
+      "kind": "task",
+      "data": {
+        "number": 87,
+        "patch": {
+          "mergePhase": "merge_requested",
+          "mergeRequestedAt": 1791315194878
+        }
+      },
+      "previous": "a3fd59607d2c48c127cafefdc1e85e17ba9d6cfb1675e00ea1974fa2b4db0b0a",
+      "digest": "5a115a77a383a5bd950ea83f810560dc4d9e84034b48e8d7c475989878c86c5d"
+    },
+    {
+      "sequence": 90,
+      "at": "2026-10-06T19:33:22.992Z",
+      "kind": "transaction",
+      "data": {
+        "id": "4a9dd877-d695-493f-bd0c-93877120036a"
+      },
+      "previous": "5a115a77a383a5bd950ea83f810560dc4d9e84034b48e8d7c475989878c86c5d",
+      "digest": "03ae3f5ea4b423c62a4e3bf6fe6e94bc1e40f8333cbb4b6d385d14d626df5a82"
     }
   ]
 }
