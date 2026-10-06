@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 72,
+  "revision": 77,
   "tasks": {
     "82": {
       "number": 82,
@@ -1591,14 +1591,34 @@
         "marker": "delivery-origin:87:86b57818f95716f3b4f4f917b5b503991bab80fd:d6e68d092b3f8021280ff15fbb849058672b5275",
         "at": 1791313268039
       }
+    },
+    "88": {
+      "number": 88,
+      "status": "developing",
+      "firstSeen": 1791313284095,
+      "attempts": {},
+      "admission": {
+        "number": 88,
+        "headSha": "86b57818f95716f3b4f4f917b5b503991bab80fd",
+        "mainSha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+        "filesHash": "7d9d594424ecc8b2fa088ea1928230b39fbcfa4352d81ac7446e6b2eeafa5a9b",
+        "scopes": [
+          "protocol"
+        ],
+        "owner": "admission/pr-88",
+        "generation": {
+          "protocol": 7
+        }
+      },
+      "updatedAt": 1791313284095
     }
   },
   "leases": {
     "protocol": {
       "owner": null,
-      "generation": 6,
-      "acquiredAt": 1791312573390,
-      "expiresAt": 1791312573390
+      "generation": 7,
+      "acquiredAt": 1791313284095,
+      "expiresAt": 1791313284095
     }
   },
   "releases": {},
@@ -4605,6 +4625,93 @@
       },
       "previous": "8ea3227c8dc676b7cbe9d86477d289b2e09bf6de386e4701eaa11652c3f2c7e3",
       "digest": "913c93cee9d34a9887a3f2f7ad91a93dbe995abbe504089cc44290d619f81496"
+    },
+    {
+      "sequence": 73,
+      "at": "2026-10-06T19:01:24.095Z",
+      "kind": "lease_acquire",
+      "data": {
+        "scopes": [
+          "protocol"
+        ],
+        "owner": "admission/pr-88",
+        "generation": {
+          "protocol": 7
+        }
+      },
+      "previous": "913c93cee9d34a9887a3f2f7ad91a93dbe995abbe504089cc44290d619f81496",
+      "digest": "50c36251c45322c161c0e61594762fd1822eb928002ef90ab393dd6cfd9f3b97"
+    },
+    {
+      "sequence": 74,
+      "at": "2026-10-06T19:01:24.095Z",
+      "kind": "lease_release",
+      "data": {
+        "scopes": [
+          "protocol"
+        ],
+        "owner": "admission/pr-88",
+        "generation": {
+          "protocol": 7
+        }
+      },
+      "previous": "50c36251c45322c161c0e61594762fd1822eb928002ef90ab393dd6cfd9f3b97",
+      "digest": "a4fa7842f5b5e91660fecc0ab9802276e090c4c1caea5cf3664049c989c4f67a"
+    },
+    {
+      "sequence": 75,
+      "at": "2026-10-06T19:01:24.095Z",
+      "kind": "source_admitted",
+      "data": {
+        "number": 88,
+        "headSha": "86b57818f95716f3b4f4f917b5b503991bab80fd",
+        "mainSha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+        "filesHash": "7d9d594424ecc8b2fa088ea1928230b39fbcfa4352d81ac7446e6b2eeafa5a9b",
+        "scopes": [
+          "protocol"
+        ],
+        "owner": "admission/pr-88",
+        "generation": {
+          "protocol": 7
+        }
+      },
+      "previous": "a4fa7842f5b5e91660fecc0ab9802276e090c4c1caea5cf3664049c989c4f67a",
+      "digest": "66ac52474f1f0ab29ad777f586f218402acacd979b0be0fcd6d66b8b7d60cc7f"
+    },
+    {
+      "sequence": 76,
+      "at": "2026-10-06T19:01:24.095Z",
+      "kind": "task",
+      "data": {
+        "number": 88,
+        "patch": {
+          "admission": {
+            "number": 88,
+            "headSha": "86b57818f95716f3b4f4f917b5b503991bab80fd",
+            "mainSha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+            "filesHash": "7d9d594424ecc8b2fa088ea1928230b39fbcfa4352d81ac7446e6b2eeafa5a9b",
+            "scopes": [
+              "protocol"
+            ],
+            "owner": "admission/pr-88",
+            "generation": {
+              "protocol": 7
+            }
+          }
+        }
+      },
+      "previous": "66ac52474f1f0ab29ad777f586f218402acacd979b0be0fcd6d66b8b7d60cc7f",
+      "digest": "89ac05f41bdcf43196264424efafbddbc6667a0f938fe8831cf8e903e8e6d7b5"
+    },
+    {
+      "sequence": 77,
+      "at": "2026-10-06T19:01:23.828Z",
+      "kind": "transaction",
+      "data": {
+        "id": "source-admit:88:86b57818f95716f3b4f4f917b5b503991bab80fd:d6e68d092b3f8021280ff15fbb849058672b5275"
+      },
+      "previous": "89ac05f41bdcf43196264424efafbddbc6667a0f938fe8831cf8e903e8e6d7b5",
+      "digest": "698adb6d7fcfed4dd14369a332357fb827c27f232aab4c0888c5f3807bead6b8"
     }
   ]
 }
