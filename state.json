@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 33,
+  "revision": 35,
   "tasks": {
     "84": {
       "number": 84,
@@ -659,7 +659,7 @@
     },
     "85": {
       "number": 85,
-      "status": "developing",
+      "status": "integrated",
       "firstSeen": 1791308900421,
       "attempts": {},
       "admission": {
@@ -675,7 +675,7 @@
           "protocol": 4
         }
       },
-      "updatedAt": 1791308904254,
+      "updatedAt": 1791309875605,
       "developerReview": {
         "schemaVersion": 1,
         "provider": "codex",
@@ -1306,6 +1306,64 @@
         "ready": true,
         "dependsOn": [],
         "releases": []
+      },
+      "headSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+      "merge": {
+        "sha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+        "sourceSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+        "mainSha": "3974756b4a1d31379f919fe813441d5f832a81da",
+        "checkSha": "ab4e4565e73567b5dd63793a532be47a2b68b191",
+        "mergedBy": "cnb.dYiF05kxAGA",
+        "verifiedAt": "2026-10-06T18:04:34.931Z"
+      },
+      "mergeSnapshot": {
+        "number": 85,
+        "pull": {
+          "number": 85,
+          "state": "open",
+          "title": "feat(base): 安装普通研发自动交付 [T-2026-1005-6953]",
+          "body": "从已激活且禁用平台 AI 的基座当前主干 2d350b7ec969abb0749f8d8d60a2212b8872e3e0 安装完整研发执行闭包。当前 Codex 会话 review、实际测试并保存准确回执；CNB/GitHub 模型审核、模型代理及 NPC 修复入口关闭。保留目标产品依赖、必需机器 CI、行业身份、业务围栏和隔离；敏感 fenced 租约、不可修改候选、真实依赖和准确 merge 双亲继续核验。\n\n安装准备账本与清单，当前会话实测交接后才能普通合入；缺真实证明保持等待，不伪造批准。任务卡 #83 [T-2026-1005-6953]。\n\n<!-- delivery-install:eadd924affbe00f33296870464578fec1ed1abc715bf15a7c104c48676df8022 -->\n\n<!-- workloom-delivery\n{\n  \"task_id\": \"T-2026-1005-6953\",\n  \"ready\": true,\n  \"depends_on\": [],\n  \"releases\": []\n}\n-->\n\n<!-- installer-policy-refresh:84:70eadaf7203e5a2d206e0bd22be5bd29b8086c13:3974756b4a1d31379f919fe813441d5f832a81da -->\n\n同一准确源码在现行 Codex/CI 交付规则下重新执行完整独立审查与原有门禁，真实合入后关闭被替代 #84，源分支保留。",
+          "author": {
+            "username": "cnb.dYiF05kxAGA",
+            "nickname": "Genius",
+            "email": "XYpmztfpCvez6l8z5BBAvJ+cnb.dYiF05kxAGA@noreply.cnb.cool",
+            "is_npc": false
+          },
+          "reviewers": [],
+          "labels": [],
+          "base": {
+            "ref": "refs/heads/main",
+            "sha": "3974756b4a1d31379f919fe813441d5f832a81da",
+            "repo": {
+              "id": "2100398244662448128",
+              "name": "panda-cineforge",
+              "path": "workloom-ai/panda-cineforge",
+              "web_url": "https://cnb.cool/workloom-ai/panda-cineforge"
+            }
+          },
+          "head": {
+            "ref": "refs/heads/chore/protocol-onboarding-delivery-policy-7d26e4b3374d4ea293dc9566",
+            "sha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+            "repo": {
+              "id": "2100398244662448128",
+              "name": "panda-cineforge",
+              "path": "workloom-ai/panda-cineforge",
+              "web_url": "https://cnb.cool/workloom-ai/panda-cineforge"
+            }
+          },
+          "blocked_on": "unblocked",
+          "merged_by": {
+            "is_npc": false
+          },
+          "mergeable_state": "mergeable",
+          "is_wip": false,
+          "is_merged": false,
+          "is_force_merged": false,
+          "statuses": {}
+        },
+        "headSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+        "mainSha": "3974756b4a1d31379f919fe813441d5f832a81da",
+        "checkSha": "ab4e4565e73567b5dd63793a532be47a2b68b191"
       }
     }
   },
@@ -3290,6 +3348,93 @@
       },
       "previous": "3612988e9473942500f99b785672c4a36e7ba1e045052b4b52c3aa5a5148843f",
       "digest": "3bb0b24be4f07fb9c0eb1b62b0c6d26d16c3fd71f72e261235795a991d58cd60"
+    },
+    {
+      "sequence": 34,
+      "at": "2026-10-06T18:04:35.605Z",
+      "kind": "task",
+      "data": {
+        "number": 85,
+        "patch": {
+          "status": "integrated",
+          "headSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+          "intent": {
+            "taskId": "T-2026-1005-6953",
+            "ready": true,
+            "dependsOn": [],
+            "releases": []
+          },
+          "merge": {
+            "sha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+            "sourceSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+            "mainSha": "3974756b4a1d31379f919fe813441d5f832a81da",
+            "checkSha": "ab4e4565e73567b5dd63793a532be47a2b68b191",
+            "mergedBy": "cnb.dYiF05kxAGA",
+            "verifiedAt": "2026-10-06T18:04:34.931Z"
+          },
+          "mergeSnapshot": {
+            "number": 85,
+            "pull": {
+              "number": 85,
+              "state": "open",
+              "title": "feat(base): 安装普通研发自动交付 [T-2026-1005-6953]",
+              "body": "从已激活且禁用平台 AI 的基座当前主干 2d350b7ec969abb0749f8d8d60a2212b8872e3e0 安装完整研发执行闭包。当前 Codex 会话 review、实际测试并保存准确回执；CNB/GitHub 模型审核、模型代理及 NPC 修复入口关闭。保留目标产品依赖、必需机器 CI、行业身份、业务围栏和隔离；敏感 fenced 租约、不可修改候选、真实依赖和准确 merge 双亲继续核验。\n\n安装准备账本与清单，当前会话实测交接后才能普通合入；缺真实证明保持等待，不伪造批准。任务卡 #83 [T-2026-1005-6953]。\n\n<!-- delivery-install:eadd924affbe00f33296870464578fec1ed1abc715bf15a7c104c48676df8022 -->\n\n<!-- workloom-delivery\n{\n  \"task_id\": \"T-2026-1005-6953\",\n  \"ready\": true,\n  \"depends_on\": [],\n  \"releases\": []\n}\n-->\n\n<!-- installer-policy-refresh:84:70eadaf7203e5a2d206e0bd22be5bd29b8086c13:3974756b4a1d31379f919fe813441d5f832a81da -->\n\n同一准确源码在现行 Codex/CI 交付规则下重新执行完整独立审查与原有门禁，真实合入后关闭被替代 #84，源分支保留。",
+              "author": {
+                "username": "cnb.dYiF05kxAGA",
+                "nickname": "Genius",
+                "email": "XYpmztfpCvez6l8z5BBAvJ+cnb.dYiF05kxAGA@noreply.cnb.cool",
+                "is_npc": false
+              },
+              "reviewers": [],
+              "labels": [],
+              "base": {
+                "ref": "refs/heads/main",
+                "sha": "3974756b4a1d31379f919fe813441d5f832a81da",
+                "repo": {
+                  "id": "2100398244662448128",
+                  "name": "panda-cineforge",
+                  "path": "workloom-ai/panda-cineforge",
+                  "web_url": "https://cnb.cool/workloom-ai/panda-cineforge"
+                }
+              },
+              "head": {
+                "ref": "refs/heads/chore/protocol-onboarding-delivery-policy-7d26e4b3374d4ea293dc9566",
+                "sha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+                "repo": {
+                  "id": "2100398244662448128",
+                  "name": "panda-cineforge",
+                  "path": "workloom-ai/panda-cineforge",
+                  "web_url": "https://cnb.cool/workloom-ai/panda-cineforge"
+                }
+              },
+              "blocked_on": "unblocked",
+              "merged_by": {
+                "is_npc": false
+              },
+              "mergeable_state": "mergeable",
+              "is_wip": false,
+              "is_merged": false,
+              "is_force_merged": false,
+              "statuses": {}
+            },
+            "headSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
+            "mainSha": "3974756b4a1d31379f919fe813441d5f832a81da",
+            "checkSha": "ab4e4565e73567b5dd63793a532be47a2b68b191"
+          }
+        }
+      },
+      "previous": "3bb0b24be4f07fb9c0eb1b62b0c6d26d16c3fd71f72e261235795a991d58cd60",
+      "digest": "da47b61fc8a9002824c40c0a271d71992715f78cea18ba9bcbef1c7aba3eaf21"
+    },
+    {
+      "sequence": 35,
+      "at": "2026-10-06T18:04:34.931Z",
+      "kind": "transaction",
+      "data": {
+        "id": "7e5a9dcc-eabf-446a-be4d-910825807d0e"
+      },
+      "previous": "da47b61fc8a9002824c40c0a271d71992715f78cea18ba9bcbef1c7aba3eaf21",
+      "digest": "d3e12cdd4873e09a25672fb8b0aa1c2e5d68e01e1470c6668fd8cdbea6712cc0"
     }
   ]
 }
