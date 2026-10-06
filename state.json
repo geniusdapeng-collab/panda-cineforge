@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 39,
+  "revision": 41,
   "tasks": {
     "84": {
       "number": 84,
@@ -675,7 +675,7 @@
           "protocol": 4
         }
       },
-      "updatedAt": 1791309875605,
+      "updatedAt": 1791309911845,
       "developerReview": {
         "schemaVersion": 1,
         "provider": "codex",
@@ -1364,6 +1364,11 @@
         "headSha": "70eadaf7203e5a2d206e0bd22be5bd29b8086c13",
         "mainSha": "3974756b4a1d31379f919fe813441d5f832a81da",
         "checkSha": "ab4e4565e73567b5dd63793a532be47a2b68b191"
+      },
+      "issueReceipt": {
+        "issue": 83,
+        "marker": "delivery-receipt:85:d6e68d092b3f8021280ff15fbb849058672b5275",
+        "verifiedAt": 1791309911845
       }
     }
   },
@@ -3694,6 +3699,33 @@
       },
       "previous": "3b1bc4ff52243063206d1540c59dc7fab8b7d13f4162a919e067c2c6ecc89f9b",
       "digest": "4b83ee61809a22a0aa7278b7d76686b9d6d79e2cd1e5181f9e2cc3d509472e19"
+    },
+    {
+      "sequence": 40,
+      "at": "2026-10-06T18:05:11.845Z",
+      "kind": "task",
+      "data": {
+        "number": 85,
+        "patch": {
+          "issueReceipt": {
+            "issue": 83,
+            "marker": "delivery-receipt:85:d6e68d092b3f8021280ff15fbb849058672b5275",
+            "verifiedAt": 1791309911845
+          }
+        }
+      },
+      "previous": "4b83ee61809a22a0aa7278b7d76686b9d6d79e2cd1e5181f9e2cc3d509472e19",
+      "digest": "cb9356a7b82a699b5df7c7ae2d14c108b2ca81886ff81e0d52a544582cc0d99d"
+    },
+    {
+      "sequence": 41,
+      "at": "2026-10-06T18:05:13.146Z",
+      "kind": "transaction",
+      "data": {
+        "id": "c32a36c0-0aba-44a3-8ec1-8721b549da6d"
+      },
+      "previous": "cb9356a7b82a699b5df7c7ae2d14c108b2ca81886ff81e0d52a544582cc0d99d",
+      "digest": "1f10391af75c96f51229e25347d6627611306fbf1369c1e9832578c2434cc31f"
     }
   ]
 }
