@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 37,
+  "revision": 39,
   "tasks": {
     "84": {
       "number": 84,
@@ -3672,6 +3672,28 @@
       },
       "previous": "21d9b19e9bf5d03d65dda79d37850d279d797f78e3a71bfba84744d3f37e5195",
       "digest": "4d586bec2d57d6cee3c35f88a620f9ccc537e73f3172ce6a03abb245b65923ea"
+    },
+    {
+      "sequence": 38,
+      "at": "2026-10-06T18:04:56.615Z",
+      "kind": "installer_replacement_closed",
+      "data": {
+        "number": 84,
+        "replacement": 85,
+        "sha": "d6e68d092b3f8021280ff15fbb849058672b5275"
+      },
+      "previous": "4d586bec2d57d6cee3c35f88a620f9ccc537e73f3172ce6a03abb245b65923ea",
+      "digest": "3b1bc4ff52243063206d1540c59dc7fab8b7d13f4162a919e067c2c6ecc89f9b"
+    },
+    {
+      "sequence": 39,
+      "at": "2026-10-06T18:04:55.953Z",
+      "kind": "transaction",
+      "data": {
+        "id": "installer-replacement-closed:84:85"
+      },
+      "previous": "3b1bc4ff52243063206d1540c59dc7fab8b7d13f4162a919e067c2c6ecc89f9b",
+      "digest": "4b83ee61809a22a0aa7278b7d76686b9d6d79e2cd1e5181f9e2cc3d509472e19"
     }
   ]
 }
