@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 79,
+  "revision": 81,
   "tasks": {
     "82": {
       "number": 82,
-      "status": "waiting_ci",
+      "status": "parked",
       "firstSeen": 1791309913187,
       "attempts": {},
       "headSha": "c4bd66e1d22441ceeb22db57b73318ae68f7a2dc",
@@ -40,7 +40,17 @@
         "scopes": [],
         "owner": "admission/pr-82",
         "generation": {}
-      }
+      },
+      "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+      "repairRequired": {
+        "provider": "codex",
+        "headSha": "c4bd66e1d22441ceeb22db57b73318ae68f7a2dc",
+        "mainSha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+        "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+        "at": 1791315194878
+      },
+      "recoveryIntent": null,
+      "blockedUntil": 1791315794878
     },
     "84": {
       "number": 84,
@@ -4749,6 +4759,39 @@
       },
       "previous": "d79d93e3fefde44484c73b04d9b0d288c76379b6016e7b172fd7f940b5db67d4",
       "digest": "f20cf10eaf6c75e642df825454daf1a6d64fc06b5005904559540025468a3e32"
+    },
+    {
+      "sequence": 80,
+      "at": "2026-10-06T19:33:14.878Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "status": "parked",
+          "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+          "repairRequired": {
+            "provider": "codex",
+            "headSha": "c4bd66e1d22441ceeb22db57b73318ae68f7a2dc",
+            "mainSha": "d6e68d092b3f8021280ff15fbb849058672b5275",
+            "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+            "at": 1791315194878
+          },
+          "recoveryIntent": null,
+          "blockedUntil": 1791315794878
+        }
+      },
+      "previous": "f20cf10eaf6c75e642df825454daf1a6d64fc06b5005904559540025468a3e32",
+      "digest": "16b1c21b1b88fab81aec35562f2daf7d3b5b545b244d17a6a07a6e3768700a1d"
+    },
+    {
+      "sequence": 81,
+      "at": "2026-10-06T19:33:17.845Z",
+      "kind": "transaction",
+      "data": {
+        "id": "e7e3b002-23c2-4e89-be2c-8e9942ef6c75"
+      },
+      "previous": "16b1c21b1b88fab81aec35562f2daf7d3b5b545b244d17a6a07a6e3768700a1d",
+      "digest": "9f9e5c17d1956aa9cda2752cf7a4a83a7e061fc1a7b51fa79f4723cdbc9e0a69"
     }
   ]
 }
