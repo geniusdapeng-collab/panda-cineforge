@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 362,
+  "revision": 364,
   "tasks": {
     "82": {
       "number": 82,
@@ -22,7 +22,7 @@
         "apps/server/src/trpc/router.ts"
       ],
       "ciSince": 1791315213513,
-      "updatedAt": 1791370814147,
+      "updatedAt": 1791371414636,
       "alignmentCount": 1,
       "alignmentIntent": null,
       "developerReview": null,
@@ -9733,6 +9733,43 @@
       },
       "previous": "9cea6478c3f8e164c6d6e5e9741e8bcb080c69d453982eb02ca1da07cd9bb3f1",
       "digest": "a73e9ac68cd08c3c796bd54a9f7db53a578217faa9d6660a99d221675154f272"
+    },
+    {
+      "sequence": 363,
+      "at": "2026-10-07T11:10:14.636Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
+          "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
+          "branch": "task/T-2026-1003-9104",
+          "intent": {
+            "taskId": "T-2026-1003-9104",
+            "dependsOn": [],
+            "releases": []
+          },
+          "originalBody": "当前 main 的行业路由仍用两参数 fenceRuleRowId 和固定 v-next，底层已有版本身份契约，导致服务端类型检查失败；修复同时消除旧固定版本提案流程的重复身份风险。本次复用基座已有版本递增、当前基线校验、同事务 dry-run 确认、事件及审批写入；保留本仓原有权限中间件，并对同一 pending dry-run 加行锁。连续提案分别落 v2/v3，失败不会消耗 pending 或留下半条事件/审批。\n\n验证：本仓 server 与 web 两项类型检查通过；16 项新增/更新回归通过。围栏测试使用真实隔离 PostgreSQL、RLS 与五元事件，成员身份和写入故障由模拟夹具注入；Tiger 交易执行器仅模拟，未接实盘。覆盖重复/并发提案、跨区/错规则/非 pending 拒绝、基线拒绝后重试、完整回滚及权限。\n\n本仓扩展通用围栏及语音相关回归通过。Panda/Tiger 没有酒店夹具，因此显式排除无条件读取酒店资产的既有行业专用测试；通用根路由 PostgreSQL 回归完整执行。 不能把 allowFailure 流水线成功等同于全部业务测试通过。\n\n风险：review。本 PR 涉及围栏、事件、审批及 Tiger 授权输入，按开发协议保留 risk/review 人审；不移除风险标签，不强制合并。回滚：revert 本 PR，不改数据库 schema 或依赖。\n\n任务卡：https://cnb.cool/workloom-ai/panda-cineforge/-/issues/81\n\n变更路径：\n- `apps/server/src/trpc/router.ts`\n- `apps/server/src/trpc/fence-proposal.pg.test.ts`",
+          "files": [
+            "apps/server/src/trpc/fence-proposal.pg.test.ts",
+            "apps/server/src/trpc/router.ts"
+          ],
+          "status": "parked",
+          "ciSince": 1791315213513
+        }
+      },
+      "previous": "a73e9ac68cd08c3c796bd54a9f7db53a578217faa9d6660a99d221675154f272",
+      "digest": "4921ad2054d8555a844e035af931276da39d9ad5f45df57412ea5d5a32da94da"
+    },
+    {
+      "sequence": 364,
+      "at": "2026-10-07T11:10:15.655Z",
+      "kind": "transaction",
+      "data": {
+        "id": "15c83bf6-0b4c-432e-9c25-019fb541ff7b"
+      },
+      "previous": "4921ad2054d8555a844e035af931276da39d9ad5f45df57412ea5d5a32da94da",
+      "digest": "d373ca18e2b874b0e7ed23394141e5a00dbafd9a5b73ead72ec8d138178c35f0"
     }
   ]
 }
