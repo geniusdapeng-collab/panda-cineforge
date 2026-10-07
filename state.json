@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 326,
+  "revision": 328,
   "tasks": {
     "82": {
       "number": 82,
@@ -22,7 +22,7 @@
         "apps/server/src/trpc/router.ts"
       ],
       "ciSince": 1791315213513,
-      "updatedAt": 1791363014388,
+      "updatedAt": 1791363614029,
       "alignmentCount": 1,
       "alignmentIntent": null,
       "developerReview": null,
@@ -50,7 +50,7 @@
         "at": 1791362109831
       },
       "recoveryIntent": null,
-      "blockedUntil": 1791363614388,
+      "blockedUntil": 1791364214029,
       "recoveryCount": 0,
       "reviewFailures": null,
       "candidate": null
@@ -9123,6 +9123,31 @@
       },
       "previous": "bc301cceaa216a8ccb748daf8aaf0387c6a91c46a23db1fa70e557a9652f1ebd",
       "digest": "8cec814e44530d76c0f1441457faa6eba2626e267b44d4d37962abdb94d30c80"
+    },
+    {
+      "sequence": 327,
+      "at": "2026-10-07T09:00:14.029Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "status": "parked",
+          "error": "CNB 429 https://api.cnb.cool/workloom-ai/panda-cineforge/-/pulls/82/commit-statuses :: {\"errcode\":8,\"errmsg\":\"Too many requests. Please try again later.\"}\n",
+          "blockedUntil": 1791364214029
+        }
+      },
+      "previous": "8cec814e44530d76c0f1441457faa6eba2626e267b44d4d37962abdb94d30c80",
+      "digest": "a9088786d5acac0ef05f4325372ce84488650f347e7b928b544f45ebaac7f5c0"
+    },
+    {
+      "sequence": 328,
+      "at": "2026-10-07T09:00:18.836Z",
+      "kind": "transaction",
+      "data": {
+        "id": "1ce22702-3726-4aea-961e-9cb0a052480b"
+      },
+      "previous": "a9088786d5acac0ef05f4325372ce84488650f347e7b928b544f45ebaac7f5c0",
+      "digest": "01dc04c269a0b060d7a89c658ea2637d9b9e9f4682154ad784760dcd8fcf6565"
     }
   ]
 }
