@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 912,
+  "revision": 914,
   "tasks": {
     "82": {
       "number": 82,
@@ -41,16 +41,16 @@
         "owner": "admission/pr-82",
         "generation": {}
       },
-      "error": "CNB 429 https://api.cnb.cool/workloom-ai/panda-cineforge/-/pulls/82/commit-statuses :: {\"errcode\":8,\"errmsg\":\"Too many requests. Please try again later.\"}\n",
+      "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
       "repairRequired": {
         "provider": "codex",
         "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
         "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
         "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
-        "at": 1791487514255
+        "at": 1791489015959
       },
       "recoveryIntent": null,
-      "blockedUntil": 1791488715296,
+      "blockedUntil": 1791489615959,
       "recoveryCount": 0,
       "reviewFailures": null,
       "candidate": null
@@ -19080,6 +19080,39 @@
       },
       "previous": "50e99ed3ab38c77a5b60f90fbfa964eb3d4aef1e879bec0da781674e135e3e6e",
       "digest": "b80bb8eed0459671df6831cafaee1adb0cd749bfb0dd651b41762d2b307366c7"
+    },
+    {
+      "sequence": 913,
+      "at": "2026-10-08T19:50:15.959Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "status": "parked",
+          "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+          "repairRequired": {
+            "provider": "codex",
+            "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
+            "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
+            "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+            "at": 1791489015959
+          },
+          "recoveryIntent": null,
+          "blockedUntil": 1791489615959
+        }
+      },
+      "previous": "b80bb8eed0459671df6831cafaee1adb0cd749bfb0dd651b41762d2b307366c7",
+      "digest": "b5d7086fd33dd824d1eb154ed439fb0481768d8a36481e8dbb1f6fcad5d7327c"
+    },
+    {
+      "sequence": 914,
+      "at": "2026-10-08T19:50:18.045Z",
+      "kind": "transaction",
+      "data": {
+        "id": "0902e902-d653-4987-b94c-9abab9f29418"
+      },
+      "previous": "b5d7086fd33dd824d1eb154ed439fb0481768d8a36481e8dbb1f6fcad5d7327c",
+      "digest": "13b8fa55aa39c439641c8b73c816b68675f6c9c2e2e6ede3d5449e7494ffccd6"
     }
   ]
 }
