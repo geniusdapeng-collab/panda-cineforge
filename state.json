@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 664,
+  "revision": 666,
   "tasks": {
     "82": {
       "number": 82,
@@ -47,10 +47,10 @@
         "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
         "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
         "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
-        "at": 1791436517774
+        "at": 1791437419455
       },
       "recoveryIntent": null,
-      "blockedUntil": 1791437117774,
+      "blockedUntil": 1791438019455,
       "recoveryCount": 0,
       "reviewFailures": null,
       "candidate": null
@@ -14820,6 +14820,39 @@
       },
       "previous": "e008358e5d9a095e9c88baa8fc7ebc6e234023a502305c41e6084988e8a05fd0",
       "digest": "a5a93506a558335f26448bec29aeb6ad888344510755a2288b4e2ef56275d793"
+    },
+    {
+      "sequence": 665,
+      "at": "2026-10-08T05:30:19.455Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "status": "parked",
+          "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+          "repairRequired": {
+            "provider": "codex",
+            "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
+            "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
+            "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+            "at": 1791437419455
+          },
+          "recoveryIntent": null,
+          "blockedUntil": 1791438019455
+        }
+      },
+      "previous": "a5a93506a558335f26448bec29aeb6ad888344510755a2288b4e2ef56275d793",
+      "digest": "c666e192761661069004164fc482ddb09018a17ecdeee7d90fec51dece0e7fd9"
+    },
+    {
+      "sequence": 666,
+      "at": "2026-10-08T05:30:21.905Z",
+      "kind": "transaction",
+      "data": {
+        "id": "19718933-1835-4614-83b3-3c0e746eec13"
+      },
+      "previous": "c666e192761661069004164fc482ddb09018a17ecdeee7d90fec51dece0e7fd9",
+      "digest": "feccaef31ec10fb04b73fb662e420b34bdf570f49f379355e76e65322c4fd048"
     }
   ]
 }
