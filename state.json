@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 624,
+  "revision": 626,
   "tasks": {
     "82": {
       "number": 82,
@@ -47,10 +47,10 @@
         "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
         "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
         "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
-        "at": 1791427813816
+        "at": 1791428416952
       },
       "recoveryIntent": null,
-      "blockedUntil": 1791428413816,
+      "blockedUntil": 1791429016952,
       "recoveryCount": 0,
       "reviewFailures": null,
       "candidate": null
@@ -14160,6 +14160,39 @@
       },
       "previous": "32680992da8e0fc07600de5f30f5ba95e723753e92539d9800f563f448d24c2b",
       "digest": "ebfd497bfd2e6f8d7ca6561dbcfe43e3410bc8e3ef89c798406caadba68010af"
+    },
+    {
+      "sequence": 625,
+      "at": "2026-10-08T03:00:16.952Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "status": "parked",
+          "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+          "repairRequired": {
+            "provider": "codex",
+            "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
+            "mainSha": "80d16853bcc8b419df6aac889ad2df32b251bad2",
+            "reason": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+            "at": 1791428416952
+          },
+          "recoveryIntent": null,
+          "blockedUntil": 1791429016952
+        }
+      },
+      "previous": "ebfd497bfd2e6f8d7ca6561dbcfe43e3410bc8e3ef89c798406caadba68010af",
+      "digest": "447a0aebeeed1e3daeaecfa6b6eaff409077ed88ce18e498bb8d49468631ebbc"
+    },
+    {
+      "sequence": 626,
+      "at": "2026-10-08T03:00:19.204Z",
+      "kind": "transaction",
+      "data": {
+        "id": "573b705e-5e6f-4797-8c25-39e7bb4988bd"
+      },
+      "previous": "447a0aebeeed1e3daeaecfa6b6eaff409077ed88ce18e498bb8d49468631ebbc",
+      "digest": "1b5107934cafe8cd0567f769188b60e7289f7d7f280e1cb1b48975d787ff6726"
     }
   ]
 }
