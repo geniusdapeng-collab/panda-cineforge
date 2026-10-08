@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repo": "workloom-ai/panda-cineforge",
-  "revision": 908,
+  "revision": 910,
   "tasks": {
     "82": {
       "number": 82,
@@ -22,7 +22,7 @@
         "apps/server/src/trpc/router.ts"
       ],
       "ciSince": 1791315213513,
-      "updatedAt": 1791487514255,
+      "updatedAt": 1791488115296,
       "alignmentCount": 1,
       "alignmentIntent": null,
       "developerReview": null,
@@ -41,7 +41,7 @@
         "owner": "admission/pr-82",
         "generation": {}
       },
-      "error": "检查/评审阻断：Developer has not handed off; Codex review identity differs from the exact repository/source/main/policy",
+      "error": "CNB 429 https://api.cnb.cool/workloom-ai/panda-cineforge/-/pulls/82/commit-statuses :: {\"errcode\":8,\"errmsg\":\"Too many requests. Please try again later.\"}\n",
       "repairRequired": {
         "provider": "codex",
         "headSha": "7eeef536e8388b490827d46ef4260790cc0ed2ee",
@@ -50,7 +50,7 @@
         "at": 1791487514255
       },
       "recoveryIntent": null,
-      "blockedUntil": 1791488114255,
+      "blockedUntil": 1791488715296,
       "recoveryCount": 0,
       "reviewFailures": null,
       "candidate": null
@@ -19018,6 +19018,31 @@
       },
       "previous": "620707a582f73e0537dfe1a95038ecaa6a4c016232f84cb8a3d7470977d996b8",
       "digest": "8080605f1ee55e06796b4ebc2a6d9a157add7e58f645b7939dea988a2575de95"
+    },
+    {
+      "sequence": 909,
+      "at": "2026-10-08T19:35:15.296Z",
+      "kind": "task",
+      "data": {
+        "number": 82,
+        "patch": {
+          "status": "parked",
+          "error": "CNB 429 https://api.cnb.cool/workloom-ai/panda-cineforge/-/pulls/82/commit-statuses :: {\"errcode\":8,\"errmsg\":\"Too many requests. Please try again later.\"}\n",
+          "blockedUntil": 1791488715296
+        }
+      },
+      "previous": "8080605f1ee55e06796b4ebc2a6d9a157add7e58f645b7939dea988a2575de95",
+      "digest": "e4a35157cddb53f20d4f60028d588a726cdd5701be45c748d871a7af1664bd9c"
+    },
+    {
+      "sequence": 910,
+      "at": "2026-10-08T19:35:18.634Z",
+      "kind": "transaction",
+      "data": {
+        "id": "ad27981d-87f2-4df5-9d8c-3c663955a14f"
+      },
+      "previous": "e4a35157cddb53f20d4f60028d588a726cdd5701be45c748d871a7af1664bd9c",
+      "digest": "366548bede1f76119d7b086db65321d34300eb295467c902141f00abd1204f32"
     }
   ]
 }
