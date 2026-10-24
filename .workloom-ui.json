@@ -23,8 +23,9 @@
   ],
   "artifact": {
     "type": "github-release-tarball",
+    "platform": "github",
     "assetName": "workloom-ui-0.1.17.tgz",
-    "url": "https://cnb.cool/workloom-ai/workloom-im/-/releases/download/ui-v0.1.17/workloom-ui-0.1.17.tgz",
+    "url": "https://github.com/geniusdapeng-collab/workloom-im/releases/download/ui-v0.1.17/workloom-ui-0.1.17.tgz",
     "sha512": "sha512-iJolO8NyIDoEZlMsX3BPJba9/6LbAhjhCgW7Kw5W/dRkW3MOsZ14Odlm6azcSnnpY9HhqAtea1YiYLZi4utLsw=="
   }
 }
