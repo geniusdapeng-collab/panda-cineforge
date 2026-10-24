@@ -7,6 +7,7 @@
  *  - withObjectLock：对象写锁（pg advisory try-lock；超时转「需介入」，禁强制抢锁，E2.5）
  */
 import type pg from "pg";
+import { randomUUID } from "node:crypto";
 import { DRY_RUN_REPLAY_LIMIT, OBJECT_LOCK_TIMEOUT_MS, type BusinessEvent } from "@workloom/shared";
 import { judge, type JudgeVerdict, type RuntimeRule } from "./judge.js";
 import { checkCandidateAgainstBaseline } from "./dsl.js";
@@ -23,6 +24,9 @@ export interface DryRunReport {
   impact: string; // 人读摘要
   /** 与现行规则集的差量（提供 baseline 时给出；HP-02 补 F2.5 证据缺口） */
   delta?: DryRunDelta;
+  /** 实际参与预演的候选快照；旧报告无此字段时，提交提案必须重新预演。 */
+  candidateRules?: RuntimeRule[];
+  candidateDefaultLevel?: "auto" | "review" | "block";
 }
 
 /**
@@ -109,6 +113,8 @@ export async function createDryRun(
     baseline?: { rules: RuntimeRule[]; defaultLevel: "auto" | "review" | "block" };
   },
 ): Promise<{ dryRunId: string; report: DryRunReport }> {
+  const candidateRules = structuredClone(input.rules);
+  const candidateDefaultLevel = input.defaultLevel;
   const client = await app.connect();
   try {
     // 事务级 RLS 上下文必须在显式事务内设置：autocommit 下 set_config(...,true) 语句结束即失效
@@ -121,7 +127,7 @@ export async function createDryRun(
       [scope.tenantId, scope.workspaceId, DRY_RUN_REPLAY_LIMIT],
     );
     const events = rows.rows.map((r) => r.payload);
-    const { verdicts } = replayRules(events, input.rules, input.defaultLevel);
+    const { verdicts } = replayRules(events, candidateRules, candidateDefaultLevel);
     let delta: DryRunDelta | undefined;
     if (input.baseline) {
       const base = replayRules(events, input.baseline.rules, input.baseline.defaultLevel);
@@ -140,8 +146,10 @@ export async function createDryRun(
         `放行 ${verdicts.filter((v) => v.verdict.level === "auto").length}` +
         (delta ? ` · ${delta.summary}` : ""),
       delta,
+      candidateRules,
+      candidateDefaultLevel,
     };
-    const dryRunId = `fdr-${input.ruleId.toLowerCase()}-${Date.now().toString(36)}`;
+    const dryRunId = `fdr-${input.ruleId.toLowerCase()}-${randomUUID()}`;
     await client.query(
       `INSERT INTO fence_dry_runs (id, workspace_id, rule_id, rule_version, report, status, created_by)
        VALUES ($1,$2,$3,$4,$5,'pending',$6)`,
@@ -314,8 +322,8 @@ export async function activateRuleVersion(
     // ① 审批绑定验真（HP-02）：approvalEventId 必须指向本工作区真实的 approval.gesture 事件，
     //    其 after.approvalId 对应的审批行已 approved，且被审事件正是本规则的 fence.rule.propose。
     //    修复前该字段只被原样写库（伪造 event id 也能过），审批与规则行没有绑定关系。
-    const gesture = await client.query<{ proposal_event_id: string }>(
-      `SELECT a.event_id AS proposal_event_id
+    const gesture = await client.query<{ proposal_event_id: string; proposal: unknown }>(
+      `SELECT a.event_id AS proposal_event_id, p.payload AS proposal
          FROM biz_events g
          JOIN approvals a
            ON a.workspace_id = g.workspace_id
@@ -323,12 +331,18 @@ export async function activateRuleVersion(
          JOIN biz_events p ON p.event_id = a.event_id AND p.workspace_id = a.workspace_id
         WHERE g.workspace_id=$1 AND g.event_id=$2
           AND g.payload->'decision'->>'action' = 'approval.gesture'
+          AND g.payload->'decision'->'after'->>'gesture' = 'approve'
           AND a.status = 'approved'
           AND p.payload->'decision'->>'action' = 'fence.rule.propose'`,
       [scope.workspaceId, input.approvalEventId],
     );
     if (!gesture.rows[0]) {
       throw new Error(`审批事件 ${input.approvalEventId} 与围栏变更提案未绑定（伪造/未绑定引用，拒绝激活）`);
+    }
+    const binding = fenceActivationFromProposal(gesture.rows[0].proposal, scope.workspaceId);
+    if (!binding || binding.ruleRowId !== input.ruleRowId || binding.dryRunId !== input.dryRunId
+      || (input.allowWhenChange === true && binding.allowWhenChange !== true)) {
+      throw new Error(`审批事件 ${input.approvalEventId} 未绑定本次候选行、dry-run 或 when 改写授权，拒绝激活`);
     }
     // ② 候选行 + 基线单调守卫（HP-02：checkMonotonic 此前只在测试里被调用）
     const cand = await client.query<{
