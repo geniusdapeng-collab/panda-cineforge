@@ -9,6 +9,7 @@ import {
   closeTicket,
   completeTicket,
   createTicket,
+  TicketIdempotencyConflictError,
   listTickets,
   slaScan,
   ticketTimeline,
@@ -40,6 +41,13 @@ function wireTicketDb(db: FakeDb, now: () => Date): FakeDb {
   });
   db.on(/^SELECT \* FROM c_tickets WHERE workspace_id=\$1 AND idempotency_key=\$2/, (p, d) => ({
     rows: d.table("c_tickets").filter((r) => r["workspace_id"] === p[0] && r["idempotency_key"] === p[1]),
+  }));
+  db.on(/^SELECT actor_type, actor_id, detail FROM c_ticket_events WHERE workspace_id=\$1 AND ticket_id=\$2 AND action IN \('create','created'\) ORDER BY id ASC LIMIT 1$/, (p, d) => ({
+    rows: d.table("c_ticket_events")
+      .filter((r) => r["workspace_id"] === p[0] && r["ticket_id"] === p[1] && ["create", "created"].includes(String(r["action"])))
+      .sort((a, b) => Number(a["id"]) - Number(b["id"]))
+      .slice(0, 1)
+      .map(({ actor_type, actor_id, detail }) => ({ actor_type, actor_id, detail })),
   }));
   db.on(/^SELECT \* FROM c_tickets WHERE id=\$1 AND workspace_id=\$2 FOR UPDATE/, (p, d) => ({
     rows: d.table("c_tickets").filter((r) => r["id"] === p[0] && r["workspace_id"] === p[1]),
@@ -159,6 +167,39 @@ describe("createTicket 幂等 + 全生命周期留痕", () => {
     expect(db.table("c_tickets").length).toBe(1);
     expect(db.table("c_ticket_events").length).toBe(1); // 只落一次 created
     expect(r1.ticket.sla_due_at).toBe(new Date("2026-08-23T11:00:00+08:00").toISOString()); // delivery 默认 1h
+  });
+
+  it.each(["actor-id", "actor-type", "request"])("同键但%s不同拒绝，不返回他人原单或新增事件", async (difference) => {
+    const { db, events, emit } = setup(() => new Date("2026-08-23T10:00:00+08:00"));
+    const input = { kind: "repair" as const, title: "水龙头漏水", payload: { room: "8808" }, idempotencyKey: "guarded-replay" };
+    await createTicket(db, CTX, input, ACTOR, emit);
+    const actor = difference === "actor-id" ? { ...ACTOR, id: "MEM-002" }
+      : difference === "actor-type" ? { type: "agent" as const, id: ACTOR.id } : ACTOR;
+    const request = difference === "request" ? { ...input, payload: { room: "9909" } } : input;
+    await expect(createTicket(db, CTX, request, actor, emit)).rejects.toBeInstanceOf(TicketIdempotencyConflictError);
+    expect(db.table("c_tickets")).toHaveLength(1);
+    expect(db.table("c_ticket_events")).toHaveLength(1);
+    expect(events).toHaveLength(1);
+  });
+
+  it("建单事件缺少历史请求摘要时拒绝重放，不用当前工单内容补造授权", async () => {
+    const { db, emit } = setup(() => new Date());
+    const input = { kind: "other" as const, title: "历史工单", idempotencyKey: "legacy-no-fingerprint" };
+    await createTicket(db, CTX, input, ACTOR, emit);
+    db.table("c_ticket_events")[0]!["detail"] = { title: input.title };
+    await expect(createTicket(db, CTX, input, ACTOR, emit)).rejects.toMatchObject({ status: 409 });
+    expect(db.table("c_ticket_events")).toHaveLength(1);
+  });
+
+  it("同主体同请求仅会话关联和JSON属性顺序变化仍幂等，不重建工单", async () => {
+    const { db, events, emit } = setup(() => new Date());
+    const input = { kind: "repair" as const, title: "水龙头漏水", payload: { room: "8808", issue: "leak" }, conversationId: "cv-old", idempotencyKey: "same-request" };
+    const first = await createTicket(db, CTX, input, ACTOR, emit);
+    const replay = await createTicket(db, CTX, { ...input, conversationId: "cv-new", payload: { issue: "leak", room: "8808" } }, ACTOR, emit);
+    expect(replay.deduped).toBe(true);
+    expect(replay.ticket.id).toBe(first.ticket.id);
+    expect(db.table("c_ticket_events")).toHaveLength(1);
+    expect(events).toHaveLength(1);
   });
 
   it("created→assigned→processing→done→closed 全链路 + 时间线回放 + 五元事件", async () => {

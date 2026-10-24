@@ -231,7 +231,11 @@ describe.skipIf(!RUN_DB || !hasHotelPack)("HP-02 真库：审批绑定与版本�
   }
 
   /** 造一条真实审批链：fence.rule.propose 事件 → approved 审批行 → approval.gesture 事件 */
-  async function buildApprovalChain(ruleId: string, dryRunId: string): Promise<string> {
+  async function buildApprovalChain(
+    ruleId: string,
+    dryRunId: string,
+    binding: { ruleRowId?: string; version?: string; allowWhenChange?: boolean } = {},
+  ): Promise<string> {
     return withAppTx(async (client) => {
       const proposal = await gatewayAppendOnClient(
         client,
@@ -240,7 +244,10 @@ describe.skipIf(!RUN_DB || !hasHotelPack)("HP-02 真库：审批绑定与版本�
           who: { type: "human", id: "MEM-001" },
           context: { tenant_id: scope.tenantId, workspace_id: scope.workspaceId, time: new Date().toISOString(), channel: "inapp" },
           object: { type: "staff", id: ruleId },
-          decision: { action: "fence.rule.propose", after: { ruleId, dryRunId } },
+          decision: { action: "fence.rule.propose", after: {
+            ruleId, dryRunId, ruleRowId: binding.ruleRowId ?? rowId(ruleId),
+            version: binding.version ?? "v-next", allowWhenChange: binding.allowWhenChange === true,
+          } },
           rule_impact: [],
         } as never,
       );
@@ -288,6 +295,20 @@ describe.skipIf(!RUN_DB || !hasHotelPack)("HP-02 真库：审批绑定与版本�
     await expect(activateRuleVersion(appPool, scope, {
       ruleRowId: rowId(newRuleId), dryRunId: dr.dryRunId, approvalEventId: `E-FAKE-${suffix}`,
     })).rejects.toThrowError(/未绑定|伪造/);
+  });
+
+  it("真实 approved 审批也不能被换绑到另一个候选行", async () => {
+    const dr = await createDryRun(appPool, scope, {
+      ruleId: newRuleId, ruleVersion: "v-next", rules: hotelPackRules,
+      defaultLevel: hotelPackDefaultLevel, createdBy: "MEM-001",
+    });
+    await confirmDryRun(appPool, scope, dr.dryRunId);
+    await insertCandidate(newRuleId, "review", "after.price < 300");
+    const wrongRule = `R${Number(newRuleId.slice(1)) + 10000}`;
+    const gestureEventId = await buildApprovalChain(wrongRule, dr.dryRunId);
+    await expect(activateRuleVersion(appPool, scope, {
+      ruleRowId: rowId(newRuleId), dryRunId: dr.dryRunId, approvalEventId: gestureEventId,
+    })).rejects.toThrowError(/未绑定/);
   });
 
   it("基线规则放宽在激活期被单调守卫拒绝（level 降档）", async () => {
@@ -359,7 +380,9 @@ describe.skipIf(!RUN_DB || !hasHotelPack)("HP-02 真库：审批绑定与版本�
       });
       await confirmDryRun(appPool, scope, dr.dryRunId);
       await insertProposalRow(row, level, opts.when ?? defaultWhen);
-      const gestureEventId = await buildApprovalChain(mcRule, dr.dryRunId);
+      const gestureEventId = await buildApprovalChain(mcRule, dr.dryRunId, {
+        ruleRowId: row.rowId, version: row.version, allowWhenChange: opts.allowWhenChange,
+      });
       return activateRuleVersion(appPool, scope, {
         ruleRowId: row.rowId, dryRunId: dr.dryRunId, approvalEventId: gestureEventId,
         allowWhenChange: opts.allowWhenChange,
