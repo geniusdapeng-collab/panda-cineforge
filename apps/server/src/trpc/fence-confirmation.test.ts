@@ -1,11 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import pg from "pg";
 import { closeAllPools, getAppPool, getGatewayPool } from "@workloom/db";
 import { signDemoToken, type Identity } from "@workloom/base/tenancy";
 import { gatewayAppend } from "@workloom/base/workdata";
 import { activateRuleVersion } from "@workloom/base/fence-engine";
+import { decide as decideApproval } from "@workloom/base/review-console";
+import { stableStringify } from "@workloom/base/im-channels";
 import { appRouter } from "./router.js";
 import { createContext } from "./context.js";
 
@@ -18,7 +20,7 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
   const workspaceId = `ws-fence-http-${suffix}`;
   const foreignWorkspaceId = `ws-fence-foreign-${suffix}`;
   const owner = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-  let tokens: { owner: string; foreign: string; readonly: string; denied: string };
+  let tokens: { owner: string; foreign: string; readonly: string; denied: string; guardrailDenied: string; approvalDenied: string };
   let sequence = 970000;
   const requestErrors: string[] = [];
 
@@ -28,10 +30,10 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
   });
   type Candidate = ReturnType<typeof rule>;
 
-  async function request(path: string, body: unknown, token?: string) {
+  async function request(path: string, body: unknown, token?: string, headers: Record<string, string> = {}) {
     const req = new Request(`http://fence-regression.local/trpc/${path}`, {
       method: "POST", headers: {
-        "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}),
+        "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}), ...headers,
       }, body: JSON.stringify(body),
     });
     const res = await fetchRequestHandler({
@@ -39,7 +41,7 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
       onError: ({ error }) => { requestErrors.push(error.message); },
     });
     const json = await res.json() as {
-      result: { data: { dryRunId: string; eventId: string } };
+      result: { data: { dryRunId: string; eventId: string; status?: string; deduped?: boolean } };
       error: { message: string };
     };
     return { status: res.status, json };
@@ -92,7 +94,11 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
       await owner.query("INSERT INTO workspaces(id,tenant_id,slug,name,industry,stage) VALUES($1,$2,$1,'围栏回归','test','stable')", [ws, tenantId]);
       for (const [memberNo, role, permissions] of [
         ["MEM-001", "owner", {}], ["MEM-003", "readonly", {}],
-        ["MEM-002", "manager", { deny: ["workspace.write"] }],
+        ["MEM-002", "manager", { deny: ["workspace.write", "guardrail.manage", "approval.decide"] }],
+        ["MEM-004", "manager", { deny: ["guardrail.manage"] }],
+        ["MEM-005", "manager", { deny: ["approval.decide"] }],
+        ["MEM-006", "manager", { "approval.decide": false }],
+        ["MEM-007", "readonly", {}],
       ] as const) {
         await owner.query("INSERT INTO members(id,workspace_id,member_no,name,role,permissions) VALUES($1,$2,$3,$3,$4,$5)",
           [`${ws}-${memberNo}`, ws, memberNo, role, JSON.stringify(permissions)]);
@@ -106,7 +112,11 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
       foreign: await token(foreignWorkspaceId, "MEM-001", "owner"),
       readonly: await token(workspaceId, "MEM-003", "readonly"),
       denied: await token(workspaceId, "MEM-002", "manager"),
+      guardrailDenied: await token(workspaceId, "MEM-004", "manager"),
+      approvalDenied: await token(workspaceId, "MEM-005", "manager"),
     };
+    await owner.query("UPDATE members SET im_openids=$2 WHERE workspace_id=$1 AND member_no='MEM-001'", [workspaceId, JSON.stringify({ dingtalk: `owner-${suffix}` })]);
+    await owner.query("UPDATE members SET im_openids=$2 WHERE workspace_id=$1 AND member_no='MEM-005'", [workspaceId, JSON.stringify({ dingtalk: `denied-${suffix}` })]);
     for (let i = 0; i < 10; i++) await gatewayAppend(getGatewayPool(), {
       tenantId, workspaceId, actor: { id: "MEM-001", type: "human" },
     }, {
@@ -145,6 +155,246 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
     expect(rejected.json.error.message).toContain("只可加严");
     expect(await rowState(id)).toBe("pending");
     expect(await candidates(candidate.ruleId)).toHaveLength(3);
+  });
+
+  it("并列待批提案激活时保留预留版本；旧版本不能覆盖已生效新版本", async () => {
+    async function pair(candidate: Candidate) {
+      const ids = await Promise.all([dryRun(candidate), dryRun(candidate)]);
+      const proposals = [];
+      for (const id of ids) {
+        const response = await confirm(candidate, id);
+        expect(response.status).toBe(200);
+        const approval = (await owner.query<{ approval_id: string }>(
+          "SELECT approval_id FROM approvals WHERE workspace_id=$1 AND event_id=$2",
+          [workspaceId, response.json.result.data.eventId],
+        )).rows[0]!;
+        proposals.push(approval.approval_id);
+      }
+      return proposals;
+    }
+    const inOrder = rule();
+    const firstPair = await pair(inOrder);
+    expect((await request("approvals.decide", { approvalId: firstPair[0]!, gesture: "approve" }, tokens.owner)).status).toBe(200);
+    expect(await candidates(inOrder.ruleId)).toEqual([
+      expect.objectContaining({ id: `fr-${inOrder.ruleId.toLowerCase()}-v1-${workspaceId}`, version: "v1", status: "active" }),
+      expect.objectContaining({ id: `fr-${inOrder.ruleId.toLowerCase()}-v2-${workspaceId}`, version: "v2", status: "pending_approval" }),
+    ]);
+    expect((await request("approvals.decide", { approvalId: firstPair[1]!, gesture: "approve" }, tokens.owner)).status).toBe(200);
+    expect((await candidates(inOrder.ruleId)).filter((row) => row.status === "active")).toEqual([
+      expect.objectContaining({ version: "v2" }),
+    ]);
+    const reversed = rule();
+    const secondPair = await pair(reversed);
+    expect((await request("approvals.decide", { approvalId: secondPair[1]!, gesture: "approve" }, tokens.owner)).status).toBe(200);
+    expect((await request("approvals.decide", { approvalId: secondPair[0]!, gesture: "approve" }, tokens.owner)).status).toBe(400);
+    expect(requestErrors.at(-1)).toContain("已过期");
+    expect((await owner.query<{ status: string }>("SELECT status FROM approvals WHERE approval_id=$1", [secondPair[0]!])).rows[0]!.status).toBe("pending");
+    expect((await owner.query<{ count: string }>(
+      `SELECT count(*)::text FROM biz_events WHERE workspace_id=$1 AND payload->'decision'->>'action'='approval.gesture'
+        AND payload->'decision'->'after'->>'approvalId'=$2`, [workspaceId, secondPair[0]!],
+    )).rows[0]!.count).toBe("0");
+    expect((await candidates(reversed.ruleId)).filter((row) => row.status === "active")).toEqual([
+      expect.objectContaining({ version: "v2" }),
+    ]);
+  });
+
+  it("并发批准同规则两个待批版本后仅最高具名版本生效", async () => {
+    const candidate = rule();
+    const ids = await Promise.all([dryRun(candidate), dryRun(candidate)]);
+    const approvals: string[] = [];
+    for (const id of ids) {
+      const proposal = await confirm(candidate, id);
+      expect(proposal.status).toBe(200);
+      approvals.push((await owner.query<{ approval_id: string }>(
+        "SELECT approval_id FROM approvals WHERE workspace_id=$1 AND event_id=$2",
+        [workspaceId, proposal.json.result.data.eventId],
+      )).rows[0]!.approval_id);
+    }
+    const responses = await Promise.all(approvals.map((approvalId) => request(
+      "approvals.decide", { approvalId, gesture: "approve" }, tokens.owner,
+    )));
+    expect(responses.some((response) => response.status === 200)).toBe(true);
+    expect(responses.every((response) => [200, 400].includes(response.status))).toBe(true);
+    const rows = await candidates(candidate.ruleId);
+    expect(rows.filter((row) => row.status === "active")).toEqual([
+      expect.objectContaining({ id: `fr-${candidate.ruleId.toLowerCase()}-v2-${workspaceId}`, version: "v2" }),
+    ]);
+    expect(rows.map((row) => row.version)).toEqual(["v1", "v2"]);
+  });
+
+  it("激活失败使审批、手势及版本切换一并回滚；恢复后可批准并幂等重试", async () => {
+    const candidate = rule();
+    await proposeAndApprove(candidate);
+    const changed = { ...candidate, level: "review" as const };
+    const id = await dryRun(changed);
+    const proposal = await confirm(changed, id);
+    expect(proposal.status).toBe(200);
+    const approvalId = (await owner.query<{ approval_id: string }>(
+      "SELECT approval_id FROM approvals WHERE workspace_id=$1 AND event_id=$2",
+      [workspaceId, proposal.json.result.data.eventId],
+    )).rows[0]!.approval_id;
+    const pendingId = (await candidates(candidate.ruleId)).find((row) => row.status === "pending_approval")!.id;
+    const constraint = `activation_fail_${suffix.replaceAll("-", "")}`;
+    await owner.query(`ALTER TABLE fence_rules ADD CONSTRAINT "${constraint}" CHECK (id <> '${pendingId}' OR status <> 'active')`);
+    try {
+      expect((await request("approvals.decide", { approvalId, gesture: "approve" }, tokens.owner)).status).toBe(500);
+      expect((await owner.query<{ status: string }>("SELECT status FROM approvals WHERE approval_id=$1", [approvalId])).rows[0]!.status).toBe("pending");
+      expect((await owner.query<{ status: string; approved_event_id: string | null }>(
+        "SELECT status,approved_event_id FROM fence_rules WHERE id=$1", [pendingId],
+      )).rows[0]).toEqual({ status: "pending_approval", approved_event_id: null });
+      expect((await owner.query<{ count: string }>(
+        `SELECT count(*)::text FROM biz_events WHERE workspace_id=$1 AND payload->'decision'->>'action'='approval.gesture'
+          AND payload->'decision'->'after'->>'approvalId'=$2`, [workspaceId, approvalId],
+      )).rows[0]!.count).toBe("0");
+      expect((await candidates(candidate.ruleId)).filter((row) => row.status === "active")).toEqual([
+        expect.objectContaining({ version: "v1", level: "auto" }),
+      ]);
+    } finally {
+      await owner.query(`ALTER TABLE fence_rules DROP CONSTRAINT "${constraint}"`);
+    }
+    expect((await request("approvals.decide", { approvalId, gesture: "approve" }, tokens.owner)).status).toBe(200);
+    const repeat = await request("approvals.decide", { approvalId, gesture: "approve" }, tokens.owner);
+    expect(repeat.status).toBe(200);
+    expect(repeat.json.result.data.deduped).toBe(true);
+    expect((await candidates(candidate.ruleId)).filter((row) => row.status === "active")).toEqual([
+      expect.objectContaining({ version: "v2", level: "review" }),
+    ]);
+  });
+
+  it("不完整围栏提案不能静默批准，显式禁审批成员不能直调批准", async () => {
+    const candidate = rule();
+    const id = await dryRun(candidate);
+    const proposal = await confirm(candidate, id);
+    expect(proposal.status).toBe(200);
+    const approvalId = (await owner.query<{ approval_id: string }>(
+      "SELECT approval_id FROM approvals WHERE workspace_id=$1 AND event_id=$2",
+      [workspaceId, proposal.json.result.data.eventId],
+    )).rows[0]!.approval_id;
+    expect((await request("approvals.decide", { approvalId, gesture: "approve" }, tokens.approvalDenied)).status).toBe(403);
+    expect((await request("approvals.batchApprove", { approvalIds: [approvalId] }, tokens.approvalDenied)).status).toBe(403);
+    expect((await request("approvals.sweep", undefined, tokens.approvalDenied)).status).toBe(403);
+    expect((await owner.query<{ status: string }>("SELECT status FROM approvals WHERE approval_id=$1", [approvalId])).rows[0]!.status).toBe("pending");
+    const edit = await request("approvals.decide", {
+      approvalId, gesture: "edit", editedAfter: { ...candidate, level: "block" }, editKind: "correction",
+    }, tokens.owner);
+    expect(edit.status).toBe(400);
+    expect(edit.json.error.message).toContain("重新预演");
+    expect((await owner.query<{ status: string }>("SELECT status FROM approvals WHERE approval_id=$1", [approvalId])).rows[0]!.status).toBe("pending");
+    const pending = (await candidates(candidate.ruleId))[0]!;
+    for (const after of [
+      { ruleId: candidate.ruleId },
+      { ruleId: `R${++sequence}`, ruleRowId: pending.id, version: "v1", dryRunId: id },
+      { ruleId: candidate.ruleId, ruleRowId: pending.id, version: "v99", dryRunId: id },
+    ]) {
+      const invalid = await gatewayAppend(getGatewayPool(), { tenantId, workspaceId, actor: { id: "MEM-001", type: "human" } }, {
+        who: { id: "MEM-001", type: "human" },
+        context: { tenant_id: tenantId, workspace_id: workspaceId, time: new Date().toISOString() },
+        object: { type: "staff", id: candidate.ruleId },
+        decision: { action: "fence.rule.propose", after }, rule_impact: [],
+      });
+      const invalidId = `apr-${invalid.eventId.toLowerCase()}`;
+      await owner.query(
+        `INSERT INTO approvals(approval_id,tenant_id,workspace_id,event_id,channel,status,snapshot)
+          VALUES($1,$2,$3,$4,'inapp','pending',$5)`,
+        [invalidId, tenantId, workspaceId, invalid.eventId, JSON.stringify({ high_risk: true })],
+      );
+      const response = await request("approvals.decide", { approvalId: invalidId, gesture: "approve" }, tokens.owner);
+      expect(response.status).toBe(400);
+      expect(response.json.error.message).toMatch(/缺少|未绑定/);
+      expect((await owner.query<{ status: string }>("SELECT status FROM approvals WHERE approval_id=$1", [invalidId])).rows[0]!.status).toBe("pending");
+    }
+    expect((await candidates(candidate.ruleId))[0]!.status).toBe("pending_approval");
+  });
+
+  it("IM 同权回调自动激活；已验签回调不能替被禁审批成员放行", async () => {
+    const candidate = rule();
+    const id = await dryRun(candidate);
+    const proposed = await confirm(candidate, id);
+    const approvalId = (await owner.query<{ approval_id: string }>(
+      "SELECT approval_id FROM approvals WHERE workspace_id=$1 AND event_id=$2", [workspaceId, proposed.json.result.data.eventId],
+    )).rows[0]!.approval_id;
+    const previousSecret = process.env.IM_CHANNEL_SECRET_DINGTALK;
+    try {
+      const denied = { channel: "dingtalk", approvalId, operatorOpenId: `denied-${suffix}`, conversationId: "fence-regression", gesture: "approve" };
+      const secret = "mock-fence-channel-secret-only-for-regression";
+      process.env.IM_CHANNEL_SECRET_DINGTALK = secret;
+      const timestamp = String(Math.floor(Date.now() / 1000));
+      const signature = createHmac("sha256", secret).update(`${timestamp}.${stableStringify(denied)}`).digest("hex");
+      const blocked = await request("im.callback", denied, tokens.owner, { "x-channel-timestamp": timestamp, "x-channel-signature": signature });
+      expect(blocked.status).toBe(403);
+      expect((await owner.query<{ status: string }>("SELECT status FROM approvals WHERE approval_id=$1", [approvalId])).rows[0]!.status).toBe("pending");
+      delete process.env.IM_CHANNEL_SECRET_DINGTALK;
+      const own = { ...denied, operatorOpenId: `owner-${suffix}` };
+      const accepted = await request("im.callback", own, tokens.owner);
+      expect(accepted.status).toBe(200);
+      expect((await candidates(candidate.ruleId))[0]!.status).toBe("active");
+      expect((await request("im.callback", own, tokens.owner)).json.result.data.deduped).toBe(true);
+    } finally {
+      if (previousSecret === undefined) delete process.env.IM_CHANNEL_SECRET_DINGTALK;
+      else process.env.IM_CHANNEL_SECRET_DINGTALK = previousSecret;
+    }
+  });
+
+  it("直接服务 decide 无需 HTTP 后置钩子即可激活；普通业务编辑保持原语义", async () => {
+    const candidate = rule();
+    const id = await dryRun(candidate);
+    const proposed = await confirm(candidate, id);
+    const approvalId = (await owner.query<{ approval_id: string }>(
+      "SELECT approval_id FROM approvals WHERE workspace_id=$1 AND event_id=$2", [workspaceId, proposed.json.result.data.eventId],
+    )).rows[0]!.approval_id;
+    await expect(decideApproval(getAppPool(), getGatewayPool(), { tenantId, workspaceId },
+      { memberNo: "MEM-005", role: "owner" }, approvalId, { type: "approve" })).rejects.toThrow(/approval.decide/);
+    for (const memberNo of ["MEM-006", "MEM-007", "MEM-NOT-FOUND"]) {
+      await expect(decideApproval(getAppPool(), getGatewayPool(), { tenantId, workspaceId },
+        { memberNo, role: "owner" }, approvalId, { type: "approve" })).rejects.toThrow(/approval.decide/);
+    }
+    const approved = await decideApproval(getAppPool(), getGatewayPool(), { tenantId, workspaceId },
+      { memberNo: "MEM-001", role: "owner" }, approvalId, { type: "approve" });
+    expect(approved.activatedRuleRowId).toBe((await candidates(candidate.ruleId))[0]!.id);
+    expect((await candidates(candidate.ruleId))[0]!.status).toBe("active");
+    const event = await gatewayAppend(getGatewayPool(), { tenantId, workspaceId, actor: { id: "MEM-001", type: "human" } }, {
+      who: { id: "MEM-001", type: "human" },
+      context: { tenant_id: tenantId, workspace_id: workspaceId, time: new Date().toISOString() },
+      object: { type: "fence_probe", id: "ordinary-edit" }, decision: { action: "fence_probe.adjust", after: { value: 1 } }, rule_impact: [],
+    });
+    const ordinaryId = `apr-${event.eventId.toLowerCase()}`;
+    await owner.query(
+      `INSERT INTO approvals(approval_id,tenant_id,workspace_id,event_id,channel,status,snapshot)
+        VALUES($1,$2,$3,$4,'inapp','pending',$5)`,
+      [ordinaryId, tenantId, workspaceId, event.eventId, JSON.stringify({ after: { value: 1 } })],
+    );
+    const edited = await decideApproval(getAppPool(), getGatewayPool(), { tenantId, workspaceId },
+      { memberNo: "MEM-001", role: "owner" }, ordinaryId, { type: "edit", editedAfter: { value: 2 }, editKind: "correction" });
+    expect(edited.status).toBe("edited");
+    expect(edited.activatedRuleRowId).toBeUndefined();
+  });
+
+  it("同事件跨通道并发批准不死锁且只产生一次手势与激活", async () => {
+    const candidate = rule();
+    const id = await dryRun(candidate);
+    const proposal = await confirm(candidate, id);
+    expect(proposal.status).toBe(200);
+    const first = (await owner.query<{ approval_id: string; snapshot: unknown }>(
+      "SELECT approval_id,snapshot FROM approvals WHERE workspace_id=$1 AND event_id=$2",
+      [workspaceId, proposal.json.result.data.eventId],
+    )).rows[0]!;
+    const secondId = `${first.approval_id}-dingtalk`;
+    await owner.query(
+      `INSERT INTO approvals(approval_id,tenant_id,workspace_id,event_id,channel,status,snapshot)
+        VALUES($1,$2,$3,$4,'dingtalk','pending',$5)`,
+      [secondId, tenantId, workspaceId, proposal.json.result.data.eventId, JSON.stringify(first.snapshot)],
+    );
+    const results = await Promise.all([first.approval_id, secondId].map((approvalId) => request(
+      "approvals.decide", { approvalId, gesture: "approve" }, tokens.owner,
+    )));
+    expect(results.map((result) => result.status)).toEqual([200, 200]);
+    expect(results.map((result) => result.json.result.data.deduped).sort()).toEqual([false, true]);
+    expect((await owner.query<{ count: string }>(
+      `SELECT count(*)::text FROM biz_events WHERE workspace_id=$1 AND payload->'decision'->>'action'='approval.gesture'
+        AND payload->'decision'->'after'->>'approvalId'=ANY($2::text[])`,
+      [workspaceId, [first.approval_id, secondId]],
+    )).rows[0]!.count).toBe("1");
+    expect((await candidates(candidate.ruleId)).filter((row) => row.status === "active")).toHaveLength(1);
   });
 
   it("候选在回放后被编辑或旧报告没有快照时，必须重跑预演", async () => {
@@ -188,6 +438,8 @@ describe.skipIf(!RUN_DB)("围栏确认 HTTP/PG：预演、版本、审批与回�
     expect((await request("fence.confirmDryRun", { dryRunId: id, rule: candidate })).status).toBe(401);
     expect((await confirm(candidate, id, tokens.readonly)).status).toBe(403);
     expect((await confirm(candidate, id, tokens.denied)).status).toBe(403);
+    expect((await confirm(candidate, id, tokens.guardrailDenied)).status).toBe(403);
+    expect((await request("fence.dryRun", candidate, tokens.guardrailDenied)).status).toBe(403);
     expect((await confirm(candidate, id, tokens.foreign)).status).toBe(400);
     expect(await rowState(id)).toBe("pending");
     expect(await candidates(candidate.ruleId)).toHaveLength(0);
