@@ -42,6 +42,14 @@ function wireTicketDb(db: FakeDb): FakeDb {
   db.on(/^SELECT \* FROM c_tickets WHERE workspace_id=\$1 AND idempotency_key=\$2/, (p, d) => ({
     rows: d.table("c_tickets").filter((r) => r["workspace_id"] === p[0] && r["idempotency_key"] === p[1]),
   }));
+  // 幂等重放核对最早建单事件的主体和不可变请求摘要，不能伪造一个默认通过的事件。
+  db.on(/^SELECT actor_type, actor_id, detail FROM c_ticket_events WHERE workspace_id=\$1 AND ticket_id=\$2 AND action IN \('create','created'\) ORDER BY id ASC LIMIT 1$/, (p, d) => ({
+    rows: d.table("c_ticket_events")
+      .filter((r) => r["workspace_id"] === p[0] && r["ticket_id"] === p[1] && ["create", "created"].includes(String(r["action"])))
+      .sort((a, b) => Number(a["id"]) - Number(b["id"]))
+      .slice(0, 1)
+      .map(({ actor_type, actor_id, detail }) => ({ actor_type, actor_id, detail })),
+  }));
   db.on(/^SELECT \* FROM c_tickets WHERE id=\$1 AND workspace_id=\$2 FOR UPDATE/, (p, d) => ({
     rows: d.table("c_tickets").filter((r) => r["id"] === p[0] && r["workspace_id"] === p[1]),
   }));

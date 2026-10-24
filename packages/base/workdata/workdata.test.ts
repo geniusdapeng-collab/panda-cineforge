@@ -146,9 +146,12 @@ describe("高风险授权段③（L3.5 + P1-8 验真）", () => {
     ).rejects.toThrow(/过期/);
   });
 
-  it("绑定对象/动作不符被拒；相符或通用授权（无绑定字段）放行", async () => {
+  it("动作必须绑定；显式声明的对象和动作不符被拒，相符才放行", async () => {
     await expect(
-      checkHighRiskAuthorization(stubDb([{ status: "approved", snapshot: { object_type: "order" } }]), scope, desktop, d(), "apr-1"),
+      checkHighRiskAuthorization(stubDb([{ status: "approved", snapshot: { action: "desktop.gui", object_type: "order" } }]), scope, desktop, d(), "apr-1"),
+    ).rejects.toThrow(/不符/);
+    await expect(
+      checkHighRiskAuthorization(stubDb([{ status: "approved", snapshot: { action: "order.refund", object_type: "price" } }]), scope, desktop, d(), "apr-1"),
     ).rejects.toThrow(/不符/);
     await expect(
       checkHighRiskAuthorization(
@@ -158,13 +161,17 @@ describe("高风险授权段③（L3.5 + P1-8 验真）", () => {
     ).resolves.toBeUndefined();
     await expect(
       checkHighRiskAuthorization(stubDb([{ status: "approved", snapshot: {} }]), scope, desktop, d(), "apr-1"),
+    ).rejects.toThrow(/缺 snapshot.action/);
+    // 对象维度为显式声明才校验；动作本身始终必须绑定。
+    await expect(
+      checkHighRiskAuthorization(stubDb([{ status: "approved", snapshot: { action: "desktop.gui" } }]), scope, desktop, d(), "apr-1"),
     ).resolves.toBeUndefined();
   });
 
   it("票据一次性消费：已被消费的审批再次验真必须被拒（B-02 / L3.5 逐次授权）", async () => {
     await expect(
       checkHighRiskAuthorization(
-        stubDb([{ status: "approved", snapshot: {} }], { consumed: true }),
+        stubDb([{ status: "approved", snapshot: { action: "desktop.gui" } }], { consumed: true }),
         scope, desktop, d(), "apr-1",
       ),
     ).rejects.toThrow(/已被消费/);
@@ -350,7 +357,7 @@ d("PG 集成（H-2/L1.4：幂等丢弃、哈希链序）", async () => {
         gatewayAppend(pool, { ...desktopCtx, approvalRef: `apr-p18-exp-${tag}` }, ddraft("RT-P18")),
       ).rejects.toThrow(/过期/);
       // approved 但绑定对象类型不符 → 拒
-      await insApr(`apr-p18-mis-${tag}`, "approved", { object_type: "order" });
+      await insApr(`apr-p18-mis-${tag}`, "approved", { action: "desktop.gui", object_type: "order" });
       await expect(
         gatewayAppend(pool, { ...desktopCtx, approvalRef: `apr-p18-mis-${tag}` }, ddraft("RT-P18")),
       ).rejects.toThrow(/不符/);
