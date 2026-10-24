@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "workloom.repository/v1",
+  "logicalId": "panda-cineforge",
+  "productId": "panda-cineforge",
+  "lane": "industry",
+  "primaryPlatform": "github",
+  "github": {
+    "repository": "geniusdapeng-collab/panda-cineforge",
+    "url": "https://github.com/geniusdapeng-collab/panda-cineforge",
+    "branch": "main"
+  },
+  "cnb": {
+    "repository": "workloom-ai/panda-cineforge",
+    "url": "https://cnb.cool/workloom-ai/panda-cineforge",
+    "branch": "main"
+  },
+  "mirrorPolicy": {
+    "platform": "cnb",
+    "mode": "deferred",
+    "automaticProductSync": false,
+    "configBackupBranchPrefix": "workloom/config-backup/"
+  },
+  "baseSync": {
+    "receive": "subscribed",
+    "reflux": "proposal-only",
+    "pathPrefix": "",
+    "extraExclude": [
+      "apps/server/src/service/contract.test.ts",
+      "apps/server/src/service/dialog.test.ts",
+      "apps/server/src/service/e2e.test.ts",
+      "packages/base/im-channels/im-channels.test.ts",
+      "packages/base/model-router/model-router.test.ts",
+      "packages/base/review-console/approvals.test.ts",
+      "packages/base/service-ticket/scenarios.test.ts",
+      "packages/base/service-ticket/service-ticket.test.ts",
+      "packages/base/tenancy/tenancy.test.ts",
+      "packages/base/workdata/atomicity.test.ts",
+      "packages/base/workdata/memory.test.ts",
+      "packages/base/workdata/recall.test.ts",
+      "packages/base/workdata/security-audit.test.ts",
+      "packages/base/workdata/workdata.test.ts",
+      "packages/shared/src/event-schema.test.ts",
+      "scripts/agent-tour.sh",
+      "scripts/e2e-service-c.mjs",
+      "scripts/release-gate.ts"
+    ],
+    "uiRolloutWave": "W4"
+  },
+  "registry": {
+    "repository": "geniusdapeng-collab/workloom-im",
+    "path": "sync/repository-registry.json"
+  }
+}
