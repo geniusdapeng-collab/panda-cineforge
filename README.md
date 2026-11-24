@@ -1,29 +1,3 @@
-# 熊猫 · WorkLoom 电商运营工作台
-
-**把多店铺的价格、库存、广告、客服和异常处置放进一个运营工作区。**
-
-团队可以看店铺与渠道状态，把异常交给对应岗位，按规则处理风险动作，然后在账本里跟踪责任、判断和结果。系统覆盖选品、刊登、定价、客服、对账与夜班班组的作业结构。
-
-## 适用场景
-
-| 场景 | 工作台里怎么处理 |
-| --- | --- |
-| 售价或库存异常 | 按店铺检查价格、库存和渠道；把需要处理的问题派给对应岗位 |
-| 广告和订单需要复盘 | 对照投放、订单和运营事件，追踪负责人和处置记录 |
-| 晚间异常需要值守 | 用夜班与待审批事项汇总值得处理的问题，重要动作遵循业务围栏 |
-| 新店铺准备接入 | 先只读体检，再根据实际授权和连接器配置进入后续阶段 |
-
-下图为仓内既有的价格健康模拟界面。真实店铺的指标、动作和回执来自各自的连接器；资金相关动作按权限与审批执行。
-
-![熊猫优选集团价格健康模拟演示](docs/images/shots/pc-price-health.png)
-
-[电商行业包](bundles/ecommerce/bundle.json) · [业务围栏](bundles/ecommerce/fences/ecom-baseline.yml) · [系统架构](docs/images/architecture.png) · [Agent 接入](docs/AGENT-CLIENTS.md)
-
-## 原版说明与 Agent 指引
-
-<details>
-<summary>展开原版 README、运行和开发说明</summary>
-
 <div align="center">
 
 # WorkLoom 熊猫电商运营系统
@@ -392,5 +366,3 @@ Apache-2.0（vendor/dsh 与 vendor/dsh-im 为 MIT）。
 本仓内置桌面 Agent 入口：`node scripts/workloom-agent.mjs list`（能力清单）与
 `node scripts/workloom-agent-mcp.mjs`（stdio MCP）。接入步骤、本仓可用能力与安全边界见
 [`docs/AGENT-CLIENTS.md`](docs/AGENT-CLIENTS.md)。
-
-</details>
